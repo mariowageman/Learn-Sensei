@@ -27,7 +27,7 @@ export function Quiz({ subject }: QuizProps) {
   } | null>(null);
 
   const { data: question, isLoading } = useQuery<Question>({
-    queryKey: ["/api/quiz", subject]
+    queryKey: [`/api/quiz/${subject}`]
   });
 
   const mutation = useMutation({
@@ -45,7 +45,7 @@ export function Quiz({ subject }: QuizProps) {
       });
       if (data.correct) {
         setTimeout(() => {
-          queryClient.invalidateQueries({ queryKey: ["/api/quiz", subject] });
+          queryClient.invalidateQueries({ queryKey: [`/api/quiz/${subject}`] });
           setCurrentAnswer("");
           setFeedback(null);
         }, 2000);
