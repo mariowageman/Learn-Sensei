@@ -1,0 +1,48 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+const formSchema = z.object({
+  subject: z.string().min(3, "Subject must be at least 3 characters")
+});
+
+interface SubjectFormProps {
+  onSubmit: (subject: string) => void;
+}
+
+export function SubjectForm({ onSubmit }: SubjectFormProps) {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      subject: ""
+    }
+  });
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit((values) => onSubmit(values.subject))}
+        className="flex gap-4"
+      >
+        <FormField
+          control={form.control}
+          name="subject"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormControl>
+                <Input
+                  placeholder="Enter a subject (e.g. photosynthesis, quantum physics)"
+                  {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Start Learning</Button>
+      </form>
+    </Form>
+  );
+}
