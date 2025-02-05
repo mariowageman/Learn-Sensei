@@ -29,6 +29,7 @@ export function Quiz({ subject }: QuizProps) {
   const [feedback, setFeedback] = useState<{
     correct: boolean;
     message: string;
+    videoSuggestions?: string[];
   } | null>(null);
 
   const { data: question, isLoading } = useQuery<Question>({
@@ -46,7 +47,8 @@ export function Quiz({ subject }: QuizProps) {
     onSuccess: (data) => {
       setFeedback({
         correct: data.correct,
-        message: data.feedback
+        message: data.feedback,
+        videoSuggestions: data.videoSuggestions
       });
       if (data.correct) {
         setTimeout(() => {

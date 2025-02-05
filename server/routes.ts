@@ -27,7 +27,7 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/messages", async (req, res) => {
     const { subject, message } = req.body;
     const response = await generateExplanation(subject);
-    
+
     await db.insert(messages).values([
       { role: "user", content: message, subject },
       { role: "assistant", content: response.explanation, subject }
@@ -39,7 +39,7 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/quiz/:subject", async (req, res) => {
     const { subject } = req.params;
     const question = await generateQuestion(subject);
-    
+
     const [savedQuestion] = await db.insert(quizQuestions).values({
       text: question.question,
       answer: question.answer,
@@ -51,17 +51,18 @@ export function registerRoutes(app: Express): Server {
 
   app.post("/api/quiz/check", async (req, res) => {
     const { questionId, answer } = req.body;
-    
+
     const question = await db.query.quizQuestions.findFirst({
       where: eq(quizQuestions.id, questionId)
     });
-
-    if (!question) {
-      return res.status(404).json({ message: "Question not found" });
-    }
+    if (!question) return res.status(404).json({ error: "Question not found" });
 
     const result = await checkAnswer(question.text, question.answer, answer);
-    res.json(result);
+    res.json({
+      correct: result.correct,
+      feedback: result.feedback,
+      videoSuggestions: result.videoSuggestions
+    });
   });
 
   return httpServer;
