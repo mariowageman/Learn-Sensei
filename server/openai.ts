@@ -47,7 +47,7 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
     messages: [
       {
         role: "system",
-        content: "Grade the answer and provide feedback. Return JSON with 'correct' (boolean) and 'feedback' (string) fields."
+        content: "Grade the answer and provide feedback. For incorrect answers, suggest 3 educational video titles that would help learn this concept. Return JSON with 'correct' (boolean), 'feedback' (string), and 'videoSuggestions' (array of strings) fields."
       },
       {
         role: "user",

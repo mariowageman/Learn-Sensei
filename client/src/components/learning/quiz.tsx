@@ -19,6 +19,11 @@ interface Question {
   answer: string;
 }
 
+interface VideoSuggestion {
+  title: string;
+  url: string;
+}
+
 export function Quiz({ subject }: QuizProps) {
   const [currentAnswer, setCurrentAnswer] = useState("");
   const [feedback, setFeedback] = useState<{
@@ -81,17 +86,32 @@ export function Quiz({ subject }: QuizProps) {
       </Card>
 
       {feedback && (
-        <Alert
-          variant={feedback.correct ? "default" : "destructive"}
-          className="animate-in fade-in"
-        >
-          {feedback.correct ? (
-            <CheckCircle className="h-4 w-4" />
-          ) : (
-            <XCircle className="h-4 w-4" />
+        <div className="space-y-4">
+          <Alert
+            variant={feedback.correct ? "default" : "destructive"}
+            className="animate-in fade-in"
+          >
+            {feedback.correct ? (
+              <CheckCircle className="h-4 w-4" />
+            ) : (
+              <XCircle className="h-4 w-4" />
+            )}
+            <AlertDescription>{feedback.message}</AlertDescription>
+          </Alert>
+          
+          {!feedback.correct && feedback.videoSuggestions && (
+            <Card className="p-4">
+              <h4 className="font-medium mb-2">Suggested Learning Videos:</h4>
+              <ul className="space-y-2">
+                {feedback.videoSuggestions.map((title, index) => (
+                  <li key={index} className="text-sm text-muted-foreground">
+                    • {title}
+                  </li>
+                ))}
+              </ul>
+            </Card>
           )}
-          <AlertDescription>{feedback.message}</AlertDescription>
-        </Alert>
+        </div>
       )}
     </div>
   );
