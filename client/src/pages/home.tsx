@@ -8,7 +8,7 @@ import { useState } from "react";
 
 export default function Home() {
   const [subject, setSubject] = useState<string>("");
-  const [showQuiz, setShowQuiz] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(true);
 
   const { data: session, isLoading } = useQuery({
     queryKey: ["/api/session"],
@@ -32,13 +32,14 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="w-full max-w-[800px] mx-auto space-y-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Learning about: {subject}</h2>
+    <div className="min-h-screen bg-background p-2 sm:p-4">
+      <div className="w-full max-w-[800px] mx-auto space-y-4 sm:space-y-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <h2 className="text-xl sm:text-2xl font-bold break-words">Learning about: {subject}</h2>
           <Button
             variant="outline"
             onClick={() => setShowQuiz(!showQuiz)}
+            className="w-full sm:w-auto"
           >
             {showQuiz ? "Back to Lesson" : "Take Quiz"}
           </Button>

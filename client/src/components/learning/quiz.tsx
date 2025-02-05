@@ -58,8 +58,8 @@ export function Quiz({ subject }: QuizProps) {
   }
 
   return (
-    <div className="space-y-8">
-      <Card className="p-6">
+    <div className="space-y-4 sm:space-y-8">
+      <Card className="p-4 sm:p-6">
         <h3 className="text-lg font-medium mb-4">Fill in the blank:</h3>
         <p className="text-xl mb-6">{question?.text}</p>
 
