@@ -29,7 +29,7 @@ export function Quiz({ subject }: QuizProps) {
   const [feedback, setFeedback] = useState<{
     correct: boolean;
     message: string;
-    videoSuggestions?: string[];
+    videoSuggestions?: VideoSuggestion[];
   } | null>(null);
 
   const { data: question, isLoading } = useQuery<Question>({
@@ -103,14 +103,22 @@ export function Quiz({ subject }: QuizProps) {
           
           {!feedback.correct && feedback.videoSuggestions && (
             <Card className="p-4">
-              <h4 className="font-medium mb-2">Suggested Learning Videos:</h4>
-              <ul className="space-y-2">
-                {feedback.videoSuggestions.map((title, index) => (
-                  <li key={index} className="text-sm text-muted-foreground">
-                    • {title}
-                  </li>
+              <h4 className="font-medium mb-4">Suggested Learning Videos:</h4>
+              <div className="space-y-6">
+                {feedback.videoSuggestions.map((video, index) => (
+                  <div key={index} className="space-y-2">
+                    <h5 className="text-sm font-medium">{video.title}</h5>
+                    <div className="relative w-full pt-[56.25%]">
+                      <iframe
+                        className="absolute top-0 left-0 w-full h-full rounded-md"
+                        src={`${video.url.replace('watch?v=', 'embed/')}?rel=0`}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </Card>
           )}
         </div>
