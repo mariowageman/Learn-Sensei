@@ -9,11 +9,11 @@ export async function generateExplanation(subject: string) {
     messages: [
       {
         role: "system",
-        content: "You are a helpful tutor that explains concepts at a 6th-grade level. Keep explanations clear and engaging."
+        content: "You are a helpful tutor that explains concepts at a 6th-grade level. Return explanation in JSON format with an 'explanation' field. Keep explanations clear and engaging."
       },
       {
         role: "user",
-        content: `Please explain ${subject} in simple terms.`
+        content: `Please explain ${subject} in simple terms and return as JSON.`
       }
     ],
     response_format: { type: "json_object" }
