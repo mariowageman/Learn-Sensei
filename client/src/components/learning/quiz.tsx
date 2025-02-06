@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle, XCircle, SkipForward } from "lucide-react";
 import { apiRequest } from "@/lib/api";
+import { ProgressStats } from "./progress-stats";
 
 interface QuizProps {
   subject: string;
@@ -72,6 +73,7 @@ export function Quiz({ subject }: QuizProps) {
 
   return (
     <div className="space-y-4">
+      <ProgressStats subject={subject} />
       <Card className="p-4">
         <h3 className="text-lg font-medium mb-4">Fill in the blank:</h3>
         <p className="text-xl mb-6 break-words">{question?.text}</p>
@@ -137,7 +139,7 @@ export function Quiz({ subject }: QuizProps) {
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       {/* Add a fallback link in case the embed fails */}
-                      Can't see the video? <a 
+                      Can't see the video? <a
                         href={`https://www.youtube.com/watch?v=${video.videoId}`}
                         target="_blank"
                         rel="noopener noreferrer"

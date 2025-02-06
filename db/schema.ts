@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
@@ -24,6 +24,15 @@ export const quizQuestions = pgTable("quiz_questions", {
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
 
+export const quizProgress = pgTable("quiz_progress", {
+  id: serial("id").primaryKey(),
+  questionId: integer("question_id").references(() => quizQuestions.id),
+  subject: text("subject").notNull(),
+  isCorrect: boolean("is_correct").notNull(),
+  userAnswer: text("user_answer").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull()
+});
+
 export const insertSessionSchema = createInsertSchema(sessions);
 export const selectSessionSchema = createSelectSchema(sessions);
 export const insertMessageSchema = createInsertSchema(messages);
@@ -31,6 +40,10 @@ export const selectMessageSchema = createSelectSchema(messages);
 export const insertQuizQuestionSchema = createInsertSchema(quizQuestions);
 export const selectQuizQuestionSchema = createSelectSchema(quizQuestions);
 
+export const insertQuizProgressSchema = createInsertSchema(quizProgress);
+export const selectQuizProgressSchema = createSelectSchema(quizProgress);
+
 export type Session = typeof sessions.$inferSelect;
 export type Message = typeof messages.$inferSelect;
 export type QuizQuestion = typeof quizQuestions.$inferSelect;
+export type QuizProgress = typeof quizProgress.$inferSelect;

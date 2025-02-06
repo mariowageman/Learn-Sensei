@@ -2,8 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { generateExplanation, generateQuestion, checkAnswer } from "./openai";
 import { db } from "@db";
-import { eq } from "drizzle-orm";
-import { sessions, messages, quizQuestions } from "@db/schema";
+import { eq, and, desc } from "drizzle-orm";
+import { sessions, messages, quizQuestions, quizProgress } from "@db/schema";
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
@@ -60,6 +60,13 @@ export function registerRoutes(app: Express): Server {
     try {
       const result = await checkAnswer(question.text, question.answer, answer);
 
+      await db.insert(quizProgress).values({
+        questionId,
+        subject: question.subject,
+        isCorrect: result.correct,
+        userAnswer: answer
+      });
+
       res.json({
         correct: result.correct,
         feedback: result.feedback,
@@ -73,6 +80,30 @@ export function registerRoutes(app: Express): Server {
         feedback: "Sorry, there was an error checking your answer. Please try again.",
         videoSuggestions: []
       });
+    }
+  });
+
+  app.get("/api/progress/:subject", async (req, res) => {
+    const { subject } = req.params;
+    try {
+      const progress = await db.query.quizProgress.findMany({
+        where: eq(quizProgress.subject, subject),
+        orderBy: (quizProgress, { desc }) => [desc(quizProgress.createdAt)]
+      });
+
+      const total = progress.length;
+      const correct = progress.filter(p => p.isCorrect).length;
+      const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+      res.json({
+        total,
+        correct,
+        percentage,
+        recentAttempts: progress.slice(0, 5)
+      });
+    } catch (error) {
+      console.error('Error fetching progress:', error);
+      res.status(500).json({ error: "Failed to fetch progress" });
     }
   });
 
