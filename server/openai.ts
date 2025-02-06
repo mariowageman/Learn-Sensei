@@ -19,7 +19,7 @@ export async function generateExplanation(subject: string) {
     response_format: { type: "json_object" }
   });
 
-  return JSON.parse(response.choices[0].message.content);
+  return JSON.parse(response.choices[0].message.content || "{}");
 }
 
 export async function generateQuestion(subject: string) {
@@ -38,7 +38,7 @@ export async function generateQuestion(subject: string) {
     response_format: { type: "json_object" }
   });
 
-  return JSON.parse(response.choices[0].message.content);
+  return JSON.parse(response.choices[0].message.content || "{}");
 }
 
 export async function checkAnswer(question: string, expectedAnswer: string, userAnswer: string) {
@@ -47,7 +47,7 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
     messages: [
       {
         role: "system",
-        content: "Grade the answer and provide feedback. For incorrect answers, suggest 3 educational YouTube videos that would help learn this concept. Return JSON with 'correct' (boolean), 'feedback' (string), and 'videoSuggestions' (array of objects with 'title' and 'url' fields) fields. The URLs should be valid YouTube video URLs."
+        content: "Grade the answer and provide feedback. For incorrect answers, suggest 3 educational YouTube videos that would help learn this concept. Return JSON with 'correct' (boolean), 'feedback' (string), and 'videoSuggestions' (array of objects with 'title' and 'videoId' fields) fields. For videoId, ONLY return the YouTube video ID (e.g., for 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', return 'dQw4w9WgXcQ'). Make sure the videoId is exactly 11 characters long."
       },
       {
         role: "user",
@@ -57,5 +57,14 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
     response_format: { type: "json_object" }
   });
 
-  return JSON.parse(response.choices[0].message.content);
+  const result = JSON.parse(response.choices[0].message.content || "{}");
+
+  // Ensure videoSuggestions are properly formatted
+  if (!result.correct && Array.isArray(result.videoSuggestions)) {
+    result.videoSuggestions = result.videoSuggestions.filter(v => 
+      v && typeof v.videoId === 'string' && v.videoId.length === 11
+    );
+  }
+
+  return result;
 }
