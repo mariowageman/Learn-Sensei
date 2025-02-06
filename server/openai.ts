@@ -47,7 +47,19 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
     messages: [
       {
         role: "system",
-        content: "Grade the answer and provide feedback. For incorrect answers, suggest 3 educational YouTube videos that would help learn this concept. Return JSON with 'correct' (boolean), 'feedback' (string), and 'videoSuggestions' (array of objects with 'title' and 'videoId' fields) fields. For videoId, ONLY return the YouTube video ID (e.g., for 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', return 'dQw4w9WgXcQ'). Make sure the videoId is exactly 11 characters long."
+        content: `Grade the answer and provide feedback. For incorrect answers, suggest 3 verified, popular educational YouTube videos from well-known channels like Khan Academy, Crash Course, or similar trusted educational content creators. The videos should be specifically about ${question.split(' ').slice(0, 3).join(' ')}. 
+
+Return JSON with these fields:
+- 'correct' (boolean)
+- 'feedback' (string)
+- 'videoSuggestions' (array of objects with 'title' and 'videoId' fields)
+
+For videoId examples:
+- Khan Academy videos (e.g., "aqm7QtiXSfs")
+- Crash Course videos (e.g., "TeYJ59td7TU")
+- National Geographic videos (e.g., "1TQBc7n6B7Y")
+
+Make sure each videoId is exactly 11 characters and comes from a verified educational channel.`
       },
       {
         role: "user",
@@ -61,9 +73,11 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
 
   // Ensure videoSuggestions are properly formatted
   if (!result.correct && Array.isArray(result.videoSuggestions)) {
-    result.videoSuggestions = result.videoSuggestions.filter((v: any) => 
-      v && typeof v.videoId === 'string' && v.videoId.length === 11
-    );
+    result.videoSuggestions = result.videoSuggestions
+      .filter((v: any) => 
+        v && typeof v.videoId === 'string' && v.videoId.length === 11
+      )
+      .slice(0, 3); // Ensure we only return up to 3 videos
   }
 
   return result;
