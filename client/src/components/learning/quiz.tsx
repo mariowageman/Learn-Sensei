@@ -25,6 +25,12 @@ interface VideoSuggestion {
   videoId: string;
 }
 
+interface CheckAnswerResponse {
+  correct: boolean;
+  feedback: string;
+  videoSuggestions?: VideoSuggestion[];
+}
+
 export function Quiz({ subject }: QuizProps) {
   const [currentAnswer, setCurrentAnswer] = useState("");
   const [feedback, setFeedback] = useState<{
@@ -33,17 +39,24 @@ export function Quiz({ subject }: QuizProps) {
     videoSuggestions?: VideoSuggestion[];
   } | null>(null);
 
-  const { data: question, isLoading, refetch } = useQuery<Question>({
+  const { data: question, isLoading: isQuestionLoading, refetch } = useQuery<Question>({
     queryKey: [`/api/quiz/${subject}`]
   });
 
-  const mutation = useMutation({
+  const mutation = useMutation<CheckAnswerResponse, Error, string>({
     mutationFn: async (answer: string) => {
+      if (!question?.id) {
+        throw new Error("No question loaded");
+      }
       const response = await apiRequest("POST", "/api/quiz/check", {
-        questionId: question?.id,
+        questionId: question.id,
         answer
       });
-      return response.json();
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to check answer");
+      }
+      return data;
     },
     onSuccess: (data) => {
       setFeedback({
@@ -51,15 +64,30 @@ export function Quiz({ subject }: QuizProps) {
         message: data.feedback,
         videoSuggestions: data.videoSuggestions
       });
+
+      // Update progress immediately
+      queryClient.invalidateQueries({ queryKey: [`/api/progress/${subject}`] });
+
       if (data.correct) {
         setTimeout(() => {
-          queryClient.invalidateQueries({ queryKey: [`/api/quiz/${subject}`] });
+          refetch(); // Get new question
           setCurrentAnswer("");
           setFeedback(null);
         }, 2000);
       }
+    },
+    onError: (error) => {
+      setFeedback({
+        correct: false,
+        message: error.message || "Failed to submit answer. Please try again."
+      });
     }
   });
+
+  const handleSubmit = () => {
+    if (!currentAnswer.trim()) return;
+    mutation.mutate(currentAnswer.trim());
+  };
 
   const handleNextQuestion = () => {
     refetch();
@@ -67,7 +95,7 @@ export function Quiz({ subject }: QuizProps) {
     setFeedback(null);
   };
 
-  if (isLoading) {
+  if (isQuestionLoading) {
     return <Skeleton className="h-48 w-full" />;
   }
 
@@ -84,15 +112,20 @@ export function Quiz({ subject }: QuizProps) {
             onChange={(e) => setCurrentAnswer(e.target.value)}
             placeholder="Type your answer..."
             disabled={mutation.isPending}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !mutation.isPending) {
+                handleSubmit();
+              }
+            }}
             className="w-full"
           />
           <div className="flex flex-col sm:flex-row gap-2">
             <Button
-              onClick={() => mutation.mutate(currentAnswer)}
-              disabled={!currentAnswer || mutation.isPending}
+              onClick={handleSubmit}
+              disabled={!currentAnswer.trim() || mutation.isPending}
               className="w-full sm:w-auto"
             >
-              Submit Answer
+              {mutation.isPending ? "Checking..." : "Submit Answer"}
             </Button>
             <Button
               onClick={handleNextQuestion}
@@ -138,7 +171,6 @@ export function Quiz({ subject }: QuizProps) {
                       />
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {/* Add a fallback link in case the embed fails */}
                       Can't see the video? <a
                         href={`https://www.youtube.com/watch?v=${video.videoId}`}
                         target="_blank"
