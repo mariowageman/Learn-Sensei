@@ -61,7 +61,7 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
 
   // Ensure videoSuggestions are properly formatted
   if (!result.correct && Array.isArray(result.videoSuggestions)) {
-    result.videoSuggestions = result.videoSuggestions.filter(v => 
+    result.videoSuggestions = result.videoSuggestions.filter((v: any) => 
       v && typeof v.videoId === 'string' && v.videoId.length === 11
     );
   }

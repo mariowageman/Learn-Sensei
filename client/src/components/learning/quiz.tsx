@@ -118,7 +118,7 @@ export function Quiz({ subject }: QuizProps) {
             <AlertDescription className="break-words">{feedback.message}</AlertDescription>
           </Alert>
 
-          {!feedback.correct && feedback.videoSuggestions && (
+          {!feedback.correct && feedback.videoSuggestions && feedback.videoSuggestions.length > 0 && (
             <Card className="p-4">
               <h4 className="font-medium mb-4">Suggested Learning Videos:</h4>
               <div className="space-y-6">
@@ -135,6 +135,17 @@ export function Quiz({ subject }: QuizProps) {
                         allowFullScreen
                       />
                     </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {/* Add a fallback link in case the embed fails */}
+                      Can't see the video? <a 
+                        href={`https://www.youtube.com/watch?v=${video.videoId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline hover:text-primary"
+                      >
+                        Watch on YouTube
+                      </a>
+                    </p>
                   </div>
                 ))}
               </div>
