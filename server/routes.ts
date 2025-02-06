@@ -157,13 +157,13 @@ export function registerRoutes(app: Express): Server {
         pathId: parseInt(id),
         currentTopic: topicIndex,
         completed: false,
-        completedTopics: []
+        completedTopics: sql`'[]'::jsonb` 
       }).returning();
 
       res.json(progress);
     } catch (error) {
-      console.error('Error updating learning path progress:', error);
-      res.status(500).json({ error: "Failed to update progress" });
+      console.error('Error creating learning path progress:', error);
+      res.status(500).json({ error: "Failed to create progress" });
     }
   });
 
@@ -183,8 +183,12 @@ export function registerRoutes(app: Express): Server {
       const [progress] = await db
         .update(learningPathProgress)
         .set({
-          completedTopics: sql`array_append(completed_topics, ${completedTopic})`,
-          completed: sql`jsonb_array_length(${path.topics}) <= (jsonb_array_length(completed_topics) + 1)`,
+          completedTopics: sql`completed_topics || ${sql.raw(`'[${completedTopic}]'::jsonb`)}`,
+          completed: sql`(SELECT CASE 
+            WHEN jsonb_array_length(${path.topics}::jsonb) <= (jsonb_array_length(completed_topics) + 1) 
+            THEN true 
+            ELSE false 
+          END)`,
           updatedAt: new Date()
         })
         .where(eq(learningPathProgress.pathId, parseInt(id)))
