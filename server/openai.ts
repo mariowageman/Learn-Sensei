@@ -43,6 +43,26 @@ export async function generateQuestion(subject: string) {
 }
 
 export async function checkAnswer(question: string, expectedAnswer: string, userAnswer: string) {
+  // First, get the core concept being tested
+  const conceptResponse = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: "Extract the main educational concept being tested in this question. Return in JSON format with a 'concept' field containing a short phrase (2-3 words max) describing the core concept."
+      },
+      {
+        role: "user",
+        content: `Question: ${question}\nAnswer: ${expectedAnswer}`
+      }
+    ],
+    response_format: { type: "json_object" }
+  });
+
+  const conceptData = JSON.parse(conceptResponse.choices[0].message.content || "{}");
+  const concept = conceptData.concept || "";
+
+  // Then check the answer
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
@@ -61,8 +81,8 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
   const result = JSON.parse(response.choices[0].message.content || "{}");
 
   if (!result.correct) {
-    // Search for relevant educational videos using the YouTube API
-    const searchQuery = `${question.split(' ').slice(0, 5).join(' ')} tutorial`;
+    // Create a more focused search query using both the question topic and correct answer
+    const searchQuery = `${concept} ${expectedAnswer} explanation tutorial`;
     const videoSuggestions = await searchEducationalVideos(searchQuery);
     result.videoSuggestions = videoSuggestions;
   }
