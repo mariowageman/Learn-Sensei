@@ -153,11 +153,13 @@ export function registerRoutes(app: Express): Server {
     const { topicIndex } = req.body;
 
     try {
+      // Initialize with empty JSONB array for completedTopics
       const [progress] = await db.insert(learningPathProgress).values({
         pathId: parseInt(id),
         currentTopic: topicIndex,
         completed: false,
-        completedTopics: sql`'[]'::jsonb` 
+        completedTopics: sql`'[]'::jsonb`,
+        updatedAt: new Date()
       }).returning();
 
       res.json(progress);
@@ -180,15 +182,29 @@ export function registerRoutes(app: Express): Server {
         return res.status(404).json({ error: "Learning path not found" });
       }
 
+      // Add the new completed topic to the JSONB array and update completion status
       const [progress] = await db
         .update(learningPathProgress)
         .set({
-          completedTopics: sql`completed_topics || ${sql.raw(`'[${completedTopic}]'::jsonb`)}`,
-          completed: sql`(SELECT CASE 
-            WHEN jsonb_array_length(${path.topics}::jsonb) <= (jsonb_array_length(completed_topics) + 1) 
-            THEN true 
-            ELSE false 
-          END)`,
+          completedTopics: sql`jsonb_set(
+            CASE 
+              WHEN completed_topics IS NULL THEN '[]'::jsonb
+              ELSE completed_topics
+            END,
+            '{-1}',
+            to_jsonb(${completedTopic})::jsonb,
+            true
+          )`,
+          completed: sql`(
+            SELECT 
+              CASE WHEN jsonb_array_length(topics::jsonb) <= 
+                (jsonb_array_length(completed_topics) + 1)
+              THEN true
+              ELSE false
+            END
+            FROM ${learningPaths}
+            WHERE id = ${parseInt(id)}
+          )`,
           updatedAt: new Date()
         })
         .where(eq(learningPathProgress.pathId, parseInt(id)))
