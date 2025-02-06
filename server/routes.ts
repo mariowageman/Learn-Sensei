@@ -184,7 +184,7 @@ export function registerRoutes(app: Express): Server {
         .update(learningPathProgress)
         .set({
           completedTopics: sql`array_append(completed_topics, ${completedTopic})`,
-          completed: sql`array_length(completed_topics, 1) + 1 >= array_length(${path.topics}, 1)`,
+          completed: sql`jsonb_array_length(${path.topics}) <= (jsonb_array_length(completed_topics) + 1)`,
           updatedAt: new Date()
         })
         .where(eq(learningPathProgress.pathId, parseInt(id)))
