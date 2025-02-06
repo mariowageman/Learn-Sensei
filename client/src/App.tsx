@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import LearningPaths from "@/pages/learning-paths";
+import LearningPath from "@/pages/learning-path";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Home as HomeIcon } from "lucide-react";
 
@@ -36,6 +37,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/learning-paths" component={LearningPaths} />
+        <Route path="/learning-paths/:id" component={LearningPath} />
         <Route component={NotFound} />
       </Switch>
     </>
