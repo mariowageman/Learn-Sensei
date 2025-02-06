@@ -2,8 +2,15 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { generateExplanation, generateQuestion, checkAnswer } from "./openai";
 import { db } from "@db";
-import { eq, and, desc } from "drizzle-orm";
-import { sessions, messages, quizQuestions, quizProgress } from "@db/schema";
+import { eq, and, desc, sql } from "drizzle-orm";
+import { 
+  sessions, 
+  messages, 
+  quizQuestions, 
+  quizProgress,
+  learningPaths,
+  learningPathProgress
+} from "@db/schema";
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
@@ -104,6 +111,89 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error('Error fetching progress:', error);
       res.status(500).json({ error: "Failed to fetch progress" });
+    }
+  });
+
+  // New Learning Paths routes
+  app.get("/api/learning-paths", async (req, res) => {
+    try {
+      const paths = await db.query.learningPaths.findMany({
+        orderBy: (paths, { asc }) => [asc(paths.difficulty), asc(paths.title)]
+      });
+      res.json(paths);
+    } catch (error) {
+      console.error('Error fetching learning paths:', error);
+      res.status(500).json({ error: "Failed to fetch learning paths" });
+    }
+  });
+
+  app.get("/api/learning-paths/:id", async (req, res) => {
+    const { id } = req.params;
+    try {
+      const path = await db.query.learningPaths.findFirst({
+        where: eq(learningPaths.id, parseInt(id)),
+        with: {
+          progress: {
+            orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
+          }
+        }
+      });
+      if (!path) {
+        return res.status(404).json({ error: "Learning path not found" });
+      }
+      res.json(path);
+    } catch (error) {
+      console.error('Error fetching learning path:', error);
+      res.status(500).json({ error: "Failed to fetch learning path" });
+    }
+  });
+
+  app.post("/api/learning-paths/:id/progress", async (req, res) => {
+    const { id } = req.params;
+    const { topicIndex } = req.body;
+
+    try {
+      const [progress] = await db.insert(learningPathProgress).values({
+        pathId: parseInt(id),
+        currentTopic: topicIndex,
+        completed: false,
+        completedTopics: []
+      }).returning();
+
+      res.json(progress);
+    } catch (error) {
+      console.error('Error updating learning path progress:', error);
+      res.status(500).json({ error: "Failed to update progress" });
+    }
+  });
+
+  app.patch("/api/learning-paths/:id/progress", async (req, res) => {
+    const { id } = req.params;
+    const { completedTopic } = req.body;
+
+    try {
+      const path = await db.query.learningPaths.findFirst({
+        where: eq(learningPaths.id, parseInt(id))
+      });
+
+      if (!path) {
+        return res.status(404).json({ error: "Learning path not found" });
+      }
+
+      const [progress] = await db
+        .update(learningPathProgress)
+        .set({
+          completedTopics: sql`array_append(completed_topics, ${completedTopic})`,
+          completed: sql`array_length(completed_topics, 1) + 1 >= array_length(${path.topics}, 1)`,
+          updatedAt: new Date()
+        })
+        .where(eq(learningPathProgress.pathId, parseInt(id)))
+        .returning();
+
+      res.json(progress);
+    } catch (error) {
+      console.error('Error updating learning path progress:', error);
+      res.status(500).json({ error: "Failed to update progress" });
     }
   });
 
