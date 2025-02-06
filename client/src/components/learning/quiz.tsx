@@ -6,7 +6,7 @@ import { queryClient } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, SkipForward } from "lucide-react";
 import { apiRequest } from "@/lib/api";
 
 interface QuizProps {
@@ -32,7 +32,7 @@ export function Quiz({ subject }: QuizProps) {
     videoSuggestions?: VideoSuggestion[];
   } | null>(null);
 
-  const { data: question, isLoading } = useQuery<Question>({
+  const { data: question, isLoading, refetch } = useQuery<Question>({
     queryKey: [`/api/quiz/${subject}`]
   });
 
@@ -60,6 +60,12 @@ export function Quiz({ subject }: QuizProps) {
     }
   });
 
+  const handleNextQuestion = () => {
+    refetch();
+    setCurrentAnswer("");
+    setFeedback(null);
+  };
+
   if (isLoading) {
     return <Skeleton className="h-48 w-full" />;
   }
@@ -68,7 +74,7 @@ export function Quiz({ subject }: QuizProps) {
     <div className="space-y-4 sm:space-y-8">
       <Card className="p-4 sm:p-6">
         <h3 className="text-lg font-medium mb-4">Fill in the blank:</h3>
-        <p className="text-xl mb-6">{question?.text}</p>
+        <p className="text-xl mb-6 break-words">{question?.text}</p>
 
         <div className="space-y-4">
           <Input
@@ -76,14 +82,25 @@ export function Quiz({ subject }: QuizProps) {
             onChange={(e) => setCurrentAnswer(e.target.value)}
             placeholder="Type your answer..."
             disabled={mutation.isPending}
-          />
-          <Button
-            onClick={() => mutation.mutate(currentAnswer)}
-            disabled={!currentAnswer || mutation.isPending}
             className="w-full"
-          >
-            Submit Answer
-          </Button>
+          />
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button
+              onClick={() => mutation.mutate(currentAnswer)}
+              disabled={!currentAnswer || mutation.isPending}
+              className="flex-1"
+            >
+              Submit Answer
+            </Button>
+            <Button
+              onClick={handleNextQuestion}
+              variant="outline"
+              className="flex-1 gap-2"
+            >
+              <SkipForward className="h-4 w-4" />
+              Next Question
+            </Button>
+          </div>
         </div>
       </Card>
 
@@ -98,20 +115,22 @@ export function Quiz({ subject }: QuizProps) {
             ) : (
               <XCircle className="h-4 w-4" />
             )}
-            <AlertDescription>{feedback.message}</AlertDescription>
+            <AlertDescription className="break-words">{feedback.message}</AlertDescription>
           </Alert>
-          
+
           {!feedback.correct && feedback.videoSuggestions && (
             <Card className="p-4">
               <h4 className="font-medium mb-4">Suggested Learning Videos:</h4>
               <div className="space-y-6">
                 {feedback.videoSuggestions.map((video, index) => (
                   <div key={index} className="space-y-2">
-                    <h5 className="text-sm font-medium">{video.title}</h5>
-                    <div className="relative w-full pt-[56.25%]">
+                    <h5 className="text-sm font-medium break-words">{video.title}</h5>
+                    <div className="relative w-full aspect-video rounded-lg overflow-hidden">
                       <iframe
-                        className="absolute top-0 left-0 w-full h-full rounded-md"
-                        src={`${video.url.replace('watch?v=', 'embed/')}?rel=0`}
+                        className="absolute top-0 left-0 w-full h-full"
+                        src={video.url.replace('watch?v=', 'embed/')}
+                        title={video.title}
+                        frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                       />

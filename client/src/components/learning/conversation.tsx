@@ -40,15 +40,15 @@ export function Conversation({ subject }: ConversationProps) {
 
   return (
     <div className="space-y-4">
-      <ScrollArea className="h-[60vh]">
-        <div className="space-y-4 p-4">
+      <ScrollArea className="h-[60vh] sm:h-[70vh]">
+        <div className="space-y-4 p-2 sm:p-4">
           {isLoading ? (
             <Skeleton className="h-24 w-full" />
           ) : (
             messages?.map((message, i) => (
               <Card
                 key={i}
-                className={`p-4 ${
+                className={`p-3 sm:p-4 break-words ${
                   message.role === "assistant"
                     ? "bg-muted"
                     : "bg-primary text-primary-foreground"
@@ -63,14 +63,19 @@ export function Conversation({ subject }: ConversationProps) {
 
       <form
         onSubmit={form.handleSubmit((values) => mutation.mutate(values.message))}
-        className="flex gap-4"
+        className="flex flex-col sm:flex-row gap-2 sm:gap-4"
       >
         <Input
           placeholder="Ask a follow-up question..."
           {...form.register("message")}
           disabled={mutation.isPending}
+          className="flex-1"
         />
-        <Button type="submit" disabled={mutation.isPending}>
+        <Button 
+          type="submit" 
+          disabled={mutation.isPending}
+          className="w-full sm:w-auto"
+        >
           Send
         </Button>
       </form>
