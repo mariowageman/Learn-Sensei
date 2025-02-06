@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { searchEducationalVideos } from "./youtube";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -47,19 +48,7 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
     messages: [
       {
         role: "system",
-        content: `Grade the answer and provide feedback. For incorrect answers, suggest 3 verified, popular educational YouTube videos from well-known channels like Khan Academy, Crash Course, or similar trusted educational content creators. The videos should be specifically about ${question.split(' ').slice(0, 3).join(' ')}. 
-
-Return JSON with these fields:
-- 'correct' (boolean)
-- 'feedback' (string)
-- 'videoSuggestions' (array of objects with 'title' and 'videoId' fields)
-
-For videoId examples:
-- Khan Academy videos (e.g., "aqm7QtiXSfs")
-- Crash Course videos (e.g., "TeYJ59td7TU")
-- National Geographic videos (e.g., "1TQBc7n6B7Y")
-
-Make sure each videoId is exactly 11 characters and comes from a verified educational channel.`
+        content: "Grade the answer and provide feedback. Return JSON with 'correct' (boolean) and 'feedback' (string) fields."
       },
       {
         role: "user",
@@ -71,13 +60,11 @@ Make sure each videoId is exactly 11 characters and comes from a verified educat
 
   const result = JSON.parse(response.choices[0].message.content || "{}");
 
-  // Ensure videoSuggestions are properly formatted
-  if (!result.correct && Array.isArray(result.videoSuggestions)) {
-    result.videoSuggestions = result.videoSuggestions
-      .filter((v: any) => 
-        v && typeof v.videoId === 'string' && v.videoId.length === 11
-      )
-      .slice(0, 3); // Ensure we only return up to 3 videos
+  if (!result.correct) {
+    // Search for relevant educational videos using the YouTube API
+    const searchQuery = `${question.split(' ').slice(0, 5).join(' ')} tutorial`;
+    const videoSuggestions = await searchEducationalVideos(searchQuery);
+    result.videoSuggestions = videoSuggestions;
   }
 
   return result;

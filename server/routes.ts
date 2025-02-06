@@ -57,23 +57,23 @@ export function registerRoutes(app: Express): Server {
     });
     if (!question) return res.status(404).json({ error: "Question not found" });
 
-    const result = await checkAnswer(question.text, question.answer, answer);
+    try {
+      const result = await checkAnswer(question.text, question.answer, answer);
 
-    // Log the response for debugging
-    console.log("OpenAI response:", JSON.stringify(result, null, 2));
-
-    // Additional validation for video suggestions
-    if (!result.correct && Array.isArray(result.videoSuggestions)) {
-      result.videoSuggestions = result.videoSuggestions
-        .filter((v: any) => v && typeof v.videoId === 'string' && v.videoId.length === 11)
-        .slice(0, 3); // Ensure we only return up to 3 videos
+      res.json({
+        correct: result.correct,
+        feedback: result.feedback,
+        videoSuggestions: result.videoSuggestions || []
+      });
+    } catch (error) {
+      console.error('Error checking answer:', error);
+      res.status(500).json({ 
+        error: "Failed to check answer",
+        correct: false,
+        feedback: "Sorry, there was an error checking your answer. Please try again.",
+        videoSuggestions: []
+      });
     }
-
-    res.json({
-      correct: result.correct,
-      feedback: result.feedback,
-      videoSuggestions: result.videoSuggestions
-    });
   });
 
   return httpServer;
