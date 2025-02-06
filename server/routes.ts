@@ -3,10 +3,10 @@ import { createServer, type Server } from "http";
 import { generateExplanation, generateQuestion, checkAnswer } from "./openai";
 import { db } from "@db";
 import { eq, and, desc, sql } from "drizzle-orm";
-import { 
-  sessions, 
-  messages, 
-  quizQuestions, 
+import {
+  sessions,
+  messages,
+  quizQuestions,
   quizProgress,
   learningPaths,
   learningPathProgress
@@ -81,7 +81,7 @@ export function registerRoutes(app: Express): Server {
       });
     } catch (error) {
       console.error('Error checking answer:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to check answer",
         correct: false,
         feedback: "Sorry, there was an error checking your answer. Please try again.",
@@ -186,25 +186,20 @@ export function registerRoutes(app: Express): Server {
       const [progress] = await db
         .update(learningPathProgress)
         .set({
-          completedTopics: sql`jsonb_set(
-            CASE 
-              WHEN completed_topics IS NULL THEN '[]'::jsonb
-              ELSE completed_topics
-            END,
-            '{-1}',
-            to_jsonb(${completedTopic})::jsonb,
-            true
-          )`,
-          completed: sql`(
-            SELECT 
-              CASE WHEN jsonb_array_length(topics::jsonb) <= 
-                (jsonb_array_length(completed_topics) + 1)
-              THEN true
-              ELSE false
-            END
-            FROM ${learningPaths}
-            WHERE id = ${parseInt(id)}
-          )`,
+          completedTopics: sql`CASE 
+            WHEN completed_topics IS NULL THEN jsonb_build_array(${completedTopic})
+            ELSE completed_topics || jsonb_build_array(${completedTopic})
+          END`,
+          completed: sql`CASE 
+            WHEN jsonb_array_length(
+              CASE 
+                WHEN completed_topics IS NULL THEN jsonb_build_array(${completedTopic})
+                ELSE completed_topics || jsonb_build_array(${completedTopic})
+              END
+            ) >= jsonb_array_length(${sql.raw(`'${JSON.stringify(path.topics)}'::jsonb`)})
+            THEN true 
+            ELSE false 
+          END`,
           updatedAt: new Date()
         })
         .where(eq(learningPathProgress.pathId, parseInt(id)))
