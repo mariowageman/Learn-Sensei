@@ -70,12 +70,6 @@ export function Quiz({ subject }: QuizProps) {
     return <Skeleton className="h-48 w-full" />;
   }
 
-  function getEmbedUrl(url: string) {
-    // Handle different YouTube URL formats
-    const videoId = url.match(/(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/user\/\S+|\/ytscreeningroom\?v=|\/sandalsResorts#\w\/\w\/.*\/))([^\/&\?]{10,12})/);
-    return videoId ? `https://www.youtube.com/embed/${videoId[1]}` : url;
-  }
-
   return (
     <div className="space-y-4">
       <Card className="p-4">
@@ -94,16 +88,16 @@ export function Quiz({ subject }: QuizProps) {
             <Button
               onClick={() => mutation.mutate(currentAnswer)}
               disabled={!currentAnswer || mutation.isPending}
-              className="w-full sm:w-auto flex-1"
+              className="w-full sm:w-auto"
             >
               Submit Answer
             </Button>
             <Button
               onClick={handleNextQuestion}
               variant="outline"
-              className="w-full sm:w-auto flex-1 gap-2"
+              className="w-full sm:w-auto"
             >
-              <SkipForward className="h-4 w-4" />
+              <SkipForward className="h-4 w-4 mr-2" />
               Next Question
             </Button>
           </div>
@@ -134,7 +128,7 @@ export function Quiz({ subject }: QuizProps) {
                     <div className="relative w-full aspect-video rounded-lg overflow-hidden">
                       <iframe
                         className="absolute top-0 left-0 w-full h-full"
-                        src={getEmbedUrl(video.url)}
+                        src={`https://www.youtube.com/embed/${video.url.split('v=')[1]?.split('&')[0] || ''}`}
                         title={video.title}
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
