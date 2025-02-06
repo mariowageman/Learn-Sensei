@@ -18,9 +18,9 @@ export default function Home() {
   if (!subject) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="w-full max-w-[800px] space-y-8">
+        <div className="w-full max-w-[800px] mx-auto px-4 space-y-8">
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold">AI Learning Assistant</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold">AI Learning Assistant</h1>
             <p className="text-muted-foreground">
               Enter any subject you'd like to learn about and get an interactive explanation
             </p>
@@ -32,9 +32,9 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-2 sm:p-4">
-      <div className="w-full max-w-[800px] mx-auto space-y-4 sm:space-y-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+    <div className="min-h-screen bg-background px-4 py-6">
+      <div className="w-full max-w-[800px] mx-auto space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <h2 className="text-xl sm:text-2xl font-bold break-words">Learning about: {subject}</h2>
           <Button
             variant="outline"
