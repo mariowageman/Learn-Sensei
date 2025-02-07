@@ -64,7 +64,7 @@ export default function LearningPath() {
 
   if (isLoading || !path) {
     return (
-      <div className="container py-6 space-y-4">
+      <div className="container max-w-4xl mx-auto px-6 py-6 space-y-4">
         <Skeleton className="h-8 w-64" />
         <Skeleton className="h-32" />
         <div className="grid gap-4">
@@ -80,17 +80,22 @@ export default function LearningPath() {
   const completedCount = progress?.completedTopics?.length ?? 0;
   const progressPercent = (completedCount / path.topics.length) * 100;
 
+  const difficultyColors = {
+    beginner: "bg-green-500 hover:bg-green-600",
+    intermediate: "bg-blue-500 hover:bg-blue-600",
+    advanced: "bg-yellow-500 hover:bg-yellow-600",
+  };
+
   return (
-    <div className="container py-6 space-y-6">
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <h1 className="text-3xl font-bold">{path.title}</h1>
-          <Badge variant={
-            path.difficulty === "beginner" ? "default" :
-            path.difficulty === "intermediate" ? "secondary" : "destructive"
-          }>
+    <div className="container max-w-4xl mx-auto px-6 py-6 space-y-6">
+      <div className="space-y-4">
+        <div className="flex flex-col gap-2">
+          <Badge 
+            className={`w-fit ${difficultyColors[path.difficulty.toLowerCase()]}`}
+          >
             {path.difficulty}
           </Badge>
+          <h1 className="text-3xl font-bold">{path.title}</h1>
         </div>
         <p className="text-muted-foreground">{path.description}</p>
       </div>
@@ -103,9 +108,11 @@ export default function LearningPath() {
               {completedCount} of {path.topics.length} topics completed
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Timer className="h-4 w-4" />
-            <span className="text-sm">{path.estimatedHours} hours estimated</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Timer className="h-4 w-4" />
+              <span className="text-sm">{path.estimatedHours} hours estimated</span>
+            </div>
           </div>
         </div>
         <Progress value={progressPercent} className="h-2" />
