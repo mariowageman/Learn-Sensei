@@ -99,6 +99,11 @@ export function Quiz({ subject }: QuizProps) {
     return <Skeleton className="h-48 w-full" />;
   }
 
+  const getButtonVariant = () => {
+    if (!feedback) return "default";
+    return feedback.correct ? "success" : "destructive";
+  };
+
   return (
     <div className="space-y-4">
       <ProgressStats subject={subject} />
@@ -123,7 +128,8 @@ export function Quiz({ subject }: QuizProps) {
             <Button
               onClick={handleSubmit}
               disabled={!currentAnswer.trim() || mutation.isPending}
-              className="w-full sm:w-auto"
+              variant={getButtonVariant()}
+              className="w-full sm:w-auto transition-colors duration-300"
             >
               {mutation.isPending ? "Checking..." : "Submit Answer"}
             </Button>
