@@ -114,11 +114,16 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // New Learning Paths routes
+  // Learning Paths routes
   app.get("/api/learning-paths", async (req, res) => {
     try {
       const paths = await db.query.learningPaths.findMany({
-        orderBy: (paths, { asc }) => [asc(paths.difficulty), asc(paths.title)]
+        orderBy: (paths, { asc }) => [asc(paths.difficulty), asc(paths.title)],
+        with: {
+          progress: {
+            orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
+          }
+        }
       });
       res.json(paths);
     } catch (error) {
@@ -153,7 +158,6 @@ export function registerRoutes(app: Express): Server {
     const { topicIndex } = req.body;
 
     try {
-      // Initialize with empty JSONB array for completedTopics
       const [progress] = await db.insert(learningPathProgress).values({
         pathId: parseInt(id),
         currentTopic: topicIndex,
@@ -174,6 +178,16 @@ export function registerRoutes(app: Express): Server {
     const { completedTopic } = req.body;
 
     try {
+      // First get current progress
+      const currentProgress = await db.query.learningPathProgress.findFirst({
+        where: eq(learningPathProgress.pathId, parseInt(id)),
+        orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
+      });
+
+      if (!currentProgress) {
+        return res.status(404).json({ error: "No progress found" });
+      }
+
       const path = await db.query.learningPaths.findFirst({
         where: eq(learningPaths.id, parseInt(id))
       });
@@ -182,27 +196,34 @@ export function registerRoutes(app: Express): Server {
         return res.status(404).json({ error: "Learning path not found" });
       }
 
-      // Add the new completed topic to the JSONB array and update completion status
+      // Update progress
       const [progress] = await db
         .update(learningPathProgress)
         .set({
           completedTopics: sql`CASE 
-            WHEN completed_topics IS NULL THEN jsonb_build_array(${completedTopic})
-            ELSE completed_topics || jsonb_build_array(${completedTopic})
+            WHEN completed_topics IS NULL OR completed_topics = '[]'::jsonb 
+            THEN jsonb_build_array(${completedTopic}::int)
+            ELSE completed_topics || jsonb_build_array(${completedTopic}::int)
           END`,
           completed: sql`CASE 
             WHEN jsonb_array_length(
               CASE 
-                WHEN completed_topics IS NULL THEN jsonb_build_array(${completedTopic})
-                ELSE completed_topics || jsonb_build_array(${completedTopic})
+                WHEN completed_topics IS NULL OR completed_topics = '[]'::jsonb
+                THEN jsonb_build_array(${completedTopic}::int)
+                ELSE completed_topics || jsonb_build_array(${completedTopic}::int)
               END
-            ) >= jsonb_array_length(${sql.raw(`'${JSON.stringify(path.topics)}'::jsonb`)})
+            ) >= ${path.topics.length}
             THEN true 
             ELSE false 
           END`,
+          currentTopic: sql`CASE 
+            WHEN ${completedTopic} + 1 >= ${path.topics.length}
+            THEN ${completedTopic}
+            ELSE ${completedTopic} + 1
+          END`,
           updatedAt: new Date()
         })
-        .where(eq(learningPathProgress.pathId, parseInt(id)))
+        .where(eq(learningPathProgress.id, currentProgress.id))
         .returning();
 
       res.json(progress);

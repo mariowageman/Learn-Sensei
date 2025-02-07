@@ -77,7 +77,7 @@ export default function LearningPath() {
   }
 
   const progress = path.progress?.[0];
-  const completedCount = progress?.completedTopics.length ?? 0;
+  const completedCount = progress?.completedTopics?.length ?? 0;
   const progressPercent = (completedCount / path.topics.length) * 100;
 
   return (
@@ -115,8 +115,8 @@ export default function LearningPath() {
         <h2 className="text-xl font-semibold">Topics</h2>
         <div className="grid gap-4">
           {path.topics.map((topic, index) => {
-            const isCompleted = progress?.completedTopics.includes(index);
-            const isLocked = index > 0 && !progress?.completedTopics.includes(index - 1);
+            const isCompleted = progress?.completedTopics?.includes(index);
+            const isLocked = index > 0 && !progress?.completedTopics?.includes(index - 1);
             const isCurrent = progress?.currentTopic === index;
 
             return (
@@ -137,18 +137,23 @@ export default function LearningPath() {
                       </p>
                     </div>
                   </div>
-                  {!isCompleted && !isLocked && (
+                  {!isLocked && (
                     <Button
                       onClick={() => {
                         if (!progress) {
                           startMutation.mutate(index);
-                        } else if (!isCompleted) {
+                        } else if (!isCompleted && (index === 0 || progress.completedTopics?.includes(index - 1))) {
                           completeMutation.mutate(index);
                         }
                       }}
-                      disabled={startMutation.isPending || completeMutation.isPending}
+                      disabled={
+                        startMutation.isPending || 
+                        completeMutation.isPending || 
+                        isCompleted || 
+                        (!!progress && !isCompleted && index !== progress.currentTopic)
+                      }
                     >
-                      {progress ? "Complete Topic" : "Start Learning"}
+                      {!progress ? "Start Learning" : "Complete Topic"}
                     </Button>
                   )}
                 </div>
