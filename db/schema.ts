@@ -70,6 +70,12 @@ export const progressAnalytics = pgTable("progress_analytics", {
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
 
+export const subjectHistory = pgTable("subject_history", {
+  id: serial("id").primaryKey(),
+  subject: text("subject").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull()
+});
+
 export const learningPathsRelations = relations(learningPaths, ({ many }) => ({
   progress: many(learningPathProgress)
 }));
@@ -102,6 +108,8 @@ export const insertLearningPathProgressSchema = createInsertSchema(learningPathP
 export const selectLearningPathProgressSchema = createSelectSchema(learningPathProgress);
 export const insertProgressAnalyticsSchema = createInsertSchema(progressAnalytics);
 export const selectProgressAnalyticsSchema = createSelectSchema(progressAnalytics);
+export const insertSubjectHistorySchema = createInsertSchema(subjectHistory);
+export const selectSubjectHistorySchema = createSelectSchema(subjectHistory);
 
 export type Session = typeof sessions.$inferSelect;
 export type Message = typeof messages.$inferSelect;
@@ -110,3 +118,4 @@ export type QuizProgress = typeof quizProgress.$inferSelect;
 export type LearningPath = typeof learningPaths.$inferSelect;
 export type LearningPathProgress = typeof learningPathProgress.$inferSelect;
 export type ProgressAnalytics = typeof progressAnalytics.$inferSelect;
+export type SubjectHistory = typeof subjectHistory.$inferSelect;

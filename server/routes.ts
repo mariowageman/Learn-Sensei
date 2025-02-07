@@ -10,7 +10,8 @@ import {
   quizProgress,
   learningPaths,
   learningPathProgress,
-  progressAnalytics
+  progressAnalytics,
+  subjectHistory
 } from "@db/schema";
 
 export function registerRoutes(app: Express): Server {
@@ -385,6 +386,41 @@ export function registerRoutes(app: Express): Server {
       res.status(500).json({ error: "Failed to generate recommendations" });
     }
   });
+
+  app.get("/api/recent-subjects", async (req, res) => {
+    try {
+      const recentSubjects = await db.query.subjectHistory.findMany({
+        orderBy: (history, { desc }) => [desc(history.createdAt)],
+        limit: 5
+      });
+      res.json(recentSubjects);
+    } catch (error) {
+      console.error('Error fetching recent subjects:', error);
+      res.status(500).json({ error: "Failed to fetch recent subjects" });
+    }
+  });
+
+  app.post("/api/session", async (req, res) => {
+    const { subject } = req.body;
+
+    try {
+      // Save to session
+      const [session] = await db.insert(sessions).values({
+        subject
+      }).returning();
+
+      // Save to history
+      await db.insert(subjectHistory).values({
+        subject
+      });
+
+      res.json(session);
+    } catch (error) {
+      console.error('Error creating session:', error);
+      res.status(500).json({ error: "Failed to create session" });
+    }
+  });
+
 
   return httpServer;
 }

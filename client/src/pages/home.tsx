@@ -2,6 +2,7 @@ import { SubjectForm } from "@/components/learning/subject-form";
 import { Conversation } from "@/components/learning/conversation";
 import { Quiz } from "@/components/learning/quiz";
 import { LearningRecommendations } from "@/components/learning/recommendations";
+import { RecentSubjects } from "@/components/learning/recent-subjects";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,10 @@ export default function Home() {
             </p>
           </div>
           <SubjectForm onSubmit={setSubject} />
-          <LearningRecommendations />
+          <div className="grid gap-8 md:grid-cols-2">
+            <RecentSubjects onSelectSubject={setSubject} />
+            <LearningRecommendations />
+          </div>
         </div>
       </div>
     );
