@@ -44,6 +44,16 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
     return null;
   }
 
+  // Format time spent to show hours and minutes
+  const formatTimeSpent = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours === 0) {
+      return `${mins}m`;
+    }
+    return `${hours}h ${mins}m`;
+  };
+
   return (
     <div className="grid gap-4">
       <Card className="p-4 space-y-4">
@@ -77,7 +87,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
               <span>Time Spent</span>
             </div>
             <p className="text-lg font-semibold">
-              {Math.round(progress.timeSpentMinutes / 60)}h {progress.timeSpentMinutes % 60}m
+              {formatTimeSpent(progress.timeSpentMinutes)}
             </p>
           </div>
 

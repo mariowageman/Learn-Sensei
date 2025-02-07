@@ -117,15 +117,13 @@ export function registerRoutes(app: Express): Server {
 
       let timeSpentMinutes = 0;
       let streakDays = 0;
-      let lastStreakDate = null;
 
       if (learningPath?.progress?.[0]) {
         const pathProgress = learningPath.progress[0];
         // Sum up time spent across all topics
-        timeSpentMinutes = Object.values(pathProgress.timeSpentMinutes as Record<string, number>)
-          .reduce((sum, time) => sum + time, 0);
-        streakDays = pathProgress.streakDays;
-        lastStreakDate = pathProgress.lastStreakDate;
+        const timeSpentObj = pathProgress.timeSpentMinutes as Record<string, number> || {};
+        timeSpentMinutes = Object.values(timeSpentObj).reduce((sum, time) => sum + (time || 0), 0);
+        streakDays = pathProgress.streakDays || 0;
       }
 
       // Calculate weekly progress
@@ -141,7 +139,7 @@ export function registerRoutes(app: Express): Server {
       const avgAccuracy = weeklyProgress.length > 0
         ? Math.round(
             weeklyProgress.reduce((sum, day) =>
-              sum + (day.correctAnswers / day.totalAttempts) * 100, 0
+              sum + ((day.correctAnswers / (day.totalAttempts || 1)) * 100), 0
             ) / weeklyProgress.length
           )
         : 0;
@@ -150,8 +148,8 @@ export function registerRoutes(app: Express): Server {
         total,
         correct,
         percentage,
-        timeSpentMinutes,
-        streakDays,
+        timeSpentMinutes: timeSpentMinutes || 0,
+        streakDays: streakDays || 0,
         avgAccuracy,
         weeklyProgress: weeklyProgress.map(day => ({
           date: day.date,
