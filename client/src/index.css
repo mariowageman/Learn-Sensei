@@ -13,14 +13,14 @@
 
   :root {
     * {
-      @apply transition-colors duration-200;
+      @apply transition-colors duration-100;
     }
   }
 
   /* Add smooth transitions for theme changes */
   body,
   :root {
-    @apply transition-colors duration-200;
+    @apply transition-colors duration-100;
   }
 
   /* Style elements with transitions */
@@ -31,6 +31,6 @@
   .drawer,
   .input,
   .select {
-    @apply transition-colors duration-200;
+    @apply transition-colors duration-100;
   }
 }
