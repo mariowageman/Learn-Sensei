@@ -31,8 +31,8 @@ interface ProgressData {
 export function ProgressStats({ subject }: ProgressStatsProps) {
   const { data: progress, isLoading, error } = useQuery<ProgressData>({
     queryKey: [`/api/progress/${subject}`],
-    refetchInterval: 30000,
-    staleTime: 30000,
+    refetchInterval: 30000, // Refetch every 30 seconds
+    staleTime: 30000,      // Consider data stale after 30 seconds
     retry: false
   });
 
