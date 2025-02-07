@@ -28,7 +28,7 @@ export default function Home() {
           <div className="space-y-4 w-full">
             <SubjectForm onSubmit={setSubject} className="w-full" />
             <Button
-              onClick={() => setSubject("")}
+              onClick={() => setSubject("General Knowledge")}
               className="w-full"
               size="lg"
             >
