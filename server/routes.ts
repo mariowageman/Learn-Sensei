@@ -268,40 +268,25 @@ export function registerRoutes(app: Express): Server {
       }
 
       // Update progress
+      const completedTopics = currentProgress.completedTopics || [];
+      const updatedCompletedTopics = [...new Set([...completedTopics, completedTopic])];
+      const isCompleted = updatedCompletedTopics.length >= (path.topics as string[]).length;
+      const nextTopic = isCompleted ? completedTopic : completedTopic + 1;
+
+      // Update time spent
+      const currentTimeSpent = (currentProgress.timeSpentMinutes || {}) as Record<string, number>;
+      const updatedTimeSpent = {
+        ...currentTimeSpent,
+        [completedTopic]: (currentTimeSpent[completedTopic] || 0) + (timeSpentMinutes || 0)
+      };
+
       const [progress] = await db
         .update(learningPathProgress)
         .set({
-          completedTopics: sql`CASE 
-            WHEN completed_topics IS NULL OR completed_topics = '[]'::jsonb 
-            THEN jsonb_build_array(${completedTopic}::int)
-            ELSE completed_topics || jsonb_build_array(${completedTopic}::int)
-          END`,
-          completed: sql`CASE 
-            WHEN jsonb_array_length(
-              CASE 
-                WHEN completed_topics IS NULL OR completed_topics = '[]'::jsonb
-                THEN jsonb_build_array(${completedTopic}::int)
-                ELSE completed_topics || jsonb_build_array(${completedTopic}::int)
-              END
-            ) >= ${path.topics.length}
-            THEN true 
-            ELSE false 
-          END`,
-          currentTopic: sql`CASE 
-            WHEN ${completedTopic} + 1 >= ${path.topics.length}
-            THEN ${completedTopic}
-            ELSE ${completedTopic} + 1
-          END`,
-          timeSpentMinutes: sql`
-            CASE
-              WHEN time_spent_minutes IS NULL OR time_spent_minutes = '{}'::jsonb
-              THEN jsonb_build_object(${completedTopic}::text, ${timeSpentMinutes}::int)
-              ELSE time_spent_minutes || 
-                   jsonb_build_object(${completedTopic}::text, 
-                     COALESCE((time_spent_minutes->>${completedTopic}::text)::int, 0) + ${timeSpentMinutes}::int
-                   )
-            END
-          `,
+          completedTopics: updatedCompletedTopics,
+          completed: isCompleted,
+          currentTopic: nextTopic,
+          timeSpentMinutes: updatedTimeSpent,
           streakDays: newStreakDays,
           lastStreakDate: today,
           updatedAt: new Date()
@@ -313,8 +298,8 @@ export function registerRoutes(app: Express): Server {
       await db.insert(progressAnalytics).values({
         pathId: parseInt(id),
         date: today,
-        topicsCompleted: progress.completedTopics.length,
-        timeSpentMinutes,
+        topicsCompleted: updatedCompletedTopics.length,
+        timeSpentMinutes: timeSpentMinutes || 0,
         correctAnswers: 1, // Assuming completion means correct
         totalAttempts: 1,
       });
