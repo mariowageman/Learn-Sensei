@@ -23,9 +23,9 @@ export default function LearningPaths() {
 
   if (isLoading) {
     return (
-      <div className="container py-6 space-y-4">
+      <div className="container max-w-6xl mx-auto px-8 py-8 space-y-4">
         <Skeleton className="h-8 w-64" />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(3)].map((_, i) => (
             <Skeleton key={i} className="h-64" />
           ))}
@@ -34,8 +34,14 @@ export default function LearningPaths() {
     );
   }
 
+  const difficultyColors = {
+    beginner: "bg-green-500 hover:bg-green-600",
+    intermediate: "bg-blue-500 hover:bg-blue-600",
+    advanced: "bg-yellow-500 hover:bg-yellow-600",
+  };
+
   return (
-    <div className="container py-6 space-y-6">
+    <div className="container max-w-6xl mx-auto px-8 py-8 space-y-8">
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Learning Paths</h1>
         <p className="text-muted-foreground">
@@ -43,39 +49,40 @@ export default function LearningPaths() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {paths?.map((path) => (
-          <Card key={path.id} className="p-6 space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-start justify-between">
+          <Card key={path.id} className="flex flex-col p-6 space-y-6">
+            <div className="space-y-4">
+              <Badge 
+                className={`w-fit ${difficultyColors[path.difficulty.toLowerCase() as keyof typeof difficultyColors]}`}
+              >
+                {path.difficulty}
+              </Badge>
+              <div className="space-y-2">
                 <h2 className="text-xl font-semibold">{path.title}</h2>
-                <Badge variant={
-                  path.difficulty === "beginner" ? "default" :
-                  path.difficulty === "intermediate" ? "secondary" : "destructive"
-                }>
-                  {path.difficulty}
-                </Badge>
-              </div>
-              <p className="text-muted-foreground">{path.description}</p>
-            </div>
-
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
-                <span>{path.topics.length} Topics</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Timer className="h-4 w-4" />
-                <span>{path.estimatedHours} hours estimated</span>
+                <p className="text-muted-foreground">{path.description}</p>
               </div>
             </div>
 
-            <Link href={`/learning-paths/${path.id}`}>
-              <Button className="w-full">
-                Start Learning
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
+            <div className="space-y-6 mt-auto">
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  <span>{path.topics.length} Topics</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Timer className="h-4 w-4" />
+                  <span>{path.estimatedHours} hours estimated</span>
+                </div>
+              </div>
+
+              <Link href={`/learning-paths/${path.id}`}>
+                <Button className="w-full">
+                  Start Learning
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
           </Card>
         ))}
       </div>
