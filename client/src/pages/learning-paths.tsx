@@ -51,7 +51,7 @@ export default function LearningPaths() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {paths?.map((path) => (
-          <Card key={path.id} className="flex flex-col p-6 space-y-6">
+          <Card key={path.id} className="flex flex-col p-6">
             <div className="space-y-4">
               <Badge 
                 className={`w-fit ${difficultyColors[path.difficulty.toLowerCase() as keyof typeof difficultyColors]}`}
@@ -64,7 +64,7 @@ export default function LearningPaths() {
               </div>
             </div>
 
-            <div className="space-y-6 mt-auto">
+            <div className="flex-1 flex flex-col justify-between mt-6">
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <BookOpen className="h-4 w-4" />
@@ -76,12 +76,14 @@ export default function LearningPaths() {
                 </div>
               </div>
 
-              <Link href={`/learning-paths/${path.id}`}>
-                <Button className="w-full">
-                  Start Learning
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+              <div className="mt-8">
+                <Link href={`/learning-paths/${path.id}`}>
+                  <Button className="w-full">
+                    Start Learning
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </Card>
         ))}
