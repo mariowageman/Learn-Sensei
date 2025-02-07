@@ -14,7 +14,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 function Navigation() {
   return (
     <nav className="border-b">
-      <div className="container py-4 px-8 flex items-center justify-between">
+      <div className="container py-4 px-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/">
             <Button variant="ghost" className="gap-2">
