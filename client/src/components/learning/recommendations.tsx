@@ -1,26 +1,32 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BookOpen, ArrowRight } from "lucide-react";
+import { BookOpen, ArrowRight, Timer } from "lucide-react";
 import { Link } from "wouter";
 
 interface Recommendation {
   pathId: number;
   title: string;
   reason: string;
-  difficulty: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
   confidenceScore: number;
   topics: string[];
+  estimatedHours?: number;
 }
+
+const difficultyColors = {
+  beginner: "bg-green-500 hover:bg-green-600",
+  intermediate: "bg-blue-500 hover:bg-blue-600",
+  advanced: "bg-[#C7AB62] hover:bg-[#B69B52]",
+} as const;
 
 export function LearningRecommendations() {
   const { data: recommendations, isLoading } = useQuery<Recommendation[]>({
     queryKey: ["/api/recommendations"],
     refetchInterval: 300000, // Refresh every 5 minutes
   });
-
-  console.log("Recommendations data:", recommendations); // Debug log
 
   if (isLoading) {
     return (
@@ -35,7 +41,6 @@ export function LearningRecommendations() {
     );
   }
 
-  // Always render the section, even if there are no recommendations
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold">Recommended for You</h2>
@@ -44,6 +49,11 @@ export function LearningRecommendations() {
           {recommendations.map((recommendation) => (
             <Card key={recommendation.pathId} className="p-6">
               <div className="space-y-4">
+                <Badge 
+                  className={`w-fit ${difficultyColors[recommendation.difficulty]}`}
+                >
+                  {recommendation.difficulty}
+                </Badge>
                 <div className="space-y-2">
                   <h3 className="text-xl font-semibold">{recommendation.title}</h3>
                   <p className="text-muted-foreground">{recommendation.reason}</p>
@@ -53,6 +63,12 @@ export function LearningRecommendations() {
                     <BookOpen className="h-4 w-4" />
                     <span>{recommendation.topics.length} Topics</span>
                   </div>
+                  {recommendation.estimatedHours && (
+                    <div className="flex items-center gap-2">
+                      <Timer className="h-4 w-4" />
+                      <span>{recommendation.estimatedHours} hours estimated</span>
+                    </div>
+                  )}
                 </div>
                 <Link href={`/learning-paths/${recommendation.pathId}`}>
                   <Button className="w-full mt-4">
