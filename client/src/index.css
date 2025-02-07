@@ -10,4 +10,27 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+
+  :root {
+    * {
+      @apply transition-colors duration-200;
+    }
+  }
+
+  /* Add smooth transitions for theme changes */
+  body,
+  :root {
+    @apply transition-colors duration-200;
+  }
+
+  /* Style elements with transitions */
+  .card,
+  .button,
+  .nav-item,
+  .dialog,
+  .drawer,
+  .input,
+  .select {
+    @apply transition-colors duration-200;
+  }
 }
