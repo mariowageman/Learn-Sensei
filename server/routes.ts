@@ -69,6 +69,76 @@ export function registerRoutes(app: Express): Server {
     try {
       const result = await checkAnswer(question.text, question.answer, answer);
 
+      // Get or create learning path progress
+      let learningPath = await db.query.learningPaths.findFirst({
+        where: eq(learningPaths.title, question.subject),
+        with: {
+          progress: {
+            orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
+          }
+        }
+      });
+
+      if (!learningPath) {
+        // Create a new learning path if it doesn't exist
+        const [newPath] = await db.insert(learningPaths).values({
+          title: question.subject,
+          description: `Learn about ${question.subject}`,
+          difficulty: "beginner",
+          topics: [],
+          prerequisites: [],
+          estimatedHours: 1
+        }).returning();
+        learningPath = newPath;
+      }
+
+      let pathProgress = learningPath.progress?.[0];
+
+      if (!pathProgress) {
+        // Create initial progress
+        const [newProgress] = await db.insert(learningPathProgress).values({
+          pathId: learningPath.id,
+          currentTopic: 0,
+          completed: false,
+          completedTopics: [],
+          timeSpentMinutes: { quiz: 5 }, // Initial time for first quiz
+          streakDays: 1,
+          lastStreakDate: new Date()
+        }).returning();
+        pathProgress = newProgress;
+      } else {
+        // Update existing progress
+        const lastStreakDate = new Date(pathProgress.lastStreakDate);
+        const today = new Date();
+        const daysDiff = Math.floor((today.getTime() - lastStreakDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        let newStreakDays = pathProgress.streakDays;
+        if (daysDiff === 0) {
+          // Same day, streak continues
+          newStreakDays = pathProgress.streakDays;
+        } else if (daysDiff === 1) {
+          // Next day, increment streak
+          newStreakDays = pathProgress.streakDays + 1;
+        } else {
+          // Streak broken
+          newStreakDays = 1;
+        }
+
+        // Update time spent
+        const currentTimeSpent = (pathProgress.timeSpentMinutes || {}) as Record<string, number>;
+        currentTimeSpent.quiz = (currentTimeSpent.quiz || 0) + 5; // Add 5 minutes for each quiz attempt
+
+        await db.update(learningPathProgress)
+          .set({
+            timeSpentMinutes: currentTimeSpent,
+            streakDays: newStreakDays,
+            lastStreakDate: today,
+            updatedAt: today
+          })
+          .where(eq(learningPathProgress.id, pathProgress.id));
+      }
+
+      // Save quiz progress
       await db.insert(quizProgress).values({
         questionId,
         subject: question.subject,
