@@ -25,7 +25,16 @@ export default function Home() {
               Enter any subject you'd like to learn about and get an interactive explanation
             </p>
           </div>
-          <SubjectForm onSubmit={setSubject} />
+          <div className="space-y-4 w-full">
+            <SubjectForm onSubmit={setSubject} className="w-full" />
+            <Button
+              onClick={() => setSubject("")}
+              className="w-full"
+              size="lg"
+            >
+              Start Learning
+            </Button>
+          </div>
         </div>
       </div>
     );
