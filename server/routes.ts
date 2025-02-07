@@ -59,7 +59,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   app.post("/api/quiz/check", async (req, res) => {
-    const { questionId, answer } = req.body;
+    const { questionId, answer, timeSpent } = req.body;
 
     const question = await db.query.quizQuestions.findFirst({
       where: eq(quizQuestions.id, questionId)
@@ -80,7 +80,6 @@ export function registerRoutes(app: Express): Server {
       });
 
       if (!learningPath) {
-        // Create a new learning path if it doesn't exist
         const [newPath] = await db.insert(learningPaths).values({
           title: question.subject,
           description: `Learn about ${question.subject}`,
@@ -95,13 +94,12 @@ export function registerRoutes(app: Express): Server {
       let pathProgress = learningPath.progress?.[0];
 
       if (!pathProgress) {
-        // Create initial progress
         const [newProgress] = await db.insert(learningPathProgress).values({
           pathId: learningPath.id,
           currentTopic: 0,
           completed: false,
           completedTopics: [],
-          timeSpentMinutes: { quiz: 5 }, // Initial time for first quiz
+          timeSpentMinutes: { quiz: 0 },
           streakDays: 1,
           lastStreakDate: new Date()
         }).returning();
@@ -114,19 +112,16 @@ export function registerRoutes(app: Express): Server {
 
         let newStreakDays = pathProgress.streakDays;
         if (daysDiff === 0) {
-          // Same day, streak continues
           newStreakDays = pathProgress.streakDays;
         } else if (daysDiff === 1) {
-          // Next day, increment streak
           newStreakDays = pathProgress.streakDays + 1;
         } else {
-          // Streak broken
           newStreakDays = 1;
         }
 
-        // Update time spent
+        // Update time spent with actual time
         const currentTimeSpent = (pathProgress.timeSpentMinutes || {}) as Record<string, number>;
-        currentTimeSpent.quiz = (currentTimeSpent.quiz || 0) + 5; // Add 5 minutes for each quiz attempt
+        currentTimeSpent.quiz = (currentTimeSpent.quiz || 0) + (timeSpent || 0);
 
         await db.update(learningPathProgress)
           .set({

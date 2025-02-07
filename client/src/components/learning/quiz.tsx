@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle, XCircle, SkipForward } from "lucide-react";
 import { apiRequest } from "@/lib/api";
@@ -33,24 +33,31 @@ interface CheckAnswerResponse {
 
 export function Quiz({ subject }: QuizProps) {
   const [currentAnswer, setCurrentAnswer] = useState("");
+  const [startTime, setStartTime] = useState<Date>(new Date());
   const [feedback, setFeedback] = useState<{
     correct: boolean;
     message: string;
     videoSuggestions?: VideoSuggestion[];
   } | null>(null);
 
+  // Reset timer when component mounts or subject changes
+  useEffect(() => {
+    setStartTime(new Date());
+  }, [subject]);
+
   const { data: question, isLoading: isQuestionLoading, refetch } = useQuery<Question>({
     queryKey: [`/api/quiz/${subject}`]
   });
 
-  const mutation = useMutation<CheckAnswerResponse, Error, string>({
-    mutationFn: async (answer: string) => {
+  const mutation = useMutation<CheckAnswerResponse, Error, { answer: string, timeSpent: number }>({
+    mutationFn: async ({ answer, timeSpent }) => {
       if (!question?.id) {
         throw new Error("No question loaded");
       }
       const response = await apiRequest("POST", "/api/quiz/check", {
         questionId: question.id,
-        answer
+        answer,
+        timeSpent
       });
       const data = await response.json();
       if (!response.ok) {
@@ -70,9 +77,11 @@ export function Quiz({ subject }: QuizProps) {
 
       if (data.correct) {
         setTimeout(() => {
-          refetch(); // Get new question
+          refetch();
           setCurrentAnswer("");
           setFeedback(null);
+          // Reset timer for new question
+          setStartTime(new Date());
         }, 2000);
       }
     },
@@ -86,13 +95,23 @@ export function Quiz({ subject }: QuizProps) {
 
   const handleSubmit = () => {
     if (!currentAnswer.trim()) return;
-    mutation.mutate(currentAnswer.trim());
+
+    // Calculate time spent in minutes
+    const endTime = new Date();
+    const timeSpentMinutes = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
+
+    mutation.mutate({ 
+      answer: currentAnswer.trim(),
+      timeSpent: timeSpentMinutes
+    });
   };
 
   const handleNextQuestion = () => {
     refetch();
     setCurrentAnswer("");
     setFeedback(null);
+    // Reset timer for new question
+    setStartTime(new Date());
   };
 
   if (isQuestionLoading) {
