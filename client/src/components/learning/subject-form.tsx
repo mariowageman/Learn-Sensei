@@ -25,13 +25,13 @@ export function SubjectForm({ onSubmit }: SubjectFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit((values) => onSubmit(values.subject))}
-        className="flex gap-4"
+        className="flex flex-col gap-4"
       >
         <FormField
           control={form.control}
           name="subject"
           render={({ field }) => (
-            <FormItem className="flex-1">
+            <FormItem>
               <FormControl>
                 <Input
                   placeholder="Enter a subject (e.g. photosynthesis, quantum physics)"
@@ -41,7 +41,7 @@ export function SubjectForm({ onSubmit }: SubjectFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">Start Learning</Button>
+        <Button type="submit" className="w-full">Start Learning</Button>
       </form>
     </Form>
   );
