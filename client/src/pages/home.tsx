@@ -1,6 +1,7 @@
 import { SubjectForm } from "@/components/learning/subject-form";
 import { Conversation } from "@/components/learning/conversation";
 import { Quiz } from "@/components/learning/quiz";
+import { LearningRecommendations } from "@/components/learning/recommendations";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -17,8 +18,8 @@ export default function Home() {
 
   if (!subject) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="w-full max-w-[800px] mx-auto px-4 space-y-8">
+      <div className="min-h-screen bg-background flex flex-col p-4">
+        <div className="w-full max-w-[800px] mx-auto px-4 space-y-12">
           <div className="text-center space-y-4">
             <h1 className="text-3xl sm:text-4xl font-bold">AI Learning Assistant</h1>
             <p className="text-muted-foreground">
@@ -26,6 +27,7 @@ export default function Home() {
             </p>
           </div>
           <SubjectForm onSubmit={setSubject} />
+          <LearningRecommendations />
         </div>
       </div>
     );

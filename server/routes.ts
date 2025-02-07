@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { generateExplanation, generateQuestion, checkAnswer } from "./openai";
 import { db } from "@db";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, gt, lt } from "drizzle-orm";
 import {
   sessions,
   messages,
@@ -10,7 +10,7 @@ import {
   quizProgress,
   learningPaths,
   learningPathProgress,
-  progressAnalytics // Assuming this schema exists for analytics
+  progressAnalytics
 } from "@db/schema";
 
 export function registerRoutes(app: Express): Server {
@@ -311,5 +311,131 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.get("/api/recommendations", async (req, res) => {
+    try {
+      // Get user's progress across all learning paths
+      const progress = await db.query.learningPathProgress.findMany({
+        orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
+      });
+
+      // Get quiz performance data
+      const quizPerformance = await db.query.quizProgress.findMany({
+        orderBy: (quiz, { desc }) => [desc(quiz.createdAt)]
+      });
+
+      // Get all learning paths
+      const allPaths = await db.query.learningPaths.findMany({
+        orderBy: (paths, { asc }) => [asc(paths.difficulty)]
+      });
+
+      // Calculate recommendations based on:
+      // 1. Current skill level (from quiz performance)
+      // 2. Learning pace (from time spent)
+      // 3. Topic progression (from completed topics)
+      const recommendations = allPaths
+        .filter(path => {
+          // Filter out paths that user has already completed
+          const pathProgress = progress.find(p => p.pathId === path.id);
+          return !pathProgress?.completed;
+        })
+        .map(path => {
+          const pathProgress = progress.find(p => p.pathId === path.id);
+          const subjectQuizzes = quizPerformance.filter(q => q.subject === path.title);
+
+          // Calculate confidence score based on various factors
+          const quizAccuracy = subjectQuizzes.length > 0
+            ? subjectQuizzes.filter(q => q.isCorrect).length / subjectQuizzes.length
+            : 0;
+
+          const timeSpent = pathProgress
+            ? Object.values(pathProgress.timeSpentMinutes as Record<string, number>)
+                .reduce((sum, time) => sum + time, 0)
+            : 0;
+
+          // Calculate a confidence score (0-1) for this recommendation
+          const confidenceScore = calculateConfidenceScore(
+            path,
+            quizAccuracy,
+            timeSpent,
+            pathProgress
+          );
+
+          // Generate a personalized reason for the recommendation
+          const reason = generateRecommendationReason(
+            path,
+            quizAccuracy,
+            pathProgress
+          );
+
+          return {
+            pathId: path.id,
+            title: path.title,
+            reason,
+            difficulty: path.difficulty,
+            confidenceScore,
+            topics: path.topics as string[],
+          };
+        })
+        .sort((a, b) => b.confidenceScore - a.confidenceScore)
+        .slice(0, 4); // Return top 4 recommendations
+
+      res.json(recommendations);
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+      res.status(500).json({ error: "Failed to generate recommendations" });
+    }
+  });
+
   return httpServer;
+}
+
+function calculateConfidenceScore(
+  path: typeof learningPaths.$inferSelect,
+  quizAccuracy: number,
+  timeSpent: number,
+  progress?: typeof learningPathProgress.$inferSelect | null
+): number {
+  let score = 0;
+
+  // Base score from quiz performance (40% weight)
+  score += quizAccuracy * 0.4;
+
+  // Engagement score from time spent (30% weight)
+  const engagementScore = Math.min(timeSpent / (path.estimatedHours * 60), 1);
+  score += engagementScore * 0.3;
+
+  // Progress score (30% weight)
+  if (progress) {
+    const progressScore = (progress.completedTopics as number[]).length / (path.topics as string[]).length;
+    score += progressScore * 0.3;
+  } else {
+    // If no progress, boost score for beginner-friendly paths
+    score += (path.difficulty === 'beginner' ? 0.2 : 0.1);
+  }
+
+  return score;
+}
+
+function generateRecommendationReason(
+  path: typeof learningPaths.$inferSelect,
+  quizAccuracy: number,
+  progress?: typeof learningPathProgress.$inferSelect | null
+): string {
+  if (!progress) {
+    return `Start your journey with ${path.title} - perfect for building a strong foundation.`;
+  }
+
+  const completedTopics = (progress.completedTopics as number[]).length;
+  const totalTopics = (path.topics as string[]).length;
+
+  if (completedTopics > 0) {
+    const progressPercent = Math.round((completedTopics / totalTopics) * 100);
+    return `Continue your progress in ${path.title} - you're already ${progressPercent}% through!`;
+  }
+
+  if (quizAccuracy > 0.8) {
+    return `Challenge yourself with ${path.title} - your quiz performance shows you're ready!`;
+  }
+
+  return `Enhance your skills with ${path.title} - aligned with your current learning progress.`;
 }
