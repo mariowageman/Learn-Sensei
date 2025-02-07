@@ -11,19 +11,18 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 
-  :root {
-    * {
-      @apply transition-colors duration-100;
-    }
+  /* Single, quick transition for all theme-related color changes */
+  :root * {
+    @apply transition-colors duration-100;
   }
 
-  /* Add smooth transitions for theme changes */
+  /* Remove individual element transitions to prevent timing mismatches */
   body,
   :root {
     @apply transition-colors duration-100;
   }
 
-  /* Style elements with transitions */
+  /* Style elements without individual transitions */
   .card,
   .button,
   .nav-item,
