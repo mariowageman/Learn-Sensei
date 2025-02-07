@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Timer, TrendingUp, Target, Award } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProgressStatsProps {
@@ -12,6 +12,14 @@ interface ProgressData {
   total: number;
   correct: number;
   percentage: number;
+  streakDays: number;
+  timeSpentMinutes: number;
+  avgAccuracy: number;
+  weeklyProgress: Array<{
+    date: string;
+    correct: number;
+    total: number;
+  }>;
   recentAttempts: Array<{
     id: number;
     isCorrect: boolean;
@@ -23,37 +31,106 @@ interface ProgressData {
 export function ProgressStats({ subject }: ProgressStatsProps) {
   const { data: progress, isLoading, error } = useQuery<ProgressData>({
     queryKey: [`/api/progress/${subject}`],
-    refetchInterval: 30000, // Only refresh every 30 seconds
-    staleTime: 30000, // Consider data fresh for 30 seconds
-    retry: false // Don't retry on error to prevent flickering
+    refetchInterval: 30000,
+    staleTime: 30000,
+    retry: false
   });
 
   if (isLoading) {
-    return <Skeleton className="h-32 w-full" />;
+    return <Skeleton className="h-96 w-full" />;
   }
 
   if (error || !progress) {
-    return null; // Don't show anything if there's an error or no data
+    return null;
   }
 
   return (
-    <Card className="p-4 space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Learning Progress</h3>
-        <span className="text-2xl font-bold">{progress.percentage}%</span>
-      </div>
+    <div className="grid gap-4">
+      <Card className="p-4 space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-medium">Learning Progress</h3>
+          <span className="text-2xl font-bold">{progress.percentage}%</span>
+        </div>
 
-      <Progress value={progress.percentage} className="h-2" />
+        <Progress value={progress.percentage} className="h-2" />
 
-      <div className="flex justify-between text-sm text-muted-foreground">
-        <span>Total Questions: {progress.total}</span>
-        <span>Correct Answers: {progress.correct}</span>
-      </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Target className="h-4 w-4" />
+              <span>Total Questions</span>
+            </div>
+            <p className="text-lg font-semibold">{progress.total}</p>
+          </div>
+
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <CheckCircle className="h-4 w-4" />
+              <span>Correct Answers</span>
+            </div>
+            <p className="text-lg font-semibold">{progress.correct}</p>
+          </div>
+
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Timer className="h-4 w-4" />
+              <span>Time Spent</span>
+            </div>
+            <p className="text-lg font-semibold">
+              {Math.round(progress.timeSpentMinutes / 60)}h {progress.timeSpentMinutes % 60}m
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Award className="h-4 w-4" />
+              <span>Current Streak</span>
+            </div>
+            <p className="text-lg font-semibold">{progress.streakDays} days</p>
+          </div>
+        </div>
+      </Card>
+
+      {progress.weeklyProgress?.length > 0 && (
+        <Card className="p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium">Weekly Progress</h4>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <TrendingUp className="h-4 w-4" />
+              <span>Avg. Accuracy: {progress.avgAccuracy}%</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {progress.weeklyProgress.map((day, index) => (
+              <div key={day.date} className="text-center">
+                <div className="h-20 relative">
+                  <div
+                    className="absolute bottom-0 w-full bg-primary/20 rounded-sm"
+                    style={{
+                      height: `${(day.correct / Math.max(...progress.weeklyProgress.map(d => d.total))) * 100}%`
+                    }}
+                  >
+                    <div
+                      className="absolute bottom-0 w-full bg-primary rounded-sm"
+                      style={{
+                        height: `${(day.correct / day.total) * 100}%`
+                      }}
+                    />
+                  </div>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {progress.recentAttempts?.length > 0 && (
-        <div className="space-y-2">
+        <Card className="p-4 space-y-4">
           <h4 className="text-sm font-medium">Recent Attempts</h4>
-          <div className="space-y-1">
+          <div className="space-y-2">
             {progress.recentAttempts.map((attempt) => (
               <div key={attempt.id} className="flex items-center gap-2 text-sm">
                 {attempt.isCorrect ? (
@@ -68,8 +145,8 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
-    </Card>
+    </div>
   );
 }

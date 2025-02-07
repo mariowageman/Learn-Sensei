@@ -9,7 +9,8 @@ import {
   quizQuestions,
   quizProgress,
   learningPaths,
-  learningPathProgress
+  learningPathProgress,
+  progressAnalytics // Assuming this schema exists for analytics
 } from "@db/schema";
 
 export function registerRoutes(app: Express): Server {
@@ -98,14 +99,64 @@ export function registerRoutes(app: Express): Server {
         orderBy: (quizProgress, { desc }) => [desc(quizProgress.createdAt)]
       });
 
+      // Calculate total stats
       const total = progress.length;
       const correct = progress.filter(p => p.isCorrect).length;
       const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+      // Calculate time spent and streak
+      const learningPath = await db.query.learningPaths.findFirst({
+        where: eq(learningPaths.title, subject),
+        with: {
+          progress: {
+            orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
+          }
+        }
+      });
+
+      let timeSpentMinutes = 0;
+      let streakDays = 0;
+      let lastStreakDate = null;
+
+      if (learningPath?.progress?.[0]) {
+        const pathProgress = learningPath.progress[0];
+        // Sum up time spent across all topics
+        timeSpentMinutes = Object.values(pathProgress.timeSpentMinutes as Record<string, number>)
+          .reduce((sum, time) => sum + time, 0);
+        streakDays = pathProgress.streakDays;
+        lastStreakDate = pathProgress.lastStreakDate;
+      }
+
+      // Calculate weekly progress
+      const weeklyProgress = await db.query.progressAnalytics.findMany({
+        where: and(
+          eq(progressAnalytics.pathId, learningPath?.id ?? 0),
+          sql`date >= NOW() - INTERVAL '7 days'`
+        ),
+        orderBy: (analytics, { asc }) => [asc(analytics.date)]
+      });
+
+      // Calculate average accuracy
+      const avgAccuracy = weeklyProgress.length > 0
+        ? Math.round(
+            weeklyProgress.reduce((sum, day) =>
+              sum + (day.correctAnswers / day.totalAttempts) * 100, 0
+            ) / weeklyProgress.length
+          )
+        : 0;
 
       res.json({
         total,
         correct,
         percentage,
+        timeSpentMinutes,
+        streakDays,
+        avgAccuracy,
+        weeklyProgress: weeklyProgress.map(day => ({
+          date: day.date,
+          correct: day.correctAnswers,
+          total: day.totalAttempts
+        })),
         recentAttempts: progress.slice(0, 5)
       });
     } catch (error) {
@@ -163,7 +214,10 @@ export function registerRoutes(app: Express): Server {
         currentTopic: topicIndex,
         completed: false,
         completedTopics: sql`'[]'::jsonb`,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        timeSpentMinutes: sql`'{}'::jsonb`, // Initialize timeSpentMinutes as an empty JSONB object
+        streakDays: 1,
+        lastStreakDate: new Date()
       }).returning();
 
       res.json(progress);
@@ -175,10 +229,10 @@ export function registerRoutes(app: Express): Server {
 
   app.patch("/api/learning-paths/:id/progress", async (req, res) => {
     const { id } = req.params;
-    const { completedTopic } = req.body;
+    const { completedTopic, timeSpentMinutes } = req.body;
 
     try {
-      // First get current progress
+      // Get current progress
       const currentProgress = await db.query.learningPathProgress.findFirst({
         where: eq(learningPathProgress.pathId, parseInt(id)),
         orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
@@ -194,6 +248,23 @@ export function registerRoutes(app: Express): Server {
 
       if (!path) {
         return res.status(404).json({ error: "Learning path not found" });
+      }
+
+      // Update streak
+      const lastStreakDate = new Date(currentProgress.lastStreakDate);
+      const today = new Date();
+      const daysDiff = Math.floor((today.getTime() - lastStreakDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      let newStreakDays = currentProgress.streakDays;
+      if (daysDiff === 0) {
+        // Same day, streak continues
+        newStreakDays = currentProgress.streakDays;
+      } else if (daysDiff === 1) {
+        // Next day, increment streak
+        newStreakDays = currentProgress.streakDays + 1;
+      } else {
+        // Streak broken
+        newStreakDays = 1;
       }
 
       // Update progress
@@ -221,10 +292,32 @@ export function registerRoutes(app: Express): Server {
             THEN ${completedTopic}
             ELSE ${completedTopic} + 1
           END`,
+          timeSpentMinutes: sql`
+            CASE
+              WHEN time_spent_minutes IS NULL OR time_spent_minutes = '{}'::jsonb
+              THEN jsonb_build_object(${completedTopic}::text, ${timeSpentMinutes}::int)
+              ELSE time_spent_minutes || 
+                   jsonb_build_object(${completedTopic}::text, 
+                     COALESCE((time_spent_minutes->>${completedTopic}::text)::int, 0) + ${timeSpentMinutes}::int
+                   )
+            END
+          `,
+          streakDays: newStreakDays,
+          lastStreakDate: today,
           updatedAt: new Date()
         })
         .where(eq(learningPathProgress.id, currentProgress.id))
         .returning();
+
+      // Update analytics
+      await db.insert(progressAnalytics).values({
+        pathId: parseInt(id),
+        date: today,
+        topicsCompleted: progress.completedTopics.length,
+        timeSpentMinutes,
+        correctAnswers: 1, // Assuming completion means correct
+        totalAttempts: 1,
+      });
 
       res.json(progress);
     } catch (error) {
