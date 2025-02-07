@@ -269,7 +269,7 @@ export function registerRoutes(app: Express): Server {
 
       // Update progress
       const completedTopics = currentProgress.completedTopics || [];
-      const updatedCompletedTopics = [...new Set([...completedTopics, completedTopic])];
+      const updatedCompletedTopics = Array.from(new Set([...completedTopics, completedTopic]));
       const isCompleted = updatedCompletedTopics.length >= (path.topics as string[]).length;
       const nextTopic = isCompleted ? completedTopic : completedTopic + 1;
 

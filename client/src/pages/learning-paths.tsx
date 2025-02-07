@@ -10,11 +10,17 @@ interface LearningPath {
   id: number;
   title: string;
   description: string;
-  difficulty: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
   topics: string[];
   prerequisites: number[];
   estimatedHours: number;
 }
+
+const difficultyColors = {
+  beginner: "bg-green-500 hover:bg-green-600",
+  intermediate: "bg-blue-500 hover:bg-blue-600",
+  advanced: "bg-[#C7AB62] hover:bg-[#B69B52]",
+} as const;
 
 export default function LearningPaths() {
   const { data: paths, isLoading } = useQuery<LearningPath[]>({
@@ -34,12 +40,6 @@ export default function LearningPaths() {
     );
   }
 
-  const difficultyColors = {
-    beginner: "bg-green-500 hover:bg-green-600",
-    intermediate: "bg-blue-500 hover:bg-blue-600",
-    advanced: "bg-[#C7AB62] hover:bg-[#B69B52]",
-  };
-
   return (
     <div className="container max-w-6xl mx-auto px-8 py-8 space-y-8">
       <div className="space-y-2">
@@ -54,7 +54,7 @@ export default function LearningPaths() {
           <Card key={path.id} className="flex flex-col p-6">
             <div className="space-y-4">
               <Badge 
-                className={`w-fit ${difficultyColors[path.difficulty.toLowerCase() as keyof typeof difficultyColors]}`}
+                className={`w-fit ${difficultyColors[path.difficulty]}`}
               >
                 {path.difficulty}
               </Badge>
