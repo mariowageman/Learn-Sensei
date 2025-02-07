@@ -3,10 +3,12 @@ import { Conversation } from "@/components/learning/conversation";
 import { Quiz } from "@/components/learning/quiz";
 import { LearningRecommendations } from "@/components/learning/recommendations";
 import { RecentSubjects } from "@/components/learning/recent-subjects";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { apiRequest } from "@/lib/api";
+import { queryClient } from "@/lib/queryClient";
 
 export default function Home() {
   const [subject, setSubject] = useState<string>("");
@@ -16,6 +18,21 @@ export default function Home() {
     queryKey: ["/api/session"],
     enabled: !!subject
   });
+
+  const createSession = useMutation({
+    mutationFn: async (newSubject: string) => {
+      const response = await apiRequest("POST", "/api/session", { subject: newSubject });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/recent-subjects"] });
+    }
+  });
+
+  const handleSubjectSubmit = async (newSubject: string) => {
+    setSubject(newSubject);
+    await createSession.mutate(newSubject);
+  };
 
   if (!subject) {
     return (
@@ -27,9 +44,9 @@ export default function Home() {
               Enter any subject you'd like to learn about and get an interactive explanation
             </p>
           </div>
-          <SubjectForm onSubmit={setSubject} />
+          <SubjectForm onSubmit={handleSubjectSubmit} />
           <div className="grid gap-8 md:grid-cols-2">
-            <RecentSubjects onSelectSubject={setSubject} />
+            <RecentSubjects onSelectSubject={handleSubjectSubmit} />
             <LearningRecommendations />
           </div>
         </div>
