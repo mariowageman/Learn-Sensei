@@ -512,20 +512,36 @@ function calculateConfidenceScore(
 ): number {
   let score = 0;
 
-  // Base score from quiz performance (40% weight)
-  score += quizAccuracy * 0.4;
+  // Quiz performance (30% weight)
+  score += quizAccuracy * 0.3;
 
-  // Engagement score from time spent (30% weight)
+  // Engagement score from time spent (20% weight)
   const engagementScore = Math.min(timeSpent / (path.estimatedHours * 60), 1);
-  score += engagementScore * 0.3;
+  score += engagementScore * 0.2;
 
-  // Progress score (30% weight)
+  // Progress and completion patterns (20% weight)
   if (progress) {
     const progressScore = (progress.completedTopics as number[]).length / (path.topics as string[]).length;
-    score += progressScore * 0.3;
+    score += progressScore * 0.2;
+
+    // Bonus for consistent learning (streak)
+    const streakBonus = Math.min(progress.streakDays / 7, 1) * 0.1;
+    score += streakBonus;
   } else {
-    // If no progress, boost score for beginner-friendly paths
+    // Boost score for beginner paths if user is new
     score += (path.difficulty === 'beginner' ? 0.2 : 0.1);
+  }
+
+  // Topic relevance (30% weight)
+  // This checks if the current path's topics align with previously completed topics
+  if (progress?.completedTopics) {
+    const completedTopics = progress.completedTopics as number[];
+    const topicOverlap = (path.topics as string[]).some(topic =>
+      completedTopics.includes(topic.toLowerCase())
+    );
+    score += topicOverlap ? 0.3 : 0.15;
+  } else {
+    score += 0.15; // Default topic relevance score
   }
 
   return score;
@@ -537,7 +553,10 @@ function generateRecommendationReason(
   progress?: typeof learningPathProgress.$inferSelect | null
 ): string {
   if (!progress) {
-    return `Start your journey with ${path.title} - perfect for building a strong foundation.`;
+    if (path.difficulty === 'beginner') {
+      return `Perfect starting point: ${path.title} will help you build a strong foundation in ${(path.topics as string[])[0]}.`;
+    }
+    return `Recommended based on your interests in ${(path.topics as string[])[0]}.`;
   }
 
   const completedTopics = (progress.completedTopics as number[]).length;
@@ -545,12 +564,20 @@ function generateRecommendationReason(
 
   if (completedTopics > 0) {
     const progressPercent = Math.round((completedTopics / totalTopics) * 100);
-    return `Continue your progress in ${path.title} - you're already ${progressPercent}% through!`;
+
+    if (progress.streakDays >= 3) {
+      return `Great momentum! Keep your ${progress.streakDays}-day streak going with ${path.title}. You're already ${progressPercent}% through!`;
+    }
+    return `Continue building your knowledge in ${path.title} - you've already mastered ${progressPercent}% of related topics!`;
   }
 
   if (quizAccuracy > 0.8) {
-    return `Challenge yourself with ${path.title} - your quiz performance shows you're ready!`;
+    return `Based on your excellent quiz performance (${Math.round(quizAccuracy * 100)}% accuracy), ${path.title} will be a perfect challenge!`;
   }
 
-  return `Enhance your skills with ${path.title} - aligned with your current learning progress.`;
+  if (quizAccuracy > 0.5) {
+    return `Your quiz results show you're ready for ${path.title}. It aligns well with your current skill level.`;
+  }
+
+  return `${path.title} matches your learning style and will help reinforce key concepts.`;
 }

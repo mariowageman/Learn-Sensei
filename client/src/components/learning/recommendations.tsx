@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BookOpen, ArrowRight, Timer } from "lucide-react";
+import { BookOpen, ArrowRight, Timer, TrendingUp, Trophy } from "lucide-react";
 import { Link } from "wouter";
 
 interface Recommendation {
@@ -49,11 +49,19 @@ export function LearningRecommendations() {
           {recommendations.map((recommendation) => (
             <Card key={recommendation.pathId} className="p-6">
               <div className="space-y-4">
-                <Badge 
-                  className={`w-fit ${difficultyColors[recommendation.difficulty]}`}
-                >
-                  {recommendation.difficulty}
-                </Badge>
+                <div className="flex items-center justify-between">
+                  <Badge 
+                    className={`${difficultyColors[recommendation.difficulty]}`}
+                  >
+                    {recommendation.difficulty}
+                  </Badge>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Trophy className="h-4 w-4 text-yellow-500" />
+                    <span className="text-muted-foreground">
+                      {Math.round(recommendation.confidenceScore * 100)}% match
+                    </span>
+                  </div>
+                </div>
                 <div className="space-y-2">
                   <h3 className="text-xl font-semibold">{recommendation.title}</h3>
                   <p className="text-muted-foreground">{recommendation.reason}</p>
@@ -83,7 +91,7 @@ export function LearningRecommendations() {
       ) : (
         <Card className="p-6">
           <p className="text-muted-foreground">
-            Complete some lessons to get personalized recommendations!
+            Complete some lessons or take quizzes to get personalized recommendations!
           </p>
         </Card>
       )}
