@@ -64,7 +64,7 @@ export function DashboardPage() {
             <Progress 
               value={(dashboardData.overallProgress.completedSubjects / 
                 Math.max(dashboardData.overallProgress.totalSubjects, 1)) * 100}
-              className="bg-gradient-to-r from-green-100 to-green-200 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-green-500 [&>[role=progressbar]]:to-green-600"
+              className="bg-gradient-to-r from-[#3A3D98]/20 to-[#3A3D98]/30 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-[#3A3D98] [&>[role=progressbar]]:to-[#3A3D98]/80"
             />
           </div>
         </Card>
@@ -111,7 +111,7 @@ export function DashboardPage() {
               </div>
               <Progress 
                 value={subject.accuracy}
-                className="bg-gradient-to-r from-green-100 to-green-200 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-green-500 [&>[role=progressbar]]:to-green-600"
+                className="bg-gradient-to-r from-[#3A3D98]/20 to-[#3A3D98]/30 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-[#3A3D98] [&>[role=progressbar]]:to-[#3A3D98]/80"
               />
             </div>
           ))}
