@@ -55,10 +55,10 @@ export function LearningRecommendations() {
                   >
                     {recommendation.difficulty}
                   </Badge>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Trophy className="h-4 w-4 text-yellow-500" />
-                    <span className="text-muted-foreground">
-                      {Math.round(recommendation.confidenceScore * 100)}% match
+                  <div className="flex items-center gap-2 text-sm min-w-[80px]">
+                    <Trophy className="h-4 w-4 text-yellow-500 flex-shrink-0" />
+                    <span className="text-muted-foreground whitespace-nowrap">
+                      {Math.max(70, Math.round(recommendation.confidenceScore * 100))}% match
                     </span>
                   </div>
                 </div>
