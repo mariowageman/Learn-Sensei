@@ -32,16 +32,6 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
           Home
         </Button>
       </Link>
-      <Link href="/dashboard">
-        <Button 
-          variant="ghost" 
-          className="w-full justify-start gap-2"
-          onClick={onNavigate}
-        >
-          <LayoutDashboard className="h-4 w-4" />
-          Dashboard
-        </Button>
-      </Link>
       <Link href="/sensei">
         <Button 
           variant="ghost" 
@@ -60,6 +50,16 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
         >
           <BookOpen className="h-4 w-4" />
           Learning Paths
+        </Button>
+      </Link>
+      <Link href="/dashboard">
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start gap-2"
+          onClick={onNavigate}
+        >
+          <LayoutDashboard className="h-4 w-4" />
+          Progress
         </Button>
       </Link>
     </>
