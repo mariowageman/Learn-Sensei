@@ -18,6 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
+import LogoIcon from "./assets/learn-sensei-logo-icon.svg";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -137,7 +138,7 @@ function Navigation() {
           <div className="absolute left-1/2 transform -translate-x-1/2 sm:static sm:transform-none sm:left-0">
             <Link href="/">
               <img 
-                src="/assets/learn-sensei-logo-icon.svg" 
+                src={LogoIcon}
                 alt="Learn Sensei Logo" 
                 className="h-8 w-8"
               />
