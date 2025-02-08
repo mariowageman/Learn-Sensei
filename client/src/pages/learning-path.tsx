@@ -14,7 +14,7 @@ interface LearningPath {
   id: number;
   title: string;
   description: string;
-  difficulty: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
   topics: string[];
   prerequisites: number[];
   estimatedHours: number;
@@ -23,7 +23,7 @@ interface LearningPath {
     currentTopic: number;
     completed: boolean;
     completedTopics: number[];
-    intensity?: string; // Changed from number to string
+    intensity?: string;
   }[];
 }
 
@@ -86,14 +86,14 @@ export default function LearningPath() {
     beginner: "bg-green-500 hover:bg-green-600",
     intermediate: "bg-blue-500 hover:bg-blue-600",
     advanced: "bg-[#C7AB62] hover:bg-[#B69B52]",
-  };
+  } as const;
 
   return (
     <div className="container max-w-4xl mx-auto px-6 py-6 space-y-6">
       <div className="space-y-4">
         <div className="flex flex-col gap-2">
           <Badge 
-            className={`w-fit ${difficultyColors[path.difficulty.toLowerCase()]}`}
+            className={`w-fit ${difficultyColors[path.difficulty]}`}
           >
             {path.difficulty}
           </Badge>
@@ -118,7 +118,7 @@ export default function LearningPath() {
             {progress && (
               <IntensityAdjuster 
                 pathId={path.id} 
-                currentIntensity={progress.intensity} 
+                currentIntensity={progress.intensity}
               />
             )}
           </div>
