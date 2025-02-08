@@ -62,7 +62,10 @@ function Navigation() {
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       const touch = e.touches[0];
-      if (touch.clientX < 30) {
+      // Allow touch start from left edge when closed, or anywhere when open
+      if (!isOpen && touch.clientX < 30) {
+        setTouchStart({ x: touch.clientX, y: touch.clientY });
+      } else if (isOpen) {
         setTouchStart({ x: touch.clientX, y: touch.clientY });
       }
     };
@@ -74,10 +77,17 @@ function Navigation() {
       const deltaX = touch.clientX - touchStart.x;
       const deltaY = Math.abs(touch.clientY - touchStart.y);
 
-      // If horizontal swipe is greater than vertical movement and it's moving right
-      if (deltaX > 50 && deltaX > deltaY) {
-        setIsOpen(true);
-        setTouchStart(null);
+      // If horizontal swipe is greater than vertical movement
+      if (Math.abs(deltaX) > deltaY) {
+        if (!isOpen && deltaX > 50) {
+          // Swipe right to open
+          setIsOpen(true);
+          setTouchStart(null);
+        } else if (isOpen && deltaX < -50) {
+          // Swipe left to close
+          setIsOpen(false);
+          setTouchStart(null);
+        }
       }
     };
 
@@ -94,7 +104,7 @@ function Navigation() {
       document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [touchStart]);
+  }, [touchStart, isOpen]);
 
   return (
     <nav className="border-b">
