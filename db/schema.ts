@@ -51,10 +51,11 @@ export const learningPathProgress = pgTable("learning_path_progress", {
   currentTopic: integer("current_topic").notNull(),
   completed: boolean("completed").notNull().default(false),
   completedTopics: jsonb("completed_topics").notNull(),
-  timeSpentMinutes: jsonb("time_spent_minutes").notNull().default(sql`'{}'::jsonb`), 
+  timeSpentMinutes: jsonb("time_spent_minutes").notNull().default(sql`'{}'::jsonb`),
   lastAccessedAt: timestamp("last_accessed_at").defaultNow().notNull(),
   streakDays: integer("streak_days").notNull().default(0),
   lastStreakDate: timestamp("last_streak_date").defaultNow().notNull(),
+  intensity: text("intensity").notNull().default('normal'),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull()
 });

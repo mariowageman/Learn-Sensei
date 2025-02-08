@@ -8,6 +8,7 @@ import { Timer, BookOpen, CheckCircle, Lock } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
+import { IntensityAdjuster } from "@/components/learning/intensity-adjuster";
 
 interface LearningPath {
   id: number;
@@ -22,6 +23,7 @@ interface LearningPath {
     currentTopic: number;
     completed: boolean;
     completedTopics: number[];
+    intensity?: number; // Added intensity property
   }[];
 }
 
@@ -113,6 +115,12 @@ export default function LearningPath() {
               <Timer className="h-4 w-4" />
               <span className="text-sm">{path.estimatedHours} hours estimated</span>
             </div>
+            {progress && (
+              <IntensityAdjuster 
+                pathId={path.id} 
+                currentIntensity={progress.intensity} 
+              />
+            )}
           </div>
         </div>
         <Progress value={progressPercent} className="h-2" />
