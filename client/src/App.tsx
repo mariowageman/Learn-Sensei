@@ -62,14 +62,23 @@ function Navigation() {
     <nav className="border-b">
       <div className="container py-4 px-4 flex items-center justify-between">
         {/* Mobile Menu */}
-        <div className="sm:hidden">
+        <div className="sm:hidden touch-pan-y">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-64">
+            <SheetContent 
+              side="left" 
+              className="w-64"
+              onTouchStart={(e) => {
+                const touch = e.touches[0];
+                if (touch.clientX < 20) {
+                  setIsOpen(true);
+                }
+              }}
+            >
               <div className="flex flex-col gap-2 mt-4">
                 <NavigationLinks onNavigate={() => setIsOpen(false)} />
               </div>
