@@ -8,7 +8,6 @@ import { Timer, BookOpen, CheckCircle, Lock } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
-import { IntensityAdjuster } from "@/components/learning/intensity-adjuster";
 
 interface LearningPath {
   id: number;
@@ -23,7 +22,6 @@ interface LearningPath {
     currentTopic: number;
     completed: boolean;
     completedTopics: number[];
-    intensity?: string;
   }[];
 }
 
@@ -92,7 +90,7 @@ export default function LearningPath() {
     <div className="container max-w-4xl mx-auto px-6 py-6 space-y-6">
       <div className="space-y-4">
         <div className="flex flex-col gap-2">
-          <Badge 
+          <Badge
             className={`w-fit ${difficultyColors[path.difficulty]}`}
           >
             {path.difficulty}
@@ -115,12 +113,6 @@ export default function LearningPath() {
               <Timer className="h-4 w-4" />
               <span className="text-sm">{path.estimatedHours} hours estimated</span>
             </div>
-            {progress && (
-              <IntensityAdjuster 
-                pathId={path.id} 
-                currentIntensity={progress.intensity}
-              />
-            )}
           </div>
         </div>
         <Progress value={progressPercent} className="h-2" />
@@ -162,9 +154,9 @@ export default function LearningPath() {
                         }
                       }}
                       disabled={
-                        startMutation.isPending || 
-                        completeMutation.isPending || 
-                        isCompleted || 
+                        startMutation.isPending ||
+                        completeMutation.isPending ||
+                        isCompleted ||
                         (!!progress && !isCompleted && index !== progress.currentTopic)
                       }
                     >

@@ -55,7 +55,6 @@ export const learningPathProgress = pgTable("learning_path_progress", {
   lastAccessedAt: timestamp("last_accessed_at").defaultNow().notNull(),
   streakDays: integer("streak_days").notNull().default(0),
   lastStreakDate: timestamp("last_streak_date").defaultNow().notNull(),
-  intensity: text("intensity").notNull().default('normal'),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull()
 });

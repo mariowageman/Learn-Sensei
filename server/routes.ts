@@ -391,40 +391,6 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.patch("/api/learning-paths/:id/intensity", async (req, res) => {
-    const { id } = req.params;
-    const { intensity } = req.body;
-
-    if (!['relaxed', 'normal', 'intensive'].includes(intensity)) {
-      return res.status(400).json({ error: "Invalid intensity level" });
-    }
-
-    try {
-      const progress = await db.query.learningPathProgress.findFirst({
-        where: eq(learningPathProgress.pathId, parseInt(id)),
-        orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
-      });
-
-      if (!progress) {
-        return res.status(404).json({ error: "No progress found" });
-      }
-
-      const [updatedProgress] = await db
-        .update(learningPathProgress)
-        .set({
-          intensity,
-          updatedAt: new Date()
-        })
-        .where(eq(learningPathProgress.id, progress.id))
-        .returning();
-
-      res.json(updatedProgress);
-    } catch (error) {
-      console.error('Error updating learning intensity:', error);
-      res.status(500).json({ error: "Failed to update intensity" });
-    }
-  });
-
 
   app.get("/api/recommendations", async (req, res) => {
     try {
