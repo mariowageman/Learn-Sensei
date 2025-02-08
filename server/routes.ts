@@ -510,30 +510,43 @@ function calculateConfidenceScore(
   timeSpent: number,
   progress?: typeof learningPathProgress.$inferSelect | null
 ): number {
-  // For highly recommended courses, return maximum confidence
-  if (!progress || path.difficulty === 'beginner') {
-    return 1.0; // 100% match for recommended courses
-  }
+  // Base score starts at 70%
+  let score = 0.70;
 
-  // Base score is 93% for all other recommended courses
-  let score = 0.93;
+  // Quiz performance (up to 10%)
+  score += quizAccuracy * 0.10;
 
-  // Quiz performance (3% weight)
-  score += quizAccuracy * 0.03;
-
-  // Engagement score from time spent (2% weight)
+  // Time investment factor (up to 5%)
   const engagementScore = Math.min(timeSpent / (path.estimatedHours * 60), 1);
-  score += engagementScore * 0.02;
+  score += engagementScore * 0.05;
 
-  // Progress and completion patterns (2% weight)
-  const completedTopics = progress.completedTopics as number[];
-  if (completedTopics.length > 0) {
-    const progressScore = completedTopics.length / (path.topics as string[]).length;
-    score += progressScore * 0.02;
+  if (progress) {
+    // Learning streak bonus (up to 5%)
+    const streakBonus = Math.min(progress.streakDays / 14, 1) * 0.05;
+    score += streakBonus;
+
+    // Topic mastery (up to 5%)
+    const completedTopics = progress.completedTopics as number[];
+    const topicMasteryScore = completedTopics.length / (path.topics as string[]).length;
+    score += topicMasteryScore * 0.05;
+
+    // Difficulty progression (up to 5%)
+    if (path.difficulty === 'beginner' && completedTopics.length === 0) {
+      score += 0.05; // Perfect for beginners
+    } else if (path.difficulty === 'intermediate' && completedTopics.length >= 2) {
+      score += 0.05; // Ready for intermediate
+    } else if (path.difficulty === 'advanced' && completedTopics.length >= 4) {
+      score += 0.05; // Ready for advanced
+    }
+  } else {
+    // New user bonuses
+    if (path.difficulty === 'beginner') {
+      score += 0.15; // Strongly recommend beginner courses for new users
+    }
   }
 
-  // Ensure the score is between 0.93 and 1.0 (93% - 100%)
-  return Math.max(0.93, Math.min(1, score));
+  // Ensure minimum 70% and maximum 100% match
+  return Math.max(0.70, Math.min(1, score));
 }
 
 function generateRecommendationReason(
@@ -541,21 +554,47 @@ function generateRecommendationReason(
   quizAccuracy: number,
   progress?: typeof learningPathProgress.$inferSelect | null
 ): string {
-  if (!progress || path.difficulty === 'beginner') {
-    return `Perfect starting point: ${path.title} will help you build a strong foundation in ${(path.topics as string[])[0]}.`;
+  const topics = path.topics as string[];
+  const mainTopic = topics[0];
+
+  if (!progress) {
+    if (path.difficulty === 'beginner') {
+      return `Great starting point for beginners! This ${mainTopic} course will help you build a strong foundation.`;
+    }
+    return `This ${path.difficulty} level course in ${mainTopic} matches your interests.`;
   }
 
-  const completedTopics = (progress.completedTopics as number[]).length;
-  const totalTopics = (path.topics as string[]).length;
+  const completedTopics = progress.completedTopics as number[];
+  const completedCount = completedTopics.length;
 
-  if (completedTopics > 0) {
-    const progressPercent = Math.round((completedTopics / totalTopics) * 100);
-    return `Strong match! Continue building your knowledge in ${path.title} - you've already mastered ${progressPercent}% of related topics!`;
+  // Tailor message based on user's progress and course difficulty
+  if (path.difficulty === 'beginner') {
+    if (completedCount === 0) {
+      return `Perfect first step! Start your journey with this beginner-friendly ${mainTopic} course.`;
+    }
+    return `Strengthen your basics with this foundational course in ${mainTopic}.`;
   }
 
-  if (quizAccuracy > 0.8) {
-    return `Perfect match! Based on your excellent quiz performance (${Math.round(quizAccuracy * 100)}% accuracy), ${path.title} will be an ideal next step!`;
+  if (path.difficulty === 'intermediate') {
+    if (completedCount >= 2) {
+      return `Ready for the next level! Your strong performance in basic courses makes this intermediate ${mainTopic} course a perfect match.`;
+    }
+    return `Level up your skills with this intermediate course in ${mainTopic}.`;
   }
 
-  return `Excellent match! ${path.title} is highly recommended for your learning journey.`;
+  if (path.difficulty === 'advanced') {
+    if (completedCount >= 4) {
+      return `Challenge yourself! Your mastery of intermediate topics makes you ready for this advanced ${mainTopic} course.`;
+    }
+    if (quizAccuracy > 0.8) {
+      return `Your exceptional quiz performance (${Math.round(quizAccuracy * 100)}% accuracy) shows you're ready for this advanced material.`;
+    }
+  }
+
+  // General recommendation based on learning streak
+  if (progress.streakDays >= 7) {
+    return `Keep your ${progress.streakDays}-day learning streak going! This ${path.difficulty} course in ${mainTopic} is perfect for your current level.`;
+  }
+
+  return `This ${path.difficulty} level course in ${mainTopic} aligns well with your learning progress.`;
 }
