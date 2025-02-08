@@ -510,7 +510,7 @@ function calculateConfidenceScore(
   timeSpent: number,
   progress?: typeof learningPathProgress.$inferSelect | null
 ): number {
-  // Base score starts at 70%
+  // Start with base score of 70%
   let score = 0.70;
 
   // Quiz performance (up to 10%)
@@ -520,32 +520,38 @@ function calculateConfidenceScore(
   const engagementScore = Math.min(timeSpent / (path.estimatedHours * 60), 1);
   score += engagementScore * 0.05;
 
-  if (progress) {
-    // Learning streak bonus (up to 5%)
-    const streakBonus = Math.min(progress.streakDays / 14, 1) * 0.05;
-    score += streakBonus;
-
-    // Topic mastery (up to 5%)
-    const completedTopics = progress.completedTopics as number[];
-    const topicMasteryScore = completedTopics.length / (path.topics as string[]).length;
-    score += topicMasteryScore * 0.05;
-
-    // Difficulty progression (up to 5%)
-    if (path.difficulty === 'beginner' && completedTopics.length === 0) {
-      score += 0.05; // Perfect for beginners
-    } else if (path.difficulty === 'intermediate' && completedTopics.length >= 2) {
-      score += 0.05; // Ready for intermediate
-    } else if (path.difficulty === 'advanced' && completedTopics.length >= 4) {
-      score += 0.05; // Ready for advanced
-    }
-  } else {
-    // New user bonuses
+  // For new users or no progress
+  if (!progress) {
+    // Boost score for beginner courses
     if (path.difficulty === 'beginner') {
-      score += 0.15; // Strongly recommend beginner courses for new users
+      score += 0.15; // Higher match for beginner courses
+    } else if (path.difficulty === 'intermediate') {
+      score += 0.10; // Medium match for intermediate courses
+    } else {
+      score += 0.05; // Lower match for advanced courses
     }
+    return Math.max(0.70, Math.min(1, score));
   }
 
-  // Ensure minimum 70% and maximum 100% match
+  // Learning streak bonus (up to 5%)
+  const streakBonus = Math.min(progress.streakDays / 14, 1) * 0.05;
+  score += streakBonus;
+
+  // Topic mastery (up to 5%)
+  const completedTopics = progress.completedTopics as number[];
+  const topicMasteryScore = completedTopics.length / (path.topics as string[]).length;
+  score += topicMasteryScore * 0.05;
+
+  // Difficulty progression (up to 5%)
+  if (path.difficulty === 'beginner' && completedTopics.length === 0) {
+    score += 0.05; // Perfect for beginners
+  } else if (path.difficulty === 'intermediate' && completedTopics.length >= 2) {
+    score += 0.05; // Ready for intermediate
+  } else if (path.difficulty === 'advanced' && completedTopics.length >= 4) {
+    score += 0.05; // Ready for advanced
+  }
+
+  // Ensure the score is between 70% and 100%
   return Math.max(0.70, Math.min(1, score));
 }
 
