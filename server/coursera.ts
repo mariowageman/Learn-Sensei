@@ -7,19 +7,19 @@ const courseSchema = z.object({
   photoUrl: z.string().optional(),
   description: z.string(),
   workload: z.string().optional(),
-  specializations: z.array(z.string()).optional(),
-  primaryLanguages: z.array(z.string()).optional(),
-  subtitleLanguages: z.array(z.string()).optional(),
+  specializations: z.array(z.unknown()).optional().default([]),
+  primaryLanguages: z.array(z.string()).optional().default([]),
+  subtitleLanguages: z.array(z.string()).optional().default([]),
   partnerLogo: z.string().optional(),
   instructors: z.array(z.object({
     fullName: z.string(),
     title: z.string().optional(),
     department: z.string().optional(),
-  })),
+  })).optional().default([]),
   partners: z.array(z.object({
     name: z.string(),
     shortName: z.string().optional(),
-  })),
+  })).optional().default([]),
 });
 
 export type CourseraCourse = z.infer<typeof courseSchema>;
@@ -75,6 +75,7 @@ export async function fetchCourseraCourses(): Promise<CourseraCourse[]> {
     }
 
     const data = await response.json();
+    console.log('API Response:', JSON.stringify(data, null, 2));
 
     if (!data.elements || data.elements.length === 0) {
       console.warn('No courses returned from API, using sample data');
