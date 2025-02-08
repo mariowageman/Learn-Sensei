@@ -16,6 +16,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useState } from "react";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -55,12 +56,14 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 function Navigation() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <nav className="border-b">
       <div className="container py-4 px-4 flex items-center justify-between">
         {/* Mobile Menu */}
         <div className="sm:hidden">
-          <Sheet>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Menu className="h-6 w-6" />
@@ -68,10 +71,7 @@ function Navigation() {
             </SheetTrigger>
             <SheetContent side="left" className="w-64">
               <div className="flex flex-col gap-2 mt-4">
-                <NavigationLinks onNavigate={() => {
-                  const closeEvent = new CustomEvent('closeSheet');
-                  window.dispatchEvent(closeEvent);
-                }} />
+                <NavigationLinks onNavigate={() => setIsOpen(false)} />
               </div>
             </SheetContent>
           </Sheet>
