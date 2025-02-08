@@ -56,7 +56,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
   };
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-4 px-6">
       <Card className="p-4 space-y-4">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-medium text-[#3A3D98]">Learning Progress</h3>
