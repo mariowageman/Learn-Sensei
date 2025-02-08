@@ -510,37 +510,26 @@ function calculateConfidenceScore(
   timeSpent: number,
   progress?: typeof learningPathProgress.$inferSelect | null
 ): number {
-  let score = 0.7; // Start with a base score of 70% for recommended courses
+  let score = 0.9; // Start with a base score of 90% for recommended courses
 
-  // Quiz performance (10% weight)
-  score += quizAccuracy * 0.1;
+  // Quiz performance (5% weight)
+  score += quizAccuracy * 0.05;
 
-  // Engagement score from time spent (10% weight)
+  // Engagement score from time spent (2% weight)
   const engagementScore = Math.min(timeSpent / (path.estimatedHours * 60), 1);
-  score += engagementScore * 0.1;
+  score += engagementScore * 0.02;
 
-  // Progress and completion patterns (10% weight)
+  // Progress and completion patterns (3% weight)
   if (progress) {
     const progressScore = (progress.completedTopics as number[]).length / (path.topics as string[]).length;
-    score += progressScore * 0.1;
-
-    // Bonus for consistent learning (streak) - no more than 5%
-    const streakBonus = Math.min(progress.streakDays / 7, 1) * 0.05;
-    score += streakBonus;
+    score += progressScore * 0.03;
   } else {
-    // For new users, boost score for beginner paths
-    score += (path.difficulty === 'beginner' ? 0.1 : 0.05);
+    // For new courses or users, maintain high confidence
+    score += 0.03;
   }
 
-  // Topic relevance check - simplified to avoid type mismatches
-  if (progress?.completedTopics) {
-    const completedTopicsCount = (progress.completedTopics as any[]).length;
-    // If user has completed some topics, they get maximum relevance score
-    score += completedTopicsCount > 0 ? 0.05 : 0.02;
-  }
-
-  // Ensure the score is between 0.7 and 1.0 (70% - 100%)
-  return Math.max(0.7, Math.min(1, score));
+  // Ensure the score is between 0.9 and 1.0 (90% - 100%)
+  return Math.max(0.9, Math.min(1, score));
 }
 
 function generateRecommendationReason(
@@ -552,7 +541,7 @@ function generateRecommendationReason(
     if (path.difficulty === 'beginner') {
       return `Perfect starting point: ${path.title} will help you build a strong foundation in ${(path.topics as string[])[0]}.`;
     }
-    return `Recommended based on your interests in ${(path.topics as string[])[0]}.`;
+    return `Highly recommended based on your interests in ${(path.topics as string[])[0]}.`;
   }
 
   const completedTopics = (progress.completedTopics as number[]).length;
@@ -560,20 +549,16 @@ function generateRecommendationReason(
 
   if (completedTopics > 0) {
     const progressPercent = Math.round((completedTopics / totalTopics) * 100);
-
-    if (progress.streakDays >= 3) {
-      return `Great momentum! Keep your ${progress.streakDays}-day streak going with ${path.title}. You're already ${progressPercent}% through!`;
-    }
-    return `Continue building your knowledge in ${path.title} - you've already mastered ${progressPercent}% of related topics!`;
+    return `Strong match! Continue building your knowledge in ${path.title} - you've already mastered ${progressPercent}% of related topics!`;
   }
 
   if (quizAccuracy > 0.8) {
-    return `Based on your excellent quiz performance (${Math.round(quizAccuracy * 100)}% accuracy), ${path.title} will be a perfect challenge!`;
+    return `Perfect match! Based on your excellent quiz performance (${Math.round(quizAccuracy * 100)}% accuracy), ${path.title} will be an ideal next step!`;
   }
 
   if (quizAccuracy > 0.5) {
-    return `Your quiz results show you're ready for ${path.title}. It aligns well with your current skill level.`;
+    return `Great match! ${path.title} aligns perfectly with your current skill level.`;
   }
 
-  return `${path.title} matches your learning style and will help reinforce key concepts.`;
+  return `Excellent match! ${path.title} is highly recommended for your learning journey.`;
 }
