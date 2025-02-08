@@ -19,6 +19,11 @@ import {
 } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 
+// For development, we can import the asset directly
+const logoPath = import.meta.env.DEV 
+  ? "/src/assets/learn-sensei-logo-icon.svg"
+  : "/learn-sensei-logo-icon.svg";
+
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
@@ -137,7 +142,7 @@ function Navigation() {
           <div className="absolute left-1/2 transform -translate-x-1/2 sm:static sm:transform-none sm:left-0">
             <Link href="/">
               <img 
-                src="/learn-sensei-logo-icon.svg"
+                src={logoPath}
                 alt="Learn Sensei Logo" 
                 className="h-8 w-8"
               />
