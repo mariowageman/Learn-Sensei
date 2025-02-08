@@ -73,7 +73,6 @@ function Navigation() {
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       const touch = e.touches[0];
-      // Allow touch start from left edge when closed, or anywhere when open
       if (!isOpen && touch.clientX < 30) {
         setTouchStart({ x: touch.clientX, y: touch.clientY });
       } else if (isOpen) {
@@ -88,14 +87,11 @@ function Navigation() {
       const deltaX = touch.clientX - touchStart.x;
       const deltaY = Math.abs(touch.clientY - touchStart.y);
 
-      // If horizontal swipe is greater than vertical movement
       if (Math.abs(deltaX) > deltaY) {
         if (!isOpen && deltaX > 50) {
-          // Swipe right to open
           setIsOpen(true);
           setTouchStart(null);
         } else if (isOpen && deltaX < -50) {
-          // Swipe left to close
           setIsOpen(false);
           setTouchStart(null);
         }
@@ -120,20 +116,36 @@ function Navigation() {
   return (
     <nav className="border-b">
       <div className="container py-4 px-4 flex items-center justify-between">
-        {/* Mobile Menu */}
-        <div className="sm:hidden touch-pan-y">
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-64">
-              <div className="flex flex-col gap-2 mt-4">
-                <NavigationLinks onNavigate={() => setIsOpen(false)} />
-              </div>
-            </SheetContent>
-          </Sheet>
+        {/* Mobile Menu and Logo */}
+        <div className="flex items-center justify-between w-full sm:w-auto">
+          <div className="sm:hidden">
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64">
+                <div className="flex flex-col gap-2 mt-4">
+                  <NavigationLinks onNavigate={() => setIsOpen(false)} />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          {/* Logo - centered on mobile, left-aligned on desktop */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 sm:static sm:transform-none sm:left-0">
+            <Link href="/">
+              <img 
+                src="/attached_assets/learn-sensei-logo-icon-250px.png" 
+                alt="Learn Sensei Logo" 
+                className="h-8 w-8"
+              />
+            </Link>
+          </div>
+
+          {/* Placeholder div to maintain mobile layout */}
+          <div className="w-8 sm:hidden"></div>
         </div>
 
         {/* Desktop Menu */}
