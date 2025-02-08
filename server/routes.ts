@@ -500,6 +500,79 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.get("/api/dashboard", async (req, res) => {
+    try {
+      // Get all quiz attempts
+      const quizAttempts = await db.query.quizProgress.findMany({
+        orderBy: (progress, { desc }) => [desc(progress.createdAt)]
+      });
+
+      // Get unique subjects
+      const subjects = [...new Set(quizAttempts.map(attempt => attempt.subject))];
+
+      // Calculate overall stats
+      const totalSubjects = subjects.length;
+      let totalCorrect = 0;
+      let totalAttempts = 0;
+
+      // Calculate subject-specific performance
+      const subjectPerformance = subjects.map(subject => {
+        const subjectAttempts = quizAttempts.filter(attempt => attempt.subject === subject);
+        const correct = subjectAttempts.filter(attempt => attempt.isCorrect).length;
+        const total = subjectAttempts.length;
+
+        totalCorrect += correct;
+        totalAttempts += total;
+
+        return {
+          subject,
+          totalAttempts: total,
+          correctAnswers: correct,
+          accuracy: Math.round((correct / total) * 100)
+        };
+      });
+
+      // Get the current learning streak
+      const pathProgress = await db.query.learningPathProgress.findMany({
+        orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
+      });
+
+      const currentStreak = pathProgress[0]?.streakDays || 0;
+
+      // Calculate total time spent
+      const totalTimeSpent = pathProgress.reduce((total, progress) => {
+        const timeSpent = progress.timeSpentMinutes as Record<string, number>;
+        return total + Object.values(timeSpent).reduce((sum, time) => sum + (time || 0), 0);
+      }, 0);
+
+      // Get recent activity
+      const recentActivity = await Promise.all(
+        quizAttempts.slice(0, 5).map(async attempt => {
+          return {
+            subject: attempt.subject,
+            type: 'Quiz Question',
+            result: attempt.isCorrect ? 'Correct' : 'Incorrect',
+            timestamp: attempt.createdAt
+          };
+        })
+      );
+
+      res.json({
+        overallProgress: {
+          totalSubjects,
+          completedSubjects: subjects.length,
+          averageAccuracy: totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0,
+          totalTimeSpent,
+          currentStreak
+        },
+        subjectPerformance,
+        recentActivity
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      res.status(500).json({ error: "Failed to fetch dashboard data" });
+    }
+  });
 
   return httpServer;
 }

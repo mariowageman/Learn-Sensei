@@ -7,8 +7,9 @@ import Home from "@/pages/home";
 import LearningPaths from "@/pages/learning-paths";
 import LearningPath from "@/pages/learning-path";
 import SenseiMode from "@/pages/sensei";
+import { DashboardPage } from "@/pages/dashboard";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Home as HomeIcon, Brain, Menu } from "lucide-react";
+import { BookOpen, Home as HomeIcon, Brain, Menu, LayoutDashboard } from "lucide-react";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
@@ -29,6 +30,16 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
         >
           <HomeIcon className="h-4 w-4" />
           Home
+        </Button>
+      </Link>
+      <Link href="/dashboard">
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start gap-2"
+          onClick={onNavigate}
+        >
+          <LayoutDashboard className="h-4 w-4" />
+          Dashboard
         </Button>
       </Link>
       <Link href="/sensei">
@@ -142,6 +153,7 @@ function Router() {
       <Navigation />
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/dashboard" component={DashboardPage} />
         <Route path="/learning-paths" component={LearningPaths} />
         <Route path="/learning-paths/:id" component={LearningPath} />
         <Route path="/sensei" component={SenseiMode} />
