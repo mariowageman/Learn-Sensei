@@ -59,16 +59,19 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
     <div className="grid gap-4">
       <Card className="p-4 space-y-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-medium">Learning Progress</h3>
-          <span className="text-2xl font-bold">{progress.percentage}%</span>
+          <h3 className="text-lg font-medium text-[#3A3D98]">Learning Progress</h3>
+          <span className="text-2xl font-bold text-[#3A3D98]">{progress.percentage}%</span>
         </div>
 
-        <Progress value={progress.percentage} className="h-2" />
+        <Progress 
+          value={progress.percentage} 
+          className="h-2 bg-gradient-to-r from-[#3A3D98]/20 to-[#3A3D98]/30 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-[#3A3D98] [&>[role=progressbar]]:to-[#3A3D98]/80" 
+        />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Target className="h-4 w-4" />
+              <Target className="h-4 w-4 text-[#3A3D98]" />
               <span>Total Questions</span>
             </div>
             <p className="text-lg font-semibold">{progress.total}</p>
@@ -76,7 +79,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
 
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <CheckCircle className="h-4 w-4" />
+              <CheckCircle className="h-4 w-4 text-[#3A3D98]" />
               <span>Correct Answers</span>
             </div>
             <p className="text-lg font-semibold">{progress.correct}</p>
@@ -84,7 +87,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
 
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Timer className="h-4 w-4" />
+              <Timer className="h-4 w-4 text-[#3A3D98]" />
               <span>Time Spent</span>
             </div>
             <p className="text-lg font-semibold">
@@ -94,7 +97,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
 
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Award className="h-4 w-4" />
+              <Award className="h-4 w-4 text-[#3A3D98]" />
               <span>Current Streak</span>
             </div>
             <p className="text-lg font-semibold">{progress.streakDays} days</p>
@@ -107,7 +110,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-medium">Weekly Progress</h4>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <TrendingUp className="h-4 w-4" />
+              <TrendingUp className="h-4 w-4 text-[#3A3D98]" />
               <span>Avg. Accuracy: {progress.avgAccuracy}%</span>
             </div>
           </div>
@@ -116,13 +119,13 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
               <div key={day.date} className="text-center">
                 <div className="h-20 relative">
                   <div
-                    className="absolute bottom-0 w-full bg-primary/20 rounded-sm"
+                    className="absolute bottom-0 w-full bg-[#3A3D98]/20 rounded-sm"
                     style={{
                       height: `${(day.correct / Math.max(...progress.weeklyProgress.map(d => d.total))) * 100}%`
                     }}
                   >
                     <div
-                      className="absolute bottom-0 w-full bg-primary rounded-sm"
+                      className="absolute bottom-0 w-full bg-[#3A3D98] rounded-sm"
                       style={{
                         height: `${(day.correct / day.total) * 100}%`
                       }}

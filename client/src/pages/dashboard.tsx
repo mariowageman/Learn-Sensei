@@ -44,13 +44,13 @@ export function DashboardPage() {
 
   return (
     <div className="container py-8 space-y-8">
-      <h1 className="text-4xl font-bold mb-8">Learning Dashboard</h1>
-      
+      <h1 className="text-4xl font-bold mb-8 text-[#3A3D98]">Learning Dashboard</h1>
+
       {/* Overall Progress Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-primary" />
+            <Brain className="h-5 w-5 text-[#3A3D98]" />
             <h3 className="font-medium">Overall Progress</h3>
           </div>
           <div className="mt-2">
@@ -63,18 +63,19 @@ export function DashboardPage() {
             </div>
             <Progress 
               value={(dashboardData.overallProgress.completedSubjects / 
-                Math.max(dashboardData.overallProgress.totalSubjects, 1)) * 100} 
+                Math.max(dashboardData.overallProgress.totalSubjects, 1)) * 100}
+              className="bg-gradient-to-r from-[#3A3D98]/20 to-[#3A3D98]/30 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-[#3A3D98] [&>[role=progressbar]]:to-[#3A3D98]/80"
             />
           </div>
         </Card>
 
         <Card className="p-4">
           <div className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-primary" />
+            <Target className="h-5 w-5 text-[#3A3D98]" />
             <h3 className="font-medium">Average Accuracy</h3>
           </div>
           <div className="mt-4">
-            <span className="text-3xl font-bold">
+            <span className="text-3xl font-bold text-[#3A3D98]">
               {dashboardData.overallProgress.averageAccuracy}%
             </span>
           </div>
@@ -82,11 +83,11 @@ export function DashboardPage() {
 
         <Card className="p-4">
           <div className="flex items-center gap-2">
-            <Award className="h-5 w-5 text-primary" />
+            <Award className="h-5 w-5 text-[#3A3D98]" />
             <h3 className="font-medium">Learning Streak</h3>
           </div>
           <div className="mt-4">
-            <span className="text-3xl font-bold">
+            <span className="text-3xl font-bold text-[#3A3D98]">
               {dashboardData.overallProgress.currentStreak} days
             </span>
           </div>
@@ -96,7 +97,7 @@ export function DashboardPage() {
       {/* Subject Performance Section */}
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-6">
-          <Book className="h-5 w-5 text-primary" />
+          <Book className="h-5 w-5 text-[#3A3D98]" />
           <h3 className="text-xl font-medium">Subject Performance</h3>
         </div>
         <div className="space-y-4">
@@ -108,7 +109,10 @@ export function DashboardPage() {
                   {subject.accuracy}% accuracy
                 </span>
               </div>
-              <Progress value={subject.accuracy} />
+              <Progress 
+                value={subject.accuracy}
+                className="bg-gradient-to-r from-[#3A3D98]/20 to-[#3A3D98]/30 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-[#3A3D98] [&>[role=progressbar]]:to-[#3A3D98]/80"
+              />
             </div>
           ))}
         </div>
@@ -117,7 +121,7 @@ export function DashboardPage() {
       {/* Recent Activity */}
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-6">
-          <Clock className="h-5 w-5 text-primary" />
+          <Clock className="h-5 w-5 text-[#3A3D98]" />
           <h3 className="text-xl font-medium">Recent Activity</h3>
         </div>
         <div className="space-y-4">
