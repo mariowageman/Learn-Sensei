@@ -23,7 +23,7 @@ interface LearningPath {
     currentTopic: number;
     completed: boolean;
     completedTopics: number[];
-    intensity?: number; // Added intensity property
+    intensity?: string; // Changed from number to string
   }[];
 }
 
