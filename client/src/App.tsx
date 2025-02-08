@@ -8,34 +8,65 @@ import LearningPaths from "@/pages/learning-paths";
 import LearningPath from "@/pages/learning-path";
 import SenseiMode from "@/pages/sensei";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Home as HomeIcon, Brain } from "lucide-react";
+import { BookOpen, Home as HomeIcon, Brain, Menu } from "lucide-react";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+
+function NavigationLinks() {
+  return (
+    <>
+      <Link href="/">
+        <Button variant="ghost" className="w-full justify-start gap-2">
+          <HomeIcon className="h-4 w-4" />
+          Home
+        </Button>
+      </Link>
+      <Link href="/sensei">
+        <Button variant="ghost" className="w-full justify-start gap-2">
+          <Brain className="h-4 w-4" />
+          Sensei Mode
+        </Button>
+      </Link>
+      <Link href="/learning-paths">
+        <Button variant="ghost" className="w-full justify-start gap-2">
+          <BookOpen className="h-4 w-4" />
+          Learning Paths
+        </Button>
+      </Link>
+    </>
+  );
+}
 
 function Navigation() {
   return (
     <nav className="border-b">
       <div className="container py-4 px-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/">
-            <Button variant="ghost" className="gap-2">
-              <HomeIcon className="h-4 w-4" />
-              Home
-            </Button>
-          </Link>
-          <Link href="/sensei">
-            <Button variant="ghost" className="gap-2">
-              <Brain className="h-4 w-4" />
-              Sensei Mode
-            </Button>
-          </Link>
-          <Link href="/learning-paths">
-            <Button variant="ghost" className="gap-2">
-              <BookOpen className="h-4 w-4" />
-              Learning Paths
-            </Button>
-          </Link>
+        {/* Mobile Menu */}
+        <div className="sm:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64">
+              <div className="flex flex-col gap-2 mt-4">
+                <NavigationLinks />
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
+
+        {/* Desktop Menu */}
+        <div className="hidden sm:flex items-center gap-4">
+          <NavigationLinks />
+        </div>
+
         <ThemeToggle />
       </div>
     </nav>
