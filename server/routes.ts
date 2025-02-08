@@ -403,18 +403,19 @@ export function registerRoutes(app: Express): Server {
         orderBy: (quiz, { desc }) => [desc(quiz.createdAt)]
       });
 
+      // Get subject history
+      const subjectHistory = await db.query.subjectHistory.findMany({
+        orderBy: (history, { desc }) => [desc(history.createdAt)]
+      });
+
       // Get all learning paths
       const allPaths = await db.query.learningPaths.findMany({
         orderBy: (paths, { asc }) => [asc(paths.difficulty)]
       });
 
-      // Calculate recommendations based on:
-      // 1. Current skill level (from quiz performance)
-      // 2. Learning pace (from time spent)
-      // 3. Topic progression (from completed topics)
+      // Calculate recommendations
       const recommendations = allPaths
         .filter(path => {
-          // Filter out paths that user has already completed
           const pathProgress = progress.find(p => p.pathId === path.id);
           return !pathProgress?.completed;
         })
@@ -422,7 +423,6 @@ export function registerRoutes(app: Express): Server {
           const pathProgress = progress.find(p => p.pathId === path.id);
           const subjectQuizzes = quizPerformance.filter(q => q.subject === path.title);
 
-          // Calculate confidence score based on various factors
           const quizAccuracy = subjectQuizzes.length > 0
             ? subjectQuizzes.filter(q => q.isCorrect).length / subjectQuizzes.length
             : 0;
@@ -432,15 +432,14 @@ export function registerRoutes(app: Express): Server {
               .reduce((sum, time) => sum + time, 0)
             : 0;
 
-          // Calculate a confidence score (0-1) for this recommendation
           const confidenceScore = calculateConfidenceScore(
             path,
             quizAccuracy,
             timeSpent,
-            pathProgress
+            pathProgress,
+            subjectHistory
           );
 
-          // Generate a personalized reason for the recommendation
           const reason = generateRecommendationReason(
             path,
             quizAccuracy,
@@ -508,10 +507,25 @@ function calculateConfidenceScore(
   path: typeof learningPaths.$inferSelect,
   quizAccuracy: number,
   timeSpent: number,
-  progress?: typeof learningPathProgress.$inferSelect | null
+  progress?: typeof learningPathProgress.$inferSelect | null,
+  subjectHistory?: { subject: string }[] = []
 ): number {
   // Start with base score of 70%
   let score = 0.70;
+
+  // Subject history bonus (up to 15%)
+  const topics = (path.topics as string[]) || [];
+  const mainTopic = topics[0]?.toLowerCase() || path.title.toLowerCase();
+  const hasSubjectHistory = subjectHistory?.some(
+    h => {
+      const historySubject = h.subject.toLowerCase();
+      const topicMatch = mainTopic.includes(historySubject) || historySubject.includes(mainTopic);
+      return topicMatch;
+    }
+  );
+  if (hasSubjectHistory) {
+    score += 0.15; // Higher match for subjects user has studied before
+  }
 
   // Quiz performance (up to 10%)
   score += quizAccuracy * 0.10;
@@ -522,13 +536,10 @@ function calculateConfidenceScore(
 
   // For new users or no progress
   if (!progress) {
-    // Boost score for beginner courses
     if (path.difficulty === 'beginner') {
-      score += 0.15; // Higher match for beginner courses
+      score += 0.10; // Higher match for beginner courses
     } else if (path.difficulty === 'intermediate') {
-      score += 0.10; // Medium match for intermediate courses
-    } else {
-      score += 0.05; // Lower match for advanced courses
+      score += 0.05; // Medium match for intermediate courses
     }
     return Math.max(0.70, Math.min(1, score));
   }
@@ -539,7 +550,7 @@ function calculateConfidenceScore(
 
   // Topic mastery (up to 5%)
   const completedTopics = progress.completedTopics as number[];
-  const topicMasteryScore = completedTopics.length / (path.topics as string[]).length;
+  const topicMasteryScore = completedTopics.length / topics.length;
   score += topicMasteryScore * 0.05;
 
   // Difficulty progression (up to 5%)
@@ -560,8 +571,8 @@ function generateRecommendationReason(
   quizAccuracy: number,
   progress?: typeof learningPathProgress.$inferSelect | null
 ): string {
-  const topics = path.topics as string[];
-  const mainTopic = topics[0];
+  const topics = (path.topics as string[]) || [];
+  const mainTopic = topics[0] || path.title;
 
   if (!progress) {
     if (path.difficulty === 'beginner') {
