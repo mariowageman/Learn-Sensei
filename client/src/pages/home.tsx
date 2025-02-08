@@ -1,84 +1,82 @@
-import { SubjectForm } from "@/components/learning/subject-form";
-import { Conversation } from "@/components/learning/conversation";
-import { Quiz } from "@/components/learning/quiz";
-import { LearningRecommendations } from "@/components/learning/recommendations";
-import { RecentSubjects } from "@/components/learning/recent-subjects";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { apiRequest } from "@/lib/api";
-import { queryClient } from "@/lib/queryClient";
+import { RecentSubjects } from "@/components/learning/recent-subjects";
+import { LearningRecommendations } from "@/components/learning/recommendations";
+import { GraduationCap, Brain, Target, Sparkles } from "lucide-react";
 
 export default function Home() {
-  const [subject, setSubject] = useState<string>("");
-  const [showQuiz, setShowQuiz] = useState(true);
-
-  const { data: session, isLoading } = useQuery({
-    queryKey: ["/api/session"],
-    enabled: !!subject
-  });
-
-  const createSession = useMutation({
-    mutationFn: async (newSubject: string) => {
-      const response = await apiRequest("POST", "/api/session", { subject: newSubject });
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/recent-subjects"] });
-    }
-  });
-
-  const handleSubjectSubmit = async (newSubject: string) => {
-    setSubject(newSubject);
-    await createSession.mutate(newSubject);
-  };
-
-  if (!subject) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col p-4">
-        <div className="w-full max-w-[800px] mx-auto px-4 space-y-12">
-          <div className="text-center space-y-4">
-            <h1 className="text-3xl sm:text-4xl font-bold">AI Learning Assistant</h1>
-            <p className="text-muted-foreground">
-              Enter any subject you'd like to learn about and get an interactive explanation
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <section className="relative py-20 px-4 overflow-hidden bg-gradient-to-b from-primary/5 to-background">
+        <div className="absolute inset-0 bg-grid-white/10" />
+        <div className="relative max-w-6xl mx-auto text-center space-y-8">
+          <div className="space-y-4">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+              Learn Sensei
+            </h1>
+            <p className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto">
+              Your AI-powered learning companion for personalized education
             </p>
           </div>
-          <SubjectForm onSubmit={handleSubjectSubmit} />
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/sensei">
+              <Button size="lg" className="w-full sm:w-auto">
+                <Brain className="mr-2 h-5 w-5" />
+                Enter Sensei Mode
+              </Button>
+            </Link>
+            <Link href="/learning-paths">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                <GraduationCap className="mr-2 h-5 w-5" />
+                Browse Courses
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Why Choose Learn Sensei?
+          </h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="p-6 rounded-lg border bg-card">
+              <Brain className="h-12 w-12 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-2">AI-Powered Learning</h3>
+              <p className="text-muted-foreground">
+                Personalized learning experience adapting to your pace and style
+              </p>
+            </div>
+            <div className="p-6 rounded-lg border bg-card">
+              <Target className="h-12 w-12 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Instant Feedback</h3>
+              <p className="text-muted-foreground">
+                Get real-time assessment and tailored suggestions for improvement
+              </p>
+            </div>
+            <div className="p-6 rounded-lg border bg-card">
+              <Sparkles className="h-12 w-12 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Diverse Content</h3>
+              <p className="text-muted-foreground">
+                Access curated courses from leading institutions and experts
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Recent & Recommendations */}
+      <section className="py-20 px-4 bg-muted/30">
+        <div className="max-w-6xl mx-auto space-y-12">
           <div className="grid gap-8 md:grid-cols-2">
-            <RecentSubjects onSelectSubject={handleSubjectSubmit} />
+            <RecentSubjects onSelectSubject={(subject) => window.location.href = `/sensei?subject=${subject}`} />
             <LearningRecommendations />
           </div>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-background px-4 py-6">
-      <div className="w-full max-w-[800px] mx-auto space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <h2 className="text-xl sm:text-2xl font-bold break-words">Learning about: {subject}</h2>
-          <Button
-            variant="outline"
-            onClick={() => setShowQuiz(!showQuiz)}
-            className="w-full sm:w-auto"
-          >
-            {showQuiz ? "Back to Lesson" : "Take Quiz"}
-          </Button>
-        </div>
-
-        {isLoading ? (
-          <div className="space-y-4">
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
-          </div>
-        ) : showQuiz ? (
-          <Quiz subject={subject} />
-        ) : (
-          <Conversation subject={subject} />
-        )}
-      </div>
+      </section>
     </div>
   );
 }

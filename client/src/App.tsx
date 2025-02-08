@@ -6,8 +6,9 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import LearningPaths from "@/pages/learning-paths";
 import LearningPath from "@/pages/learning-path";
+import SenseiMode from "@/pages/sensei";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Home as HomeIcon } from "lucide-react";
+import { BookOpen, Home as HomeIcon, Brain } from "lucide-react";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -20,6 +21,12 @@ function Navigation() {
             <Button variant="ghost" className="gap-2">
               <HomeIcon className="h-4 w-4" />
               Home
+            </Button>
+          </Link>
+          <Link href="/sensei">
+            <Button variant="ghost" className="gap-2">
+              <Brain className="h-4 w-4" />
+              Sensei Mode
             </Button>
           </Link>
           <Link href="/learning-paths">
@@ -43,6 +50,7 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/learning-paths" component={LearningPaths} />
         <Route path="/learning-paths/:id" component={LearningPath} />
+        <Route path="/sensei" component={SenseiMode} />
         <Route component={NotFound} />
       </Switch>
     </>
