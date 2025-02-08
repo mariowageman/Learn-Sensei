@@ -17,23 +17,35 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-function NavigationLinks() {
+function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       <Link href="/">
-        <Button variant="ghost" className="w-full justify-start gap-2">
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start gap-2"
+          onClick={onNavigate}
+        >
           <HomeIcon className="h-4 w-4" />
           Home
         </Button>
       </Link>
       <Link href="/sensei">
-        <Button variant="ghost" className="w-full justify-start gap-2">
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start gap-2"
+          onClick={onNavigate}
+        >
           <Brain className="h-4 w-4" />
           Sensei Mode
         </Button>
       </Link>
       <Link href="/learning-paths">
-        <Button variant="ghost" className="w-full justify-start gap-2">
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start gap-2"
+          onClick={onNavigate}
+        >
           <BookOpen className="h-4 w-4" />
           Learning Paths
         </Button>
@@ -51,12 +63,15 @@ function Navigation() {
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
-                <Menu className="h-5 w-5" />
+                <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-64">
               <div className="flex flex-col gap-2 mt-4">
-                <NavigationLinks />
+                <NavigationLinks onNavigate={() => {
+                  const closeEvent = new CustomEvent('closeSheet');
+                  window.dispatchEvent(closeEvent);
+                }} />
               </div>
             </SheetContent>
           </Sheet>
