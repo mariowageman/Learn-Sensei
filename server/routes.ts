@@ -12,13 +12,14 @@ import {
   learningPathProgress,
   progressAnalytics,
   subjectHistory
+} from "@db/schema";
+import { fetchCourseraCourses, type CourseraCourse } from "./coursera";
 
+// Initialize Coursera API configuration
 const courseraConfig = {
   apiKey: process.env.COURSERA_API_KEY,
   apiSecret: process.env.COURSERA_API_SECRET
 };
-
-} from "@db/schema";
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
@@ -209,10 +210,10 @@ export function registerRoutes(app: Express): Server {
       // Calculate average accuracy
       const avgAccuracy = weeklyProgress.length > 0
         ? Math.round(
-            weeklyProgress.reduce((sum, day) =>
-              sum + ((day.correctAnswers / (day.totalAttempts || 1)) * 100), 0
-            ) / weeklyProgress.length
-          )
+          weeklyProgress.reduce((sum, day) =>
+            sum + ((day.correctAnswers / (day.totalAttempts || 1)) * 100), 0
+          ) / weeklyProgress.length
+        )
         : 0;
 
       res.json({
@@ -238,18 +239,27 @@ export function registerRoutes(app: Express): Server {
   // Learning Paths routes
   app.get("/api/learning-paths", async (req, res) => {
     try {
-      const paths = await db.query.learningPaths.findMany({
-        orderBy: (paths, { asc }) => [asc(paths.difficulty), asc(paths.title)],
-        with: {
-          progress: {
-            orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
-          }
-        }
-      });
+      const courses = await fetchCourseraCourses();
+
+      // Transform Coursera courses into our learning path format
+      const paths = courses.map(course => ({
+        id: parseInt(course.id),
+        title: course.name,
+        description: course.description,
+        difficulty: course.specializations?.length ? "advanced" : "intermediate",
+        topics: course.primaryLanguages || [],
+        prerequisites: [],
+        estimatedHours: parseInt(course.workload?.split(" ")[0] || "0"),
+        instructor: course.instructors[0]?.fullName,
+        partner: course.partners[0]?.name,
+        photoUrl: course.photoUrl,
+        externalLink: `https://www.coursera.org/learn/${course.slug}`
+      }));
+
       res.json(paths);
     } catch (error) {
-      console.error('Error fetching learning paths:', error);
-      res.status(500).json({ error: "Failed to fetch learning paths" });
+      console.error('Error fetching Coursera courses:', error);
+      res.status(500).json({ error: "Failed to fetch courses" });
     }
   });
 
@@ -419,7 +429,7 @@ export function registerRoutes(app: Express): Server {
 
           const timeSpent = pathProgress
             ? Object.values(pathProgress.timeSpentMinutes as Record<string, number>)
-                .reduce((sum, time) => sum + time, 0)
+              .reduce((sum, time) => sum + time, 0)
             : 0;
 
           // Calculate a confidence score (0-1) for this recommendation

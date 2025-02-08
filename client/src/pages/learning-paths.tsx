@@ -3,8 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Timer, BookOpen, ArrowRight } from "lucide-react";
-import { Link } from "wouter";
+import { Timer, BookOpen, ArrowRight, GraduationCap, Building2 } from "lucide-react";
 
 interface LearningPath {
   id: number;
@@ -14,6 +13,10 @@ interface LearningPath {
   topics: string[];
   prerequisites: number[];
   estimatedHours: number;
+  instructor: string;
+  partner: string;
+  photoUrl?: string;
+  externalLink: string;
 }
 
 const difficultyColors = {
@@ -43,46 +46,69 @@ export default function LearningPaths() {
   return (
     <div className="container max-w-6xl mx-auto px-8 py-8 space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Learning Paths</h1>
+        <h1 className="text-3xl font-bold">Coursera Courses</h1>
         <p className="text-muted-foreground">
-          Choose a structured learning path to progressively build your knowledge
+          Explore curated courses from leading universities and companies
         </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {paths?.map((path) => (
-          <Card key={path.id} className="flex flex-col p-6">
-            <div className="space-y-4">
-              <Badge 
-                className={`w-fit ${difficultyColors[path.difficulty]}`}
-              >
-                {path.difficulty}
-              </Badge>
-              <div className="space-y-2">
-                <h2 className="text-xl font-semibold">{path.title}</h2>
-                <p className="text-muted-foreground">{path.description}</p>
+          <Card key={path.id} className="flex flex-col overflow-hidden">
+            {path.photoUrl && (
+              <div className="relative h-48 w-full">
+                <img
+                  src={path.photoUrl}
+                  alt={path.title}
+                  className="object-cover w-full h-full"
+                />
               </div>
-            </div>
-
-            <div className="flex-1 flex flex-col justify-between mt-6">
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  <span>{path.topics.length} Topics</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Timer className="h-4 w-4" />
-                  <span>{path.estimatedHours} hours estimated</span>
+            )}
+            <div className="flex flex-col p-6 flex-1">
+              <div className="space-y-4">
+                <Badge 
+                  className={`w-fit ${difficultyColors[path.difficulty]}`}
+                >
+                  {path.difficulty}
+                </Badge>
+                <div className="space-y-2">
+                  <h2 className="text-xl font-semibold">{path.title}</h2>
+                  <p className="text-muted-foreground line-clamp-2">{path.description}</p>
                 </div>
               </div>
 
-              <div className="mt-8">
-                <Link href={`/learning-paths/${path.id}`}>
-                  <Button className="w-full">
-                    Start Learning
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+              <div className="flex-1 flex flex-col justify-between mt-6">
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  {path.instructor && (
+                    <div className="flex items-center gap-2">
+                      <GraduationCap className="h-4 w-4" />
+                      <span>{path.instructor}</span>
+                    </div>
+                  )}
+                  {path.partner && (
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      <span>{path.partner}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4" />
+                    <span>{path.topics.length} Topics</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Timer className="h-4 w-4" />
+                    <span>{path.estimatedHours} hours estimated</span>
+                  </div>
+                </div>
+
+                <div className="mt-8">
+                  <a href={path.externalLink} target="_blank" rel="noopener noreferrer">
+                    <Button className="w-full">
+                      View on Coursera
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </a>
+                </div>
               </div>
             </div>
           </Card>
