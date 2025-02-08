@@ -1,5 +1,6 @@
 import { Quiz } from "@/components/learning/quiz";
 import { SubjectForm } from "@/components/learning/subject-form";
+import { RecentSubjects } from "@/components/learning/recent-subjects";
 import { useState } from "react";
 
 export default function SenseiMode() {
@@ -16,8 +17,11 @@ export default function SenseiMode() {
         </div>
 
         {!subject ? (
-          <div className="max-w-xl mx-auto">
-            <SubjectForm onSubmit={setSubject} />
+          <div className="space-y-8">
+            <div className="max-w-xl mx-auto">
+              <SubjectForm onSubmit={setSubject} />
+            </div>
+            <RecentSubjects onSelectSubject={setSubject} />
           </div>
         ) : (
           <div className="space-y-6">

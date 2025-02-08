@@ -1,6 +1,5 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { RecentSubjects } from "@/components/learning/recent-subjects";
 import { LearningRecommendations } from "@/components/learning/recommendations";
 import { GraduationCap, Brain, Target, Sparkles } from "lucide-react";
 
@@ -68,13 +67,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Recent & Recommendations */}
+      {/* Recommendations */}
       <section className="py-20 px-4 bg-muted/30">
-        <div className="max-w-6xl mx-auto space-y-12">
-          <div className="grid gap-8 md:grid-cols-2">
-            <RecentSubjects onSelectSubject={(subject) => window.location.href = `/sensei?subject=${subject}`} />
-            <LearningRecommendations />
-          </div>
+        <div className="max-w-6xl mx-auto">
+          <LearningRecommendations />
         </div>
       </section>
     </div>
