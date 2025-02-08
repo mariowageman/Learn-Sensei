@@ -137,7 +137,7 @@ function Navigation() {
           <div className="absolute left-1/2 transform -translate-x-1/2 sm:static sm:transform-none sm:left-0">
             <Link href="/">
               <img 
-                src="/attached_assets/learn-sensei-logo-icon-250px.png"
+                src="/src/assets/learn-sensei-logo-icon.svg"
                 alt="Learn Sensei Logo" 
                 className="h-8 w-8"
               />
