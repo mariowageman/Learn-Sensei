@@ -510,26 +510,28 @@ function calculateConfidenceScore(
   timeSpent: number,
   progress?: typeof learningPathProgress.$inferSelect | null
 ): number {
-  let score = 0.9; // Start with a base score of 90% for recommended courses
+  // For highly recommended courses, return maximum confidence
+  if (!progress && path.difficulty === 'beginner') {
+    return 1.0; // 100% match for recommended beginner courses
+  }
 
-  // Quiz performance (5% weight)
-  score += quizAccuracy * 0.05;
+  let score = 0.93; // Base score of 93% for other recommended courses
+
+  // Quiz performance (3% weight)
+  score += quizAccuracy * 0.03;
 
   // Engagement score from time spent (2% weight)
   const engagementScore = Math.min(timeSpent / (path.estimatedHours * 60), 1);
   score += engagementScore * 0.02;
 
-  // Progress and completion patterns (3% weight)
+  // Progress and completion patterns (2% weight)
   if (progress) {
     const progressScore = (progress.completedTopics as number[]).length / (path.topics as string[]).length;
-    score += progressScore * 0.03;
-  } else {
-    // For new courses or users, maintain high confidence
-    score += 0.03;
+    score += progressScore * 0.02;
   }
 
-  // Ensure the score is between 0.9 and 1.0 (90% - 100%)
-  return Math.max(0.9, Math.min(1, score));
+  // Ensure the score is between 0.93 and 1.0 (93% - 100%)
+  return Math.max(0.93, Math.min(1, score));
 }
 
 function generateRecommendationReason(
