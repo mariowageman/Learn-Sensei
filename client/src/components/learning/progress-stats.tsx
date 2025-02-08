@@ -65,7 +65,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
 
         <Progress 
           value={progress.percentage} 
-          className="h-2 bg-gradient-to-r from-[#3A3D98]/20 to-[#3A3D98]/30 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-[#3A3D98] [&>[role=progressbar]]:to-[#3A3D98]/80" 
+          className="h-2 bg-gradient-to-r from-green-100 to-green-200 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-green-500 [&>[role=progressbar]]:to-green-600" 
         />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
@@ -119,13 +119,13 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
               <div key={day.date} className="text-center">
                 <div className="h-20 relative">
                   <div
-                    className="absolute bottom-0 w-full bg-[#3A3D98]/20 rounded-sm"
+                    className="absolute bottom-0 w-full bg-green-100 rounded-sm"
                     style={{
                       height: `${(day.correct / Math.max(...progress.weeklyProgress.map(d => d.total))) * 100}%`
                     }}
                   >
                     <div
-                      className="absolute bottom-0 w-full bg-[#3A3D98] rounded-sm"
+                      className="absolute bottom-0 w-full bg-gradient-to-r from-green-500 to-green-600 rounded-sm"
                       style={{
                         height: `${(day.correct / day.total) * 100}%`
                       }}
