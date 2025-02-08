@@ -35,17 +35,31 @@ export async function fetchCourseraCourses(): Promise<CourseraCourse[]> {
     start: "0"
   });
 
-  const response = await fetch(`${COURSERA_API_BASE}?${params.toString()}`, {
-    headers: {
-      'Authorization': `Bearer ${process.env.COURSERA_API_KEY}:${process.env.COURSERA_API_SECRET}`,
-      'Accept': 'application/json'
+  console.log('Fetching courses from Coursera API...');
+
+  try {
+    const auth = Buffer.from(`${process.env.COURSERA_API_KEY}:${process.env.COURSERA_API_SECRET}`).toString('base64');
+
+    const response = await fetch(`${COURSERA_API_BASE}?${params.toString()}`, {
+      headers: {
+        'Authorization': `Basic ${auth}`,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      console.error('Coursera API error:', response.status, response.statusText);
+      const error = await response.text();
+      console.error('Error details:', error);
+      throw new Error(`Coursera API error: ${response.statusText}`);
     }
-  });
 
-  if (!response.ok) {
-    throw new Error(`Coursera API error: ${response.statusText}`);
+    const data = await response.json();
+    console.log('Received courses:', data.elements?.length || 0);
+
+    return courseSchema.array().parse(data.elements || []);
+  } catch (error) {
+    console.error('Error fetching Coursera courses:', error);
+    throw error;
   }
-
-  const data = await response.json();
-  return courseSchema.array().parse(data.elements);
 }
