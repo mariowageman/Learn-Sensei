@@ -16,7 +16,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -57,6 +57,44 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      if (touch.clientX < 30) {
+        setTouchStart({ x: touch.clientX, y: touch.clientY });
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!touchStart) return;
+
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - touchStart.x;
+      const deltaY = Math.abs(touch.clientY - touchStart.y);
+
+      // If horizontal swipe is greater than vertical movement and it's moving right
+      if (deltaX > 50 && deltaX > deltaY) {
+        setIsOpen(true);
+        setTouchStart(null);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      setTouchStart(null);
+    };
+
+    document.addEventListener('touchstart', handleTouchStart);
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [touchStart]);
 
   return (
     <nav className="border-b">
@@ -69,16 +107,7 @@ function Navigation() {
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent 
-              side="left" 
-              className="w-64"
-              onTouchStart={(e) => {
-                const touch = e.touches[0];
-                if (touch.clientX < 20) {
-                  setIsOpen(true);
-                }
-              }}
-            >
+            <SheetContent side="left" className="w-64">
               <div className="flex flex-col gap-2 mt-4">
                 <NavigationLinks onNavigate={() => setIsOpen(false)} />
               </div>
