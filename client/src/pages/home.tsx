@@ -12,7 +12,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-grid-white/10" />
         <div className="relative max-w-6xl mx-auto text-center space-y-8">
           <div className="space-y-4">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#3A3D98] to-[#3A3D98]/80">
               Learn Sensei
             </h1>
             <p className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto">
@@ -21,13 +21,13 @@ export default function Home() {
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/sensei">
-              <Button size="lg" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto bg-[#3A3D98] hover:bg-[#3A3D98]/90 text-white">
                 <Brain className="mr-2 h-5 w-5" />
                 Enter Sensei Mode
               </Button>
             </Link>
             <Link href="/learning-paths">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto border-[#3A3D98] text-[#3A3D98] hover:bg-[#3A3D98]/10">
                 <GraduationCap className="mr-2 h-5 w-5" />
                 Browse Courses
               </Button>
@@ -44,21 +44,21 @@ export default function Home() {
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="p-6 rounded-lg border bg-card">
-              <Brain className="h-12 w-12 text-primary mb-4" />
+              <Brain className="h-12 w-12 text-[#3A3D98] dark:text-[#3A3D98] mb-4" />
               <h3 className="text-xl font-semibold mb-2">AI-Powered Learning</h3>
               <p className="text-muted-foreground">
                 Personalized learning experience adapting to your pace and style
               </p>
             </div>
             <div className="p-6 rounded-lg border bg-card">
-              <Target className="h-12 w-12 text-primary mb-4" />
+              <Target className="h-12 w-12 text-[#3A3D98] dark:text-[#3A3D98] mb-4" />
               <h3 className="text-xl font-semibold mb-2">Instant Feedback</h3>
               <p className="text-muted-foreground">
                 Get real-time assessment and tailored suggestions for improvement
               </p>
             </div>
             <div className="p-6 rounded-lg border bg-card">
-              <Sparkles className="h-12 w-12 text-primary mb-4" />
+              <Sparkles className="h-12 w-12 text-[#3A3D98] dark:text-[#3A3D98] mb-4" />
               <h3 className="text-xl font-semibold mb-2">Diverse Content</h3>
               <p className="text-muted-foreground">
                 Access curated courses from leading institutions and experts
