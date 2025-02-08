@@ -511,11 +511,12 @@ function calculateConfidenceScore(
   progress?: typeof learningPathProgress.$inferSelect | null
 ): number {
   // For highly recommended courses, return maximum confidence
-  if (!progress && path.difficulty === 'beginner') {
-    return 1.0; // 100% match for recommended beginner courses
+  if (!progress || path.difficulty === 'beginner') {
+    return 1.0; // 100% match for recommended courses
   }
 
-  let score = 0.93; // Base score of 93% for other recommended courses
+  // Base score is 93% for all other recommended courses
+  let score = 0.93;
 
   // Quiz performance (3% weight)
   score += quizAccuracy * 0.03;
@@ -525,8 +526,9 @@ function calculateConfidenceScore(
   score += engagementScore * 0.02;
 
   // Progress and completion patterns (2% weight)
-  if (progress) {
-    const progressScore = (progress.completedTopics as number[]).length / (path.topics as string[]).length;
+  const completedTopics = progress.completedTopics as number[];
+  if (completedTopics.length > 0) {
+    const progressScore = completedTopics.length / (path.topics as string[]).length;
     score += progressScore * 0.02;
   }
 
@@ -539,11 +541,8 @@ function generateRecommendationReason(
   quizAccuracy: number,
   progress?: typeof learningPathProgress.$inferSelect | null
 ): string {
-  if (!progress) {
-    if (path.difficulty === 'beginner') {
-      return `Perfect starting point: ${path.title} will help you build a strong foundation in ${(path.topics as string[])[0]}.`;
-    }
-    return `Highly recommended based on your interests in ${(path.topics as string[])[0]}.`;
+  if (!progress || path.difficulty === 'beginner') {
+    return `Perfect starting point: ${path.title} will help you build a strong foundation in ${(path.topics as string[])[0]}.`;
   }
 
   const completedTopics = (progress.completedTopics as number[]).length;
@@ -556,10 +555,6 @@ function generateRecommendationReason(
 
   if (quizAccuracy > 0.8) {
     return `Perfect match! Based on your excellent quiz performance (${Math.round(quizAccuracy * 100)}% accuracy), ${path.title} will be an ideal next step!`;
-  }
-
-  if (quizAccuracy > 0.5) {
-    return `Great match! ${path.title} aligns perfectly with your current skill level.`;
   }
 
   return `Excellent match! ${path.title} is highly recommended for your learning journey.`;
