@@ -12,6 +12,12 @@ import {
   learningPathProgress,
   progressAnalytics,
   subjectHistory
+
+const courseraConfig = {
+  apiKey: process.env.COURSERA_API_KEY,
+  apiSecret: process.env.COURSERA_API_SECRET
+};
+
 } from "@db/schema";
 
 export function registerRoutes(app: Express): Server {
