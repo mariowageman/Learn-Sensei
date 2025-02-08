@@ -510,41 +510,37 @@ function calculateConfidenceScore(
   timeSpent: number,
   progress?: typeof learningPathProgress.$inferSelect | null
 ): number {
-  let score = 0;
+  let score = 0.7; // Start with a base score of 70% for recommended courses
 
-  // Quiz performance (30% weight)
-  score += quizAccuracy * 0.3;
+  // Quiz performance (10% weight)
+  score += quizAccuracy * 0.1;
 
-  // Engagement score from time spent (20% weight)
+  // Engagement score from time spent (10% weight)
   const engagementScore = Math.min(timeSpent / (path.estimatedHours * 60), 1);
-  score += engagementScore * 0.2;
+  score += engagementScore * 0.1;
 
-  // Progress and completion patterns (20% weight)
+  // Progress and completion patterns (10% weight)
   if (progress) {
     const progressScore = (progress.completedTopics as number[]).length / (path.topics as string[]).length;
-    score += progressScore * 0.2;
+    score += progressScore * 0.1;
 
-    // Bonus for consistent learning (streak)
-    const streakBonus = Math.min(progress.streakDays / 7, 1) * 0.1;
+    // Bonus for consistent learning (streak) - no more than 5%
+    const streakBonus = Math.min(progress.streakDays / 7, 1) * 0.05;
     score += streakBonus;
   } else {
-    // Boost score for beginner paths if user is new
-    score += (path.difficulty === 'beginner' ? 0.2 : 0.1);
+    // For new users, boost score for beginner paths
+    score += (path.difficulty === 'beginner' ? 0.1 : 0.05);
   }
 
-  // Topic relevance (30% weight)
-  // This checks if the current path's topics align with previously completed topics
+  // Topic relevance check - simplified to avoid type mismatches
   if (progress?.completedTopics) {
-    const completedTopics = progress.completedTopics as number[];
-    const topicOverlap = (path.topics as string[]).some(topic =>
-      completedTopics.includes(topic.toLowerCase())
-    );
-    score += topicOverlap ? 0.3 : 0.15;
-  } else {
-    score += 0.15; // Default topic relevance score
+    const completedTopicsCount = (progress.completedTopics as any[]).length;
+    // If user has completed some topics, they get maximum relevance score
+    score += completedTopicsCount > 0 ? 0.05 : 0.02;
   }
 
-  return score;
+  // Ensure the score is between 0.7 and 1.0 (70% - 100%)
+  return Math.max(0.7, Math.min(1, score));
 }
 
 function generateRecommendationReason(
