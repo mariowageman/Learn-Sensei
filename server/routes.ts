@@ -104,8 +104,7 @@ export function registerRoutes(app: Express): Server {
         ),
         with: {
           spacedRepetition: true
-        },
-        orderBy: (questions, { asc }) => [asc(questions.id)]
+        }
       });
 
       if (dueQuestion) {
