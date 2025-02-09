@@ -43,13 +43,13 @@ export async function generateQuestion(subject: string) {
 
 export async function checkAnswer(question: string, expectedAnswer: string, userAnswer: string) {
   try {
-    // First, get the specific topic and learning objective
+    // Get the specific topic and learning objective with more context
     const topicResponse = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "Analyze the question and extract: 1) the main topic being tested, 2) the specific concept or skill being assessed, and 3) key terms needed to understand the answer. Return in JSON format with 'topic', 'concept', and 'keyTerms' fields. For keyTerms, provide a comma-separated string of terms."
+          content: "Analyze the question and extract: 1) the main topic being tested, 2) the specific concept or skill being assessed, and 3) key terms needed to understand the answer. Return in JSON format with 'topic', 'concept', and 'keyTerms' fields. For keyTerms, provide a comma-separated string of terms that are DIRECTLY related to the specific concept being tested."
         },
         {
           role: "user",
@@ -91,10 +91,25 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
         ...(keyTerms ? keyTerms.split(',').map(term => term.trim()) : [])
       ].filter(Boolean);
 
-      // Create a highly focused search query
-      const searchQuery = searchTerms.join(' ');
-      const videoSuggestions = await searchEducationalVideos(searchQuery);
-      result.videoSuggestions = videoSuggestions;
+      // Create focused search queries for both topic and specific concept
+      const searchQuery = `${mainTopic} ${specificConcept} tutorial`;
+      const conceptQuery = `${specificConcept} ${keyTerms} explanation`;
+
+      // Get videos for both queries and combine results
+      const [topicVideos, conceptVideos] = await Promise.all([
+        searchEducationalVideos(searchQuery, 2),
+        searchEducationalVideos(conceptQuery, 2)
+      ]);
+
+      // Combine and deduplicate videos, prioritizing concept-specific ones
+      const seenIds = new Set();
+      const combinedVideos = [...conceptVideos, ...topicVideos].filter(video => {
+        if (seenIds.has(video.videoId)) return false;
+        seenIds.add(video.videoId);
+        return true;
+      }).slice(0, 3);
+
+      result.videoSuggestions = combinedVideos;
     }
 
     return result;
