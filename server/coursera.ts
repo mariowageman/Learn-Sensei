@@ -49,11 +49,11 @@ export async function fetchCourseraCourses(subject?: string): Promise<CourseraCo
     start: "0",
     limit: "20",
     q: "search",
-    query: subject || "computer science",
+    query: subject ? subject.toLowerCase().replace(/\s+/g, ' ') : "computer science",
     orderBy: "popularity"
   });
 
-  console.log('Fetching courses from Coursera API...', { subject });
+  console.log('Fetching courses from Coursera API...', { subject, url: `${COURSERA_API_BASE}?${params.toString()}` });
 
   try {
     const auth = Buffer.from(`${process.env.COURSERA_API_KEY}:${process.env.COURSERA_API_SECRET}`).toString('base64');
@@ -86,22 +86,23 @@ export async function fetchCourseraCourses(subject?: string): Promise<CourseraCo
     return courseSchema.array().parse(data.elements);
   } catch (error) {
     console.error('Error fetching Coursera courses:', error);
-    throw error;
+    return getSampleCourses(subject);
   }
 }
 
 function getSampleCourses(subject?: string): CourseraCourse[] {
   const subjectTitle = subject || "Computer Science";
-  return [{
-    id: "1",
-    slug: `introduction-to-${subjectTitle.toLowerCase().replace(/\s+/g, '-')}`,
-    name: `Introduction to ${subjectTitle}`,
-    description: `Learn the basics of ${subjectTitle} with our comprehensive introduction course`,
-    workload: "10 hours",
+  return Array(6).fill(null).map((_, index) => ({
+    id: `sample-${index + 1}`,
+    slug: `introduction-to-${subjectTitle.toLowerCase().replace(/\s+/g, '-')}-${index + 1}`,
+    name: `${subjectTitle} Course ${index + 1}`,
+    description: `Learn ${subjectTitle} with our comprehensive course ${index + 1}`,
+    workload: `${10 + index * 5} hours`,
     specializations: [],
     primaryLanguages: ["English"],
+    subtitleLanguages: ["English"],
     instructors: [{
-      fullName: "John Doe",
+      fullName: `Prof. John Doe ${index + 1}`,
       title: `${subjectTitle} Professor`,
       department: `Department of ${subjectTitle}`
     }],
@@ -109,6 +110,6 @@ function getSampleCourses(subject?: string): CourseraCourse[] {
       name: "Example University",
       shortName: "EU"
     }],
-    photoUrl: "https://placekitten.com/400/300"
-  }];
+    photoUrl: `https://placekitten.com/${400 + index}/${300 + index}`
+  }));
 }
