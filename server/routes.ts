@@ -261,11 +261,18 @@ export function registerRoutes(app: Express): Server {
             })
           );
 
-          // Flatten and transform courses
-          const courses = allRecommendedCourses.flat();
+          // Flatten and deduplicate courses based on course ID
+          const seenCourseIds = new Set<string>();
+          const uniqueCourses = allRecommendedCourses.flat().filter(course => {
+            if (seenCourseIds.has(course.id)) {
+              return false;
+            }
+            seenCourseIds.add(course.id);
+            return true;
+          });
 
           // Transform Coursera courses into our learning path format
-          const paths = courses.map(course => ({
+          const paths = uniqueCourses.map(course => ({
             id: parseInt(course.id),
             title: course.name,
             description: course.description,

@@ -35,7 +35,7 @@ const difficultyColors = {
 } as const;
 
 export default function LearningPaths() {
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>("recommended");
 
   const { data: paths, isLoading } = useQuery<LearningPath[]>({
     queryKey: ["/api/learning-paths", selectedSubject],
