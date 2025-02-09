@@ -5,8 +5,8 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle, XCircle, SkipForward } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { apiRequest } from "@/lib/api";
 import { ProgressStats } from "./progress-stats";
 
@@ -166,21 +166,26 @@ export function Quiz({ subject }: QuizProps) {
       {feedback && (
         <>
           <Card className="p-4">
-            <h3 className="text-lg font-medium mb-4">Answer:</h3>
+            <div className="flex items-center gap-2 mb-4">
+              <h3 className="text-lg font-medium">Answer:</h3>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className={`rounded-full p-1 ${feedback.correct ? 'bg-green-100' : 'bg-red-100'}`}>
+                    {feedback.correct ? (
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-red-600" />
+                    )}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs break-words">{feedback.message}</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <p className="text-xl mb-6 break-words">{question?.answer}</p>
           </Card>
           <div className="space-y-4">
-            <Alert
-              variant={feedback.correct ? "default" : "destructive"}
-              className="animate-in fade-in"
-            >
-              {feedback.correct ? (
-                <CheckCircle className="h-4 w-4" />
-              ) : (
-                <XCircle className="h-4 w-4" />
-              )}
-              <AlertDescription className="break-words">{feedback.message}</AlertDescription>
-            </Alert>
 
             {!feedback.correct && feedback.videoSuggestions && feedback.videoSuggestions.length > 0 && (
               <Card className="p-4">
