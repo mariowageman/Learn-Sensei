@@ -43,27 +43,28 @@ export async function generateQuestion(subject: string) {
 }
 
 export async function checkAnswer(question: string, expectedAnswer: string, userAnswer: string) {
-  // First, get the core concept and subject area being tested
-  const conceptResponse = await openai.chat.completions.create({
+  // First, get the specific topic and learning objective
+  const topicResponse = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
       {
         role: "system",
-        content: "Extract the main educational concept being tested and the broader subject area. Return in JSON format with 'concept' (2-3 words) and 'subject' (1 word) fields describing the core topic and its broader category."
+        content: "Analyze the question and extract: 1) the main topic being tested, 2) the specific concept or skill being assessed, and 3) key terms needed to understand the answer. Return in JSON format with 'topic', 'concept', and 'keyTerms' fields."
       },
       {
         role: "user",
-        content: `Question: ${question}\nAnswer: ${expectedAnswer}`
+        content: `Question: ${question}\nCorrect Answer: ${expectedAnswer}`
       }
     ],
     response_format: { type: "json_object" }
   });
 
-  const conceptData = JSON.parse(conceptResponse.choices[0].message.content || "{}");
-  const concept = conceptData.concept || "";
-  const subjectArea = conceptData.subject || "";
+  const topicData = JSON.parse(topicResponse.choices[0].message.content || "{}");
+  const mainTopic = topicData.topic || "";
+  const specificConcept = topicData.concept || "";
+  const keyTerms = topicData.keyTerms || "";
 
-  // Then check the answer
+  // Check the answer
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
@@ -82,27 +83,15 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
   const result = JSON.parse(response.choices[0].message.content || "{}");
 
   if (!result.correct) {
-    // Extract key terms for a more focused search
-    const keyTermsResponse = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "Extract 2-3 key educational terms from the question and answer that would be most helpful for finding a relevant tutorial video. Return in JSON format with a 'terms' field containing a comma-separated list."
-        },
-        {
-          role: "user",
-          content: `Question: ${question}\nCorrect Answer: ${expectedAnswer}\nSubject Area: ${subjectArea}`
-        }
-      ],
-      response_format: { type: "json_object" }
-    });
+    // Generate educational video search query using the specific topic and concept
+    const searchTerms = [
+      mainTopic,
+      specificConcept,
+      ...keyTerms.split(',').map(term => term.trim())
+    ].filter(Boolean);
 
-    const keyTermsData = JSON.parse(keyTermsResponse.choices[0].message.content || "{}");
-    const keyTerms = keyTermsData.terms || "";
-
-    // Create a highly focused search query combining all relevant information
-    const searchQuery = `${subjectArea} ${concept} ${keyTerms} lesson`;
+    // Create a highly focused search query
+    const searchQuery = searchTerms.join(' ');
     const videoSuggestions = await searchEducationalVideos(searchQuery);
     result.videoSuggestions = videoSuggestions;
   }

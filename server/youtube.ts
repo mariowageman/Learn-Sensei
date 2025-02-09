@@ -69,10 +69,14 @@ export async function searchEducationalVideos(query: string, maxResults = 3): Pr
         const description = item.snippet!.description!.toLowerCase();
         const queryTerms = query.toLowerCase().split(' ');
 
-        // Calculate relevance score
+        // Calculate relevance score with higher weights for specific terms
         let score = 0;
         queryTerms.forEach(term => {
-          if (title.includes(term)) score += 2;
+          // Higher weight for exact matches in title
+          if (title.includes(` ${term} `)) score += 3;
+          // Medium weight for partial matches in title
+          else if (title.includes(term)) score += 2;
+          // Lower weight for matches in description
           if (description.includes(term)) score += 1;
         });
 
@@ -83,12 +87,12 @@ export async function searchEducationalVideos(query: string, maxResults = 3): Pr
         };
       })
       .sort((a, b) => b.score - a.score) // Sort by relevance score
-      .slice(0, maxResults) // Take top 3 most relevant videos
-      .map(({ title, videoId }) => ({ title, videoId }));
+      .slice(0, maxResults); // Take top 3 most relevant videos
 
     // If we don't have enough results, make another attempt with broader terms
     if (scoredVideos.length < maxResults) {
-      const broadQuery = query.split(' ')[0] + ' basics tutorial';
+      const [mainTerm, ...rest] = query.split(' ');
+      const broadQuery = `${mainTerm} ${rest[0] || ''} basics tutorial`;
       const backupResponse = await youtube.search.list({
         part: ['snippet'],
         q: broadQuery,
@@ -110,7 +114,7 @@ export async function searchEducationalVideos(query: string, maxResults = 3): Pr
       return [...scoredVideos, ...backupVideos].slice(0, maxResults);
     }
 
-    return scoredVideos;
+    return scoredVideos.map(({ title, videoId }) => ({ title, videoId }));
   } catch (error) {
     console.error('YouTube API error:', error);
     return [];
