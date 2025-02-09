@@ -19,8 +19,8 @@ import {
 } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 
-// The logo path is relative to the public directory in production
-const logoPath = "/learn-sensei-logo-icon.svg";
+// Use assets directory for consistent path in dev and production
+const logoPath = "/assets/learn-sensei-logo-icon.svg";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
