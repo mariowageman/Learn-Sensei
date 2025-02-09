@@ -249,15 +249,46 @@ export function registerRoutes(app: Express): Server {
           limit: 5
         });
 
+        // Get quiz performance data to identify areas for improvement
+        const quizPerformance = await db.query.quizProgress.findMany({
+          orderBy: (quiz, { desc }) => [desc(quiz.createdAt)]
+        });
+
         // If user has history, fetch courses based on their interests
         if (recentSubjects.length > 0) {
           console.log('Fetching recommended courses based on recent subjects:', recentSubjects.map(s => s.subject));
 
-          // Fetch courses for each recent subject
+          // Group quiz performance by subject
+          const subjectPerformance = quizPerformance.reduce((acc, quiz) => {
+            if (!acc[quiz.subject]) {
+              acc[quiz.subject] = {
+                total: 0,
+                correct: 0
+              };
+            }
+            acc[quiz.subject].total++;
+            if (quiz.isCorrect) acc[quiz.subject].correct++;
+            return acc;
+          }, {} as Record<string, { total: number; correct: number }>);
+
+          // Identify subjects where user needs improvement (accuracy < 70%)
+          const improvementSubjects = Object.entries(subjectPerformance)
+            .filter(([_, stats]) => (stats.correct / stats.total) < 0.7)
+            .map(([subject]) => subject);
+
+          // Combine recent subjects and improvement subjects
+          const allTargetSubjects = [...new Set([
+            ...recentSubjects.map(s => s.subject),
+            ...improvementSubjects
+          ])];
+
+          // Fetch courses for each subject
           const allRecommendedCourses = await Promise.all(
-            recentSubjects.map(async ({ subject }) => {
+            allTargetSubjects.map(async (subject) => {
               const courses = await fetchCourseraCourses(subject);
-              return courses.slice(0, 2); // Take top 2 courses from each subject
+              // Take more courses from subjects with lower performance
+              const isImprovementSubject = improvementSubjects.includes(subject);
+              return courses.slice(0, isImprovementSubject ? 4 : 2); // Take more courses for improvement areas
             })
           );
 
@@ -271,8 +302,20 @@ export function registerRoutes(app: Express): Server {
             return true;
           });
 
+          // Sort courses prioritizing those for improvement subjects
+          const sortedCourses = uniqueCourses.sort((a, b) => {
+            const aIsImprovement = improvementSubjects.some(subject =>
+              a.name.toLowerCase().includes(subject.toLowerCase()));
+            const bIsImprovement = improvementSubjects.some(subject =>
+              b.name.toLowerCase().includes(subject.toLowerCase()));
+
+            if (aIsImprovement && !bIsImprovement) return -1;
+            if (!aIsImprovement && bIsImprovement) return 1;
+            return 0;
+          });
+
           // Transform Coursera courses into our learning path format
-          const paths = uniqueCourses.map(course => ({
+          const paths = sortedCourses.map(course => ({
             id: parseInt(course.id),
             title: course.name,
             description: course.description,
