@@ -167,13 +167,13 @@ export function Quiz({ subject }: QuizProps) {
       {feedback && (
         <>
           <Card className="p-4">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium">Answer:</h3>
               <Tooltip>
-                  <TooltipTrigger>
-                    <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                  <TooltipTrigger className="cursor-pointer">
+                    <Info className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
                   </TooltipTrigger>
-                  <TooltipContent>
+                  <TooltipContent side="left">
                     <p className="max-w-xs break-words">{feedback.message}</p>
                   </TooltipContent>
                 </Tooltip>
