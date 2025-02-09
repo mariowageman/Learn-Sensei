@@ -251,9 +251,18 @@ export function registerRoutes(app: Express): Server {
 
         // If user has history, fetch courses based on their interests
         if (recentSubjects.length > 0) {
-          const mostRecentSubject = recentSubjects[0].subject;
-          console.log('Fetching recommended courses based on recent subject:', mostRecentSubject);
-          const courses = await fetchCourseraCourses(mostRecentSubject);
+          console.log('Fetching recommended courses based on recent subjects:', recentSubjects.map(s => s.subject));
+
+          // Fetch courses for each recent subject
+          const allRecommendedCourses = await Promise.all(
+            recentSubjects.map(async ({ subject }) => {
+              const courses = await fetchCourseraCourses(subject);
+              return courses.slice(0, 2); // Take top 2 courses from each subject
+            })
+          );
+
+          // Flatten and transform courses
+          const courses = allRecommendedCourses.flat();
 
           // Transform Coursera courses into our learning path format
           const paths = courses.map(course => ({
