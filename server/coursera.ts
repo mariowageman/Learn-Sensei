@@ -26,18 +26,34 @@ export type CourseraCourse = z.infer<typeof courseSchema>;
 
 const COURSERA_API_BASE = "https://api.coursera.org/api/courses.v1";
 
-export async function fetchCourseraCourses(): Promise<CourseraCourse[]> {
+// Common subjects that users might be interested in
+export const AVAILABLE_SUBJECTS = [
+  "Computer Science",
+  "Data Science",
+  "Business",
+  "Mathematics",
+  "Language Learning",
+  "Art & Design",
+  "Social Sciences",
+  "Personal Development",
+  "Health & Medicine",
+  "Physical Science",
+] as const;
+
+export type Subject = typeof AVAILABLE_SUBJECTS[number];
+
+export async function fetchCourseraCourses(subject?: string): Promise<CourseraCourse[]> {
   const params = new URLSearchParams({
     fields: "photoUrl,description,workload,specializations,primaryLanguages,subtitleLanguages,partnerLogo,instructors,partners",
     includes: "instructors,partners",
     start: "0",
     limit: "20",
     q: "search",
-    query: "computer science",
+    query: subject || "computer science",
     orderBy: "popularity"
   });
 
-  console.log('Fetching courses from Coursera API...');
+  console.log('Fetching courses from Coursera API...', { subject });
 
   try {
     const auth = Buffer.from(`${process.env.COURSERA_API_KEY}:${process.env.COURSERA_API_SECRET}`).toString('base64');
@@ -56,22 +72,7 @@ export async function fetchCourseraCourses(): Promise<CourseraCourse[]> {
       console.error('Error details:', errorText);
 
       // Return sample data for development
-      return [{
-        id: "1",
-        slug: "introduction-to-computer-science",
-        name: "Introduction to Computer Science",
-        description: "Learn the basics of computer science and programming",
-        workload: "10 hours",
-        specializations: [],
-        primaryLanguages: ["English"],
-        instructors: [{
-          fullName: "John Doe"
-        }],
-        partners: [{
-          name: "Example University"
-        }],
-        photoUrl: "https://placekitten.com/400/300"
-      }];
+      return getSampleCourses(subject);
     }
 
     const data = await response.json();
@@ -79,22 +80,7 @@ export async function fetchCourseraCourses(): Promise<CourseraCourse[]> {
 
     if (!data.elements || data.elements.length === 0) {
       console.warn('No courses returned from API, using sample data');
-      return [{
-        id: "1",
-        slug: "introduction-to-computer-science",
-        name: "Introduction to Computer Science",
-        description: "Learn the basics of computer science and programming",
-        workload: "10 hours",
-        specializations: [],
-        primaryLanguages: ["English"],
-        instructors: [{
-          fullName: "John Doe"
-        }],
-        partners: [{
-          name: "Example University"
-        }],
-        photoUrl: "https://placekitten.com/400/300"
-      }];
+      return getSampleCourses(subject);
     }
 
     return courseSchema.array().parse(data.elements);
@@ -102,4 +88,27 @@ export async function fetchCourseraCourses(): Promise<CourseraCourse[]> {
     console.error('Error fetching Coursera courses:', error);
     throw error;
   }
+}
+
+function getSampleCourses(subject?: string): CourseraCourse[] {
+  const subjectTitle = subject || "Computer Science";
+  return [{
+    id: "1",
+    slug: `introduction-to-${subjectTitle.toLowerCase().replace(/\s+/g, '-')}`,
+    name: `Introduction to ${subjectTitle}`,
+    description: `Learn the basics of ${subjectTitle} with our comprehensive introduction course`,
+    workload: "10 hours",
+    specializations: [],
+    primaryLanguages: ["English"],
+    instructors: [{
+      fullName: "John Doe",
+      title: `${subjectTitle} Professor`,
+      department: `Department of ${subjectTitle}`
+    }],
+    partners: [{
+      name: "Example University",
+      shortName: "EU"
+    }],
+    photoUrl: "https://placekitten.com/400/300"
+  }];
 }

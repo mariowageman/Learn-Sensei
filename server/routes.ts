@@ -239,7 +239,8 @@ export function registerRoutes(app: Express): Server {
   // Learning Paths routes
   app.get("/api/learning-paths", async (req, res) => {
     try {
-      const courses = await fetchCourseraCourses();
+      const subject = req.query.subject as string | undefined;
+      const courses = await fetchCourseraCourses(subject);
 
       // Transform Coursera courses into our learning path format
       const paths = courses.map(course => ({
@@ -390,6 +391,7 @@ export function registerRoutes(app: Express): Server {
       res.status(500).json({ error: "Failed to update progress" });
     }
   });
+
 
 
   app.get("/api/recommendations", async (req, res) => {

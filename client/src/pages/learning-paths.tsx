@@ -3,7 +3,16 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Timer, BookOpen, ArrowRight, GraduationCap, Building2 } from "lucide-react";
+import { Timer, BookOpen, ArrowRight, GraduationCap, Building2, Filter } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState } from "react";
+import { AVAILABLE_SUBJECTS } from "../../../server/coursera";
 
 interface LearningPath {
   id: number;
@@ -26,8 +35,18 @@ const difficultyColors = {
 } as const;
 
 export default function LearningPaths() {
+  const [selectedSubject, setSelectedSubject] = useState<string>("");
+
   const { data: paths, isLoading } = useQuery<LearningPath[]>({
-    queryKey: ["/api/learning-paths"]
+    queryKey: ["/api/learning-paths", selectedSubject],
+    queryFn: async () => {
+      const url = selectedSubject 
+        ? `/api/learning-paths?subject=${encodeURIComponent(selectedSubject)}`
+        : "/api/learning-paths";
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch paths');
+      return response.json();
+    }
   });
 
   if (isLoading) {
@@ -45,11 +64,34 @@ export default function LearningPaths() {
 
   return (
     <div className="container max-w-6xl mx-auto px-8 py-8 space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Coursera Courses</h1>
-        <p className="text-muted-foreground">
-          Explore curated courses from leading universities and companies
-        </p>
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">Coursera Courses</h1>
+          <p className="text-muted-foreground">
+            Explore curated courses from leading universities and companies
+          </p>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div className="w-[250px]">
+            <Select
+              value={selectedSubject}
+              onValueChange={setSelectedSubject}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a subject" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Subjects</SelectItem>
+                {AVAILABLE_SUBJECTS.map((subject) => (
+                  <SelectItem key={subject} value={subject}>
+                    {subject}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
