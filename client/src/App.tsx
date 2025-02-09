@@ -136,14 +136,12 @@ function Navigation() {
           {/* Logo - centered on mobile, left-aligned on desktop */}
           <div className="absolute left-1/2 transform -translate-x-1/2 sm:static sm:transform-none sm:left-0">
             <Link href="/" className="flex items-center justify-center">
-              <div 
-                className="h-8 w-8 rounded-full bg-[#3a3d98] flex items-center justify-center text-white font-bold shadow-sm hover:shadow-md transition-shadow"
-                style={{ 
-                  textShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                }}
-              >
-                LS
-              </div>
+              <img 
+                src="/src/assets/learn-sensei-logo-icon.svg"
+                alt="Learn Sensei Logo"
+                className="h-8 w-8 hover:opacity-90 transition-opacity"
+                style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
+              />
             </Link>
           </div>
 
