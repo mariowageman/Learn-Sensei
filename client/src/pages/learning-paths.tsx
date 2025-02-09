@@ -35,7 +35,7 @@ const difficultyColors = {
 } as const;
 
 export default function LearningPaths() {
-  const [selectedSubject, setSelectedSubject] = useState<string>("");
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 
   const { data: paths, isLoading } = useQuery<LearningPath[]>({
     queryKey: ["/api/learning-paths", selectedSubject],
@@ -75,14 +75,13 @@ export default function LearningPaths() {
         <div className="flex items-center gap-4">
           <div className="w-[250px]">
             <Select
-              value={selectedSubject}
+              value={selectedSubject || undefined}
               onValueChange={setSelectedSubject}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select a subject" />
+                <SelectValue placeholder="All Subjects" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Subjects</SelectItem>
                 {AVAILABLE_SUBJECTS.map((subject) => (
                   <SelectItem key={subject} value={subject}>
                     {subject}
