@@ -218,7 +218,6 @@ export function Quiz({ subject }: QuizProps) {
         </>
       )}
       <ProgressStats subject={subject} />
-      <div>Recent Attempts</div> {/* Placeholder for Recent Attempts card */}
     </div>
   );
 }
