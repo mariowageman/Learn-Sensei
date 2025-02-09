@@ -43,13 +43,13 @@ export async function generateQuestion(subject: string) {
 
 export async function checkAnswer(question: string, expectedAnswer: string, userAnswer: string) {
   try {
-    // Get the main educational concept being tested
+    // Extract what the question is specifically testing
     const topicResponse = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "Analyze the full question to understand: 1) the broader educational concept being tested, 2) any prerequisite concepts needed to understand this topic, and 3) specific technical terms used. Focus on what the student needs to learn to understand this topic, not just the specific answer. Return JSON with fields: 'mainConcept' (the primary concept), 'prerequisites' (comma-separated foundational concepts), and 'technicalTerms' (key vocabulary)."
+          content: "Analyze this question and identify the exact concept or principle that the student needs help understanding. Consider the full context of the question, not just the blank part. Return JSON with fields: 'concept' (the exact concept/principle this question is testing), 'focusedSearch' (2-3 key terms that would help find a good tutorial about this specific concept)."
         },
         {
           role: "user",
@@ -60,9 +60,8 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
     });
 
     const conceptData = JSON.parse(topicResponse.choices[0].message.content || "{}");
-    const mainConcept = conceptData.mainConcept || "";
-    const prerequisites = typeof conceptData.prerequisites === 'string' ? conceptData.prerequisites : '';
-    const technicalTerms = typeof conceptData.technicalTerms === 'string' ? conceptData.technicalTerms : '';
+    const specificConcept = conceptData.concept || "";
+    const searchTerms = conceptData.focusedSearch || "";
 
     // Check the answer
     const response = await openai.chat.completions.create({
@@ -83,19 +82,19 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
     const result = JSON.parse(response.choices[0].message.content || "{}");
 
     if (!result.correct) {
-      // Create focused search queries for different aspects of the concept
-      const conceptQuery = `${mainConcept} explanation tutorial`;
-      const foundationQuery = prerequisites ? `${prerequisites.split(',')[0]} basics tutorial` : mainConcept;
+      // Create two targeted search queries using the specific concept and search terms
+      const primaryQuery = `${specificConcept} tutorial how to`;
+      const secondaryQuery = `${searchTerms} explained`;
 
-      // Get videos for both concept explanation and foundational understanding
-      const [conceptVideos, foundationVideos] = await Promise.all([
-        searchEducationalVideos(conceptQuery, 2),
-        searchEducationalVideos(foundationQuery, 2)
+      // Get videos for both the specific concept and the focused search terms
+      const [conceptVideos, termVideos] = await Promise.all([
+        searchEducationalVideos(primaryQuery, 2),
+        searchEducationalVideos(secondaryQuery, 2)
       ]);
 
       // Combine and deduplicate videos, prioritizing concept-specific ones
       const seenIds = new Set();
-      const combinedVideos = [...conceptVideos, ...foundationVideos].filter(video => {
+      const combinedVideos = [...conceptVideos, ...termVideos].filter(video => {
         if (seenIds.has(video.videoId)) return false;
         seenIds.add(video.videoId);
         return true;
