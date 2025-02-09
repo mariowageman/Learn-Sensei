@@ -55,6 +55,7 @@ export const learningPathProgress = pgTable("learning_path_progress", {
   lastAccessedAt: timestamp("last_accessed_at").defaultNow().notNull(),
   streakDays: integer("streak_days").notNull().default(0),
   lastStreakDate: timestamp("last_streak_date").defaultNow().notNull(),
+  intensity: text("intensity"), 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull()
 });
@@ -80,8 +81,8 @@ export const spacedRepetition = pgTable("spaced_repetition", {
   id: serial("id").primaryKey(),
   questionId: integer("question_id").references(() => quizQuestions.id),
   nextReviewDate: timestamp("next_review_date").notNull(),
-  interval: real("interval").notNull().default(1), 
-  easeFactor: real("ease_factor").notNull().default(2.5), 
+  interval: real("interval").notNull().default(1),
+  easeFactor: real("ease_factor").notNull().default(2.5),
   consecutiveCorrect: integer("consecutive_correct").notNull().default(0),
   lastReviewedAt: timestamp("last_reviewed_at").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull()
@@ -118,7 +119,6 @@ export const spacedRepetitionRelations = relations(spacedRepetition, ({ one }) =
     references: [quizQuestions.id],
   })
 }));
-
 
 export const insertSessionSchema = createInsertSchema(sessions);
 export const selectSessionSchema = createSelectSchema(sessions);
