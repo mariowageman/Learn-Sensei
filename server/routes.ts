@@ -292,15 +292,29 @@ export function registerRoutes(app: Express): Server {
             })
           );
 
-          // Flatten and deduplicate courses based on course ID
+          // Flatten and deduplicate courses based on course ID, excluding sample courses
           const seenCourseIds = new Set<string>();
           const uniqueCourses = allRecommendedCourses.flat().filter(course => {
+            // Skip if already seen
             if (seenCourseIds.has(course.id)) {
+              return false;
+            }
+            // Skip sample courses
+            if (
+              course.id.startsWith('sample-') ||
+              course.instructors?.[0]?.fullName?.includes('John Doe') ||
+              course.partners?.[0]?.name === 'Example University'
+            ) {
               return false;
             }
             seenCourseIds.add(course.id);
             return true;
           });
+
+          // If no real courses found after filtering, return empty array
+          if (uniqueCourses.length === 0) {
+            return res.json([]);
+          }
 
           // Sort courses prioritizing those for improvement subjects
           const sortedCourses = uniqueCourses.sort((a, b) => {
