@@ -115,7 +115,7 @@ function Navigation() {
 
   return (
     <nav className="border-b">
-      <div className="container py-4 px-4 flex items-center justify-between">
+      <div className="container py-4 px-4 flex items-center justify-center"> {/* Changed justify-between to justify-center */}
         {/* Mobile Menu and Logo */}
         <div className="flex items-center justify-between w-full sm:w-auto">
           <div className="sm:hidden">
@@ -134,7 +134,7 @@ function Navigation() {
           </div>
 
           {/* Logo - centered on mobile, left-aligned on desktop */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 sm:static sm:transform-none sm:left-0">
+          <div className="sm:static sm:transform-none sm:left-0"> {/* Removed absolute positioning and transform for better centering */}
             <Link href="/" className="flex items-center justify-center">
               <img 
                 src="/src/assets/learn-sensei-logo-icon.svg"
