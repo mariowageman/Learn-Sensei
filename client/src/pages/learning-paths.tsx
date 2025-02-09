@@ -183,19 +183,12 @@ export default function LearningPaths() {
                 </div>
 
                 <div className="mt-8">
-                  <Button 
+                  <Button
                     className="w-full"
-                    asChild
+                    onClick={() => window.open(path.externalLink, '_blank', 'noopener,noreferrer')}
                   >
-                    <a
-                      href={path.externalLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center w-full"
-                    >
-                      View on Coursera
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </a>
+                    View on Coursera
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
               </div>
