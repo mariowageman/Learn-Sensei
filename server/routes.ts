@@ -240,6 +240,7 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/learning-paths", async (req, res) => {
     try {
       const subject = req.query.subject as string | undefined;
+      console.log('Fetching courses for subject:', subject);
       const courses = await fetchCourseraCourses(subject);
 
       // Transform Coursera courses into our learning path format
