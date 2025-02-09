@@ -19,9 +19,6 @@ import {
 } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 
-// Use assets directory for consistent path in dev and production
-const logoPath = "/assets/learn-sensei-logo-icon-250px.png";
-
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
@@ -138,12 +135,15 @@ function Navigation() {
 
           {/* Logo - centered on mobile, left-aligned on desktop */}
           <div className="absolute left-1/2 transform -translate-x-1/2 sm:static sm:transform-none sm:left-0">
-            <Link href="/">
-              <img 
-                src={logoPath}
-                alt="Learn Sensei Logo" 
-                className="h-8 w-8"
-              />
+            <Link href="/" className="flex items-center justify-center">
+              <div 
+                className="h-8 w-8 rounded-full bg-[#3a3d98] flex items-center justify-center text-white font-bold shadow-sm hover:shadow-md transition-shadow"
+                style={{ 
+                  textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                }}
+              >
+                LS
+              </div>
             </Link>
           </div>
 
