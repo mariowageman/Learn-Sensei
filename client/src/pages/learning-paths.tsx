@@ -46,15 +46,41 @@ export default function LearningPaths() {
       const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch paths');
       return response.json();
-    }
+    },
+    staleTime: 0, // Don't cache the data
+    refetchOnWindowFocus: false
   });
 
   if (isLoading) {
     return (
       <div className="container max-w-6xl mx-auto px-8 py-8 space-y-4">
-        <Skeleton className="h-8 w-64" />
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold">Coursera Courses</h1>
+            <p className="text-muted-foreground">
+              Explore curated courses from leading universities and companies
+            </p>
+          </div>
+          <div className="w-[250px]">
+            <Select
+              value={selectedSubject || undefined}
+              onValueChange={setSelectedSubject}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="All Subjects" />
+              </SelectTrigger>
+              <SelectContent>
+                {AVAILABLE_SUBJECTS.map((subject) => (
+                  <SelectItem key={subject} value={subject}>
+                    {subject}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[...Array(3)].map((_, i) => (
+          {[...Array(6)].map((_, i) => (
             <Skeleton key={i} className="h-64" />
           ))}
         </div>
@@ -93,7 +119,7 @@ export default function LearningPaths() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div key={selectedSubject} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {paths?.map((path) => (
           <Card key={path.id} className="flex flex-col overflow-hidden">
             {path.photoUrl && (
