@@ -329,19 +329,36 @@ export function registerRoutes(app: Express): Server {
           });
 
           // Transform Coursera courses into our learning path format
-          const paths = sortedCourses.map(course => ({
-            id: parseInt(course.id),
-            title: course.name,
-            description: course.description,
-            difficulty: course.specializations?.length ? "advanced" : "intermediate",
-            topics: course.primaryLanguages || [],
-            prerequisites: [],
-            estimatedHours: parseInt(course.workload?.split(" ")[0] || "0"),
-            instructor: course.instructors[0]?.fullName,
-            partner: course.partners[0]?.name,
-            photoUrl: course.photoUrl,
-            externalLink: `https://www.coursera.org/learn/${course.slug}`
-          }));
+          const paths = sortedCourses.map(course => {
+            // Parse workload hours with better fallback handling
+            let estimatedHours = 10; // Default fallback of 10 hours
+            if (course.workload) {
+              const hourMatch = course.workload.match(/(\d+).*?hour/i);
+              if (hourMatch) {
+                estimatedHours = parseInt(hourMatch[1]);
+              } else {
+                // Try to parse just the first number if no "hour" keyword found
+                const numberMatch = course.workload.match(/(\d+)/);
+                if (numberMatch) {
+                  estimatedHours = parseInt(numberMatch[1]);
+                }
+              }
+            }
+
+            return {
+              id: parseInt(course.id),
+              title: course.name,
+              description: course.description,
+              difficulty: course.specializations?.length ? "advanced" : "intermediate",
+              topics: course.primaryLanguages || [],
+              prerequisites: [],
+              estimatedHours: Math.max(estimatedHours, 1), // Ensure at least 1 hour
+              instructor: course.instructors[0]?.fullName,
+              partner: course.partners[0]?.name,
+              photoUrl: course.photoUrl,
+              externalLink: `https://www.coursera.org/learn/${course.slug}`
+            };
+          });
 
           return res.json(paths);
         }
@@ -352,19 +369,36 @@ export function registerRoutes(app: Express): Server {
       const courses = await fetchCourseraCourses(subject);
 
       // Transform Coursera courses into our learning path format
-      const paths = courses.map(course => ({
-        id: parseInt(course.id),
-        title: course.name,
-        description: course.description,
-        difficulty: course.specializations?.length ? "advanced" : "intermediate",
-        topics: course.primaryLanguages || [],
-        prerequisites: [],
-        estimatedHours: parseInt(course.workload?.split(" ")[0] || "0"),
-        instructor: course.instructors[0]?.fullName,
-        partner: course.partners[0]?.name,
-        photoUrl: course.photoUrl,
-        externalLink: `https://www.coursera.org/learn/${course.slug}`
-      }));
+      const paths = courses.map(course => {
+            // Parse workload hours with better fallback handling
+            let estimatedHours = 10; // Default fallback of 10 hours
+            if (course.workload) {
+              const hourMatch = course.workload.match(/(\d+).*?hour/i);
+              if (hourMatch) {
+                estimatedHours = parseInt(hourMatch[1]);
+              } else {
+                // Try to parse just the first number if no "hour" keyword found
+                const numberMatch = course.workload.match(/(\d+)/);
+                if (numberMatch) {
+                  estimatedHours = parseInt(numberMatch[1]);
+                }
+              }
+            }
+
+            return {
+              id: parseInt(course.id),
+              title: course.name,
+              description: course.description,
+              difficulty: course.specializations?.length ? "advanced" : "intermediate",
+              topics: course.primaryLanguages || [],
+              prerequisites: [],
+              estimatedHours: Math.max(estimatedHours, 1), // Ensure at least 1 hour
+              instructor: course.instructors[0]?.fullName,
+              partner: course.partners[0]?.name,
+              photoUrl: course.photoUrl,
+              externalLink: `https://www.coursera.org/learn/${course.slug}`
+            };
+          });
 
       res.json(paths);
     } catch (error) {
@@ -500,7 +534,6 @@ export function registerRoutes(app: Express): Server {
       res.status(500).json({ error: "Failed to update progress" });
     }
   });
-
 
 
   app.get("/api/recommendations", async (req, res) => {
