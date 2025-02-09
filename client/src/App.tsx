@@ -20,7 +20,7 @@ import {
 import { useState, useEffect } from "react";
 
 // Use assets directory for consistent path in dev and production
-const logoPath = "/assets/learn-sensei-logo-icon.svg";
+const logoPath = "/assets/learn-sensei-logo-icon-250px.png";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
