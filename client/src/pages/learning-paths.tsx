@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Timer, BookOpen, ArrowRight, GraduationCap, Building2, Filter } from "lucide-react";
+import { Timer, BookOpen, ArrowRight, GraduationCap, Building2, Filter, Sparkles } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -40,14 +40,16 @@ export default function LearningPaths() {
   const { data: paths, isLoading } = useQuery<LearningPath[]>({
     queryKey: ["/api/learning-paths", selectedSubject],
     queryFn: async () => {
-      const url = selectedSubject 
-        ? `/api/learning-paths?subject=${encodeURIComponent(selectedSubject)}`
-        : "/api/learning-paths";
+      const url = selectedSubject === "recommended" 
+        ? "/api/learning-paths?recommended=true"
+        : selectedSubject 
+          ? `/api/learning-paths?subject=${encodeURIComponent(selectedSubject)}`
+          : "/api/learning-paths";
       const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch paths');
       return response.json();
     },
-    staleTime: 0, // Don't cache the data
+    staleTime: 0,
     refetchOnWindowFocus: false
   });
 
@@ -70,6 +72,12 @@ export default function LearningPaths() {
                 <SelectValue placeholder="All Subjects" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="recommended">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-yellow-500" />
+                    Recommended
+                  </div>
+                </SelectItem>
                 {AVAILABLE_SUBJECTS.map((subject) => (
                   <SelectItem key={subject} value={subject}>
                     {subject}
@@ -108,6 +116,12 @@ export default function LearningPaths() {
                 <SelectValue placeholder="All Subjects" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="recommended">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-yellow-500" />
+                    Recommended
+                  </div>
+                </SelectItem>
                 {AVAILABLE_SUBJECTS.map((subject) => (
                   <SelectItem key={subject} value={subject}>
                     {subject}

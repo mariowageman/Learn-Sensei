@@ -240,6 +240,41 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/learning-paths", async (req, res) => {
     try {
       const subject = req.query.subject as string | undefined;
+      const recommended = req.query.recommended === 'true';
+
+      if (recommended) {
+        // Get user's recent subjects from history
+        const recentSubjects = await db.query.subjectHistory.findMany({
+          orderBy: (history, { desc }) => [desc(history.createdAt)],
+          limit: 5
+        });
+
+        // If user has history, fetch courses based on their interests
+        if (recentSubjects.length > 0) {
+          const mostRecentSubject = recentSubjects[0].subject;
+          console.log('Fetching recommended courses based on recent subject:', mostRecentSubject);
+          const courses = await fetchCourseraCourses(mostRecentSubject);
+
+          // Transform Coursera courses into our learning path format
+          const paths = courses.map(course => ({
+            id: parseInt(course.id),
+            title: course.name,
+            description: course.description,
+            difficulty: course.specializations?.length ? "advanced" : "intermediate",
+            topics: course.primaryLanguages || [],
+            prerequisites: [],
+            estimatedHours: parseInt(course.workload?.split(" ")[0] || "0"),
+            instructor: course.instructors[0]?.fullName,
+            partner: course.partners[0]?.name,
+            photoUrl: course.photoUrl,
+            externalLink: `https://www.coursera.org/learn/${course.slug}`
+          }));
+
+          return res.json(paths);
+        }
+      }
+
+      // If not recommended or no history, proceed with normal subject filtering
       console.log('Fetching courses for subject:', subject);
       const courses = await fetchCourseraCourses(subject);
 
