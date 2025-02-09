@@ -137,7 +137,7 @@ function Navigation() {
           <div className="sm:static sm:transform-none sm:left-0"> {/* Removed absolute positioning and transform for better centering */}
             <Link href="/" className="flex items-center justify-center">
               <img 
-                src="/assets/learn-sensei-logo-icon.svg"
+                src="/src/assets/learn-sensei-logo-icon.svg"
                 alt="Learn Sensei Logo"
                 className="h-12 w-12 -my-2 hover:opacity-90 transition-opacity"
                 style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
