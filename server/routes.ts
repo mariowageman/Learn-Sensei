@@ -362,45 +362,56 @@ export function registerRoutes(app: Express): Server {
 
           return res.json(paths);
         }
-      }
+      } else {
+        console.log('Fetching courses for subject:', subject);
+        const courses = await fetchCourseraCourses(subject);
 
-      // If not recommended or no history, proceed with normal subject filtering
-      console.log('Fetching courses for subject:', subject);
-      const courses = await fetchCourseraCourses(subject);
+        // Filter out sample/example courses
+        const filteredCourses = courses.filter(course => 
+          !course.id.startsWith('sample-') &&
+          !course.instructors?.[0]?.fullName?.includes('John Doe') &&
+          !course.partners?.[0]?.name?.includes('Example University')
+        );
 
-      // Transform Coursera courses into our learning path format
-      const paths = courses.map(course => {
-            // Parse workload hours with better fallback handling
-            let estimatedHours = 10; // Default fallback of 10 hours
-            if (course.workload) {
-              const hourMatch = course.workload.match(/(\d+).*?hour/i);
-              if (hourMatch) {
-                estimatedHours = parseInt(hourMatch[1]);
-              } else {
-                // Try to parse just the first number if no "hour" keyword found
-                const numberMatch = course.workload.match(/(\d+)/);
-                if (numberMatch) {
-                  estimatedHours = parseInt(numberMatch[1]);
+        // If no real courses found after filtering, return empty array
+        if (filteredCourses.length === 0) {
+          return res.json([]);
+        }
+
+        // Transform Coursera courses into our learning path format
+        const paths = filteredCourses.map(course => {
+              // Parse workload hours with better fallback handling
+              let estimatedHours = 10; // Default fallback of 10 hours
+              if (course.workload) {
+                const hourMatch = course.workload.match(/(\d+).*?hour/i);
+                if (hourMatch) {
+                  estimatedHours = parseInt(hourMatch[1]);
+                } else {
+                  // Try to parse just the first number if no "hour" keyword found
+                  const numberMatch = course.workload.match(/(\d+)/);
+                  if (numberMatch) {
+                    estimatedHours = parseInt(numberMatch[1]);
+                  }
                 }
               }
-            }
 
-            return {
-              id: parseInt(course.id),
-              title: course.name,
-              description: course.description,
-              difficulty: course.specializations?.length ? "advanced" : "intermediate",
-              topics: course.primaryLanguages || [],
-              prerequisites: [],
-              estimatedHours: Math.max(estimatedHours, 1), // Ensure at least 1 hour
-              instructor: course.instructors[0]?.fullName,
-              partner: course.partners[0]?.name,
-              photoUrl: course.photoUrl,
-              externalLink: `https://www.coursera.org/learn/${course.slug}`
-            };
-          });
+              return {
+                id: parseInt(course.id),
+                title: course.name,
+                description: course.description,
+                difficulty: course.specializations?.length ? "advanced" : "intermediate",
+                topics: course.primaryLanguages || [],
+                prerequisites: [],
+                estimatedHours: Math.max(estimatedHours, 1), // Ensure at least 1 hour
+                instructor: course.instructors[0]?.fullName,
+                partner: course.partners[0]?.name,
+                photoUrl: course.photoUrl,
+                externalLink: `https://www.coursera.org/learn/${course.slug}`
+              };
+            });
 
-      res.json(paths);
+        res.json(paths);
+      }
     } catch (error) {
       console.error('Error fetching Coursera courses:', error);
       res.status(500).json({ error: "Failed to fetch courses" });

@@ -40,9 +40,9 @@ export default function LearningPaths() {
   const { data: paths, isLoading } = useQuery<LearningPath[]>({
     queryKey: ["/api/learning-paths", selectedSubject],
     queryFn: async () => {
-      const url = selectedSubject === "recommended" 
+      const url = selectedSubject === "recommended"
         ? "/api/learning-paths?recommended=true"
-        : selectedSubject 
+        : selectedSubject
           ? `/api/learning-paths?subject=${encodeURIComponent(selectedSubject)}`
           : "/api/learning-paths";
       const response = await fetch(url);
@@ -147,7 +147,7 @@ export default function LearningPaths() {
             )}
             <div className="flex flex-col p-6 flex-1">
               <div className="space-y-4">
-                <Badge 
+                <Badge
                   className={`w-fit ${difficultyColors[path.difficulty]}`}
                 >
                   {path.difficulty}
@@ -183,7 +183,12 @@ export default function LearningPaths() {
                 </div>
 
                 <div className="mt-8">
-                  <a href={path.externalLink} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={path.externalLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full"
+                  >
                     <Button className="w-full">
                       View on Coursera
                       <ArrowRight className="ml-2 h-4 w-4" />
