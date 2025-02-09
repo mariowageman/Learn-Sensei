@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, SkipForward } from "lucide-react";
+import { CheckCircle, XCircle, SkipForward, InfoCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { apiRequest } from "@/lib/api";
 import { ProgressStats } from "./progress-stats";
@@ -171,13 +171,7 @@ export function Quiz({ subject }: QuizProps) {
               <h3 className="text-lg font-medium">Answer:</h3>
               <Tooltip>
                   <TooltipTrigger>
-                    <div className={`rounded-full p-1 ${feedback.correct ? 'bg-green-100' : 'bg-red-100'}`}>
-                      {feedback.correct ? (
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <XCircle className="h-4 w-4 text-red-600" />
-                      )}
-                    </div>
+                    <InfoCircle className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
                   </TooltipTrigger>
                   <TooltipContent>
                     <p className="max-w-xs break-words">{feedback.message}</p>
