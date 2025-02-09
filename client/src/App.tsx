@@ -134,8 +134,8 @@ function Navigation() {
           </div>
 
           {/* Logo - centered on mobile, left-aligned on desktop */}
-          <div className="sm:static sm:transform-none sm:left-0"> {/* Removed absolute positioning and transform for better centering */}
-            <Link href="/" className="flex items-center justify-center">
+          <div className="absolute left-1/2 -translate-x-1/2 sm:static sm:transform-none sm:left-0">
+            <Link href="/" className="flex items-center">
               <img 
                 src="/src/assets/learn-sensei-logo-icon.svg"
                 alt="Learn Sensei Logo"
