@@ -139,7 +139,7 @@ function Navigation() {
               <img 
                 src="/src/assets/learn-sensei-logo-icon.svg"
                 alt="Learn Sensei Logo"
-                className="h-10 w-10 -my-1 hover:opacity-90 transition-opacity"
+                className="h-12 w-12 -my-2 hover:opacity-90 transition-opacity"
                 style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
               />
             </Link>
