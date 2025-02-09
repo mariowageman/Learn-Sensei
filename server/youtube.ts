@@ -17,6 +17,9 @@ interface VideoResult {
 
 export async function searchEducationalVideos(query: string, maxResults = 3): Promise<VideoResult[]> {
   try {
+    // Request more results initially to ensure we have enough after filtering
+    const initialResults = 10;
+
     // Add educational qualifiers to the search query
     const enhancedQuery = `${query} tutorial explanation`;
 
@@ -25,42 +28,89 @@ export async function searchEducationalVideos(query: string, maxResults = 3): Pr
       q: enhancedQuery,
       type: ['video'],
       videoEmbeddable: 'true',
-      maxResults,
+      maxResults: initialResults,
       relevanceLanguage: 'en',
       videoCategoryId: '27', // Education category
       safeSearch: 'strict',
-      // Additional parameters to improve educational content relevance
       order: 'relevance',
-      videoDefinition: 'high',
-      // Filter for videos that are likely to be tutorials/educational
-      videoType: 'any'
+      videoDefinition: 'high'
     });
 
-    return (response.data.items || [])
+    // Filter and score videos based on relevance
+    const scoredVideos = (response.data.items || [])
       .filter(item => {
         if (!item.id?.videoId || !item.snippet?.title || !item.snippet?.description) {
           return false;
         }
 
-        // Additional filtering criteria for educational content
         const title = item.snippet.title.toLowerCase();
         const description = item.snippet.description.toLowerCase();
+        const queryTerms = query.toLowerCase().split(' ');
 
+        // Check if title or description contains query terms
+        const hasQueryTerms = queryTerms.some(term => 
+          title.includes(term) || description.includes(term)
+        );
+
+        // Educational content markers
         const educationalKeywords = [
           'tutorial', 'lesson', 'guide', 'explanation', 'learn', 
           'how to', 'course', 'education', 'teaching', 'explained'
         ];
 
-        // Check if title or description contains educational keywords
-        return educationalKeywords.some(keyword => 
+        const hasEducationalKeyword = educationalKeywords.some(keyword => 
           title.includes(keyword) || description.includes(keyword)
         );
+
+        return hasQueryTerms && hasEducationalKeyword;
       })
-      .map(item => ({
-        title: item.snippet!.title!,
-        videoId: item.id!.videoId!
-      }))
-      .slice(0, maxResults); // Ensure we only return the requested number of results
+      .map(item => {
+        const title = item.snippet!.title!.toLowerCase();
+        const description = item.snippet!.description!.toLowerCase();
+        const queryTerms = query.toLowerCase().split(' ');
+
+        // Calculate relevance score
+        let score = 0;
+        queryTerms.forEach(term => {
+          if (title.includes(term)) score += 2;
+          if (description.includes(term)) score += 1;
+        });
+
+        return {
+          title: item.snippet!.title!,
+          videoId: item.id!.videoId!,
+          score
+        };
+      })
+      .sort((a, b) => b.score - a.score) // Sort by relevance score
+      .slice(0, maxResults) // Take top 3 most relevant videos
+      .map(({ title, videoId }) => ({ title, videoId }));
+
+    // If we don't have enough results, make another attempt with broader terms
+    if (scoredVideos.length < maxResults) {
+      const broadQuery = query.split(' ')[0] + ' basics tutorial';
+      const backupResponse = await youtube.search.list({
+        part: ['snippet'],
+        q: broadQuery,
+        type: ['video'],
+        videoEmbeddable: 'true',
+        maxResults: maxResults - scoredVideos.length,
+        relevanceLanguage: 'en',
+        videoCategoryId: '27',
+        safeSearch: 'strict'
+      });
+
+      const backupVideos = (backupResponse.data.items || [])
+        .filter(item => item.id?.videoId && item.snippet?.title)
+        .map(item => ({
+          title: item.snippet!.title!,
+          videoId: item.id!.videoId!
+        }));
+
+      return [...scoredVideos, ...backupVideos].slice(0, maxResults);
+    }
+
+    return scoredVideos;
   } catch (error) {
     console.error('YouTube API error:', error);
     return [];
