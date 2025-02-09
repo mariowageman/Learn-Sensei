@@ -115,9 +115,9 @@ function Navigation() {
 
   return (
     <nav className="border-b">
-      <div className="container max-w-6xl mx-auto py-4 px-4 flex items-center justify-center"> {/* Changed justify-between to justify-center */}
+      <div className="container max-w-6xl mx-auto py-4 px-4 flex items-center justify-between">
         {/* Mobile Menu and Logo */}
-        <div className="flex items-center justify-between w-full sm:w-auto">
+        <div className="flex items-center gap-4">
           <div className="sm:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
@@ -150,11 +150,13 @@ function Navigation() {
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden sm:flex items-center gap-4">
+        <div className="hidden sm:flex items-center justify-center flex-1">
           <NavigationLinks />
         </div>
 
-        <ThemeToggle />
+        <div className="flex items-center">
+          <ThemeToggle />
+        </div>
       </div>
     </nav>
   );
