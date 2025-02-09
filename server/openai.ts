@@ -43,13 +43,13 @@ export async function generateQuestion(subject: string) {
 }
 
 export async function checkAnswer(question: string, expectedAnswer: string, userAnswer: string) {
-  // First, get the core concept being tested
+  // First, get the core concept and subject area being tested
   const conceptResponse = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
       {
         role: "system",
-        content: "Extract the main educational concept being tested in this question. Return in JSON format with a 'concept' field containing a short phrase (2-3 words max) describing the core concept."
+        content: "Extract the main educational concept being tested and the broader subject area. Return in JSON format with 'concept' (2-3 words) and 'subject' (1 word) fields describing the core topic and its broader category."
       },
       {
         role: "user",
@@ -61,6 +61,7 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
 
   const conceptData = JSON.parse(conceptResponse.choices[0].message.content || "{}");
   const concept = conceptData.concept || "";
+  const subjectArea = conceptData.subject || "";
 
   // Then check the answer
   const response = await openai.chat.completions.create({
@@ -81,8 +82,27 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
   const result = JSON.parse(response.choices[0].message.content || "{}");
 
   if (!result.correct) {
-    // Create a more focused search query using both the question topic and correct answer
-    const searchQuery = `${concept} ${expectedAnswer} explanation tutorial`;
+    // Extract key terms for a more focused search
+    const keyTermsResponse = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: "Extract 2-3 key educational terms from the question and answer that would be most helpful for finding a relevant tutorial video. Return in JSON format with a 'terms' field containing a comma-separated list."
+        },
+        {
+          role: "user",
+          content: `Question: ${question}\nCorrect Answer: ${expectedAnswer}\nSubject Area: ${subjectArea}`
+        }
+      ],
+      response_format: { type: "json_object" }
+    });
+
+    const keyTermsData = JSON.parse(keyTermsResponse.choices[0].message.content || "{}");
+    const keyTerms = keyTermsData.terms || "";
+
+    // Create a highly focused search query combining all relevant information
+    const searchQuery = `${subjectArea} ${concept} ${keyTerms} lesson`;
     const videoSuggestions = await searchEducationalVideos(searchQuery);
     result.videoSuggestions = videoSuggestions;
   }
