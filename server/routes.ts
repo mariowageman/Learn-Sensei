@@ -108,7 +108,10 @@ export function registerRoutes(app: Express): Server {
       });
 
       if (dueQuestion) {
-        return res.json(dueQuestion);
+        return res.json({
+          ...dueQuestion,
+          spacedRepetition: dueQuestion.spacedRepetition
+        });
       }
 
       // If no questions are due, generate a new question
@@ -121,15 +124,18 @@ export function registerRoutes(app: Express): Server {
       }).returning();
 
       // Initialize spaced repetition for the new question
-      await db.insert(spacedRepetition).values({
+      const [spaceRepData] = await db.insert(spacedRepetition).values({
         questionId: savedQuestion.id,
         nextReviewDate: new Date(), // Due immediately
         interval: 1,
         easeFactor: 2.5,
         consecutiveCorrect: 0
-      });
+      }).returning();
 
-      res.json(savedQuestion);
+      res.json({
+        ...savedQuestion,
+        spacedRepetition: spaceRepData
+      });
     } catch (error) {
       console.error('Error getting quiz question:', error);
       res.status(500).json({ error: "Failed to get quiz question" });
