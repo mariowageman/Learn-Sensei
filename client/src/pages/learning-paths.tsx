@@ -183,17 +183,20 @@ export default function LearningPaths() {
                 </div>
 
                 <div className="mt-8">
-                  <a
-                    href={path.externalLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Button 
                     className="w-full"
+                    asChild
                   >
-                    <Button className="w-full">
+                    <a
+                      href={path.externalLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center w-full"
+                    >
                       View on Coursera
                       <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </a>
+                    </a>
+                  </Button>
                 </div>
               </div>
             </div>

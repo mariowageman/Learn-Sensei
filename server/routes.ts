@@ -367,7 +367,7 @@ export function registerRoutes(app: Express): Server {
         const courses = await fetchCourseraCourses(subject);
 
         // Filter out sample/example courses
-        const filteredCourses = courses.filter(course => 
+        const filteredCourses = courses.filter(course =>
           !course.id.startsWith('sample-') &&
           !course.instructors?.[0]?.fullName?.includes('John Doe') &&
           !course.partners?.[0]?.name?.includes('Example University')
@@ -380,35 +380,41 @@ export function registerRoutes(app: Express): Server {
 
         // Transform Coursera courses into our learning path format
         const paths = filteredCourses.map(course => {
-              // Parse workload hours with better fallback handling
-              let estimatedHours = 10; // Default fallback of 10 hours
-              if (course.workload) {
-                const hourMatch = course.workload.match(/(\d+).*?hour/i);
-                if (hourMatch) {
-                  estimatedHours = parseInt(hourMatch[1]);
-                } else {
-                  // Try to parse just the first number if no "hour" keyword found
-                  const numberMatch = course.workload.match(/(\d+)/);
-                  if (numberMatch) {
-                    estimatedHours = parseInt(numberMatch[1]);
-                  }
-                }
+          // Parse workload hours with better fallback handling
+          let estimatedHours = 10; // Default fallback of 10 hours
+          if (course.workload) {
+            const hourMatch = course.workload.match(/(\d+).*?hour/i);
+            if (hourMatch) {
+              estimatedHours = parseInt(hourMatch[1]);
+            } else {
+              // Try to parse just the first number if no "hour" keyword found
+              const numberMatch = course.workload.match(/(\d+)/);
+              if (numberMatch) {
+                estimatedHours = parseInt(numberMatch[1]);
               }
+            }
+          }
 
-              return {
-                id: parseInt(course.id),
-                title: course.name,
-                description: course.description,
-                difficulty: course.specializations?.length ? "advanced" : "intermediate",
-                topics: course.primaryLanguages || [],
-                prerequisites: [],
-                estimatedHours: Math.max(estimatedHours, 1), // Ensure at least 1 hour
-                instructor: course.instructors[0]?.fullName,
-                partner: course.partners[0]?.name,
-                photoUrl: course.photoUrl,
-                externalLink: `https://www.coursera.org/learn/${course.slug}`
-              };
-            });
+          // Ensure valid course URL
+          const courseSlug = course.slug?.replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
+          const externalLink = courseSlug
+            ? `https://www.coursera.org/learn/${courseSlug}`
+            : `https://www.coursera.org/courses?query=${encodeURIComponent(course.name)}`;
+
+          return {
+            id: parseInt(course.id),
+            title: course.name,
+            description: course.description,
+            difficulty: course.specializations?.length ? "advanced" : "intermediate",
+            topics: course.primaryLanguages || [],
+            prerequisites: [],
+            estimatedHours: Math.max(estimatedHours, 1), // Ensure at least 1 hour
+            instructor: course.instructors[0]?.fullName,
+            partner: course.partners[0]?.name,
+            photoUrl: course.photoUrl,
+            externalLink
+          };
+        });
 
         res.json(paths);
       }
