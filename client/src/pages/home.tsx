@@ -15,7 +15,7 @@ export default function Home() {
               Learn Sensei
             </h1>
             <p className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Your AI-powered learning companion for personalized education
+              Your AI-powered learning companion for personalized&nbsp;education
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
