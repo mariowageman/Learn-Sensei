@@ -115,7 +115,7 @@ function Navigation() {
 
   return (
     <nav className="border-b">
-      <div className="container py-4 px-4 flex items-center justify-center"> {/* Changed justify-between to justify-center */}
+      <div className="container max-w-6xl mx-auto py-4 px-4 flex items-center justify-center"> {/* Changed justify-between to justify-center */}
         {/* Mobile Menu and Logo */}
         <div className="flex items-center justify-between w-full sm:w-auto">
           <div className="sm:hidden">
