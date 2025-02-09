@@ -2,13 +2,12 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { generateExplanation, generateQuestion, checkAnswer } from "./openai";
 import { db } from "@db";
-import { and, eq, desc, sql, gt, lt, lte, isNull } from "drizzle-orm";
+import { eq, and, desc, sql, gt, lt } from "drizzle-orm";
 import {
   sessions,
   messages,
   quizQuestions,
   quizProgress,
-  spacedRepetition,
   learningPaths,
   learningPathProgress,
   progressAnalytics,
@@ -21,41 +20,6 @@ const courseraConfig = {
   apiKey: process.env.COURSERA_API_KEY,
   apiSecret: process.env.COURSERA_API_SECRET
 };
-
-// Helper function to calculate next review date using SM-2 algorithm
-function calculateNextReview(
-  correct: boolean,
-  currentInterval: number,
-  easeFactor: number,
-  consecutiveCorrect: number
-): { interval: number; easeFactor: number; consecutiveCorrect: number } {
-  if (!correct) {
-    return {
-      interval: 1,
-      easeFactor: Math.max(1.3, easeFactor - 0.2),
-      consecutiveCorrect: 0
-    };
-  }
-
-  const newConsecutiveCorrect = consecutiveCorrect + 1;
-  let newInterval: number;
-
-  if (newConsecutiveCorrect === 1) {
-    newInterval = 1;
-  } else if (newConsecutiveCorrect === 2) {
-    newInterval = 6;
-  } else {
-    newInterval = Math.round(currentInterval * easeFactor);
-  }
-
-  const newEaseFactor = easeFactor + (0.1 - (5 - 5) * (0.08 + (5 - 5) * 0.02));
-
-  return {
-    interval: newInterval,
-    easeFactor: Math.max(1.3, newEaseFactor),
-    consecutiveCorrect: newConsecutiveCorrect
-  };
-}
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
@@ -90,117 +54,27 @@ export function registerRoutes(app: Express): Server {
 
   app.get("/api/quiz/:subject", async (req, res) => {
     const { subject } = req.params;
+    const question = await generateQuestion(subject);
 
-    try {
-      // First, check for questions due for review
-      const dueQuestion = await db.query.quizQuestions.findFirst({
-        where: and(
-          eq(quizQuestions.subject, subject),
-          sql`EXISTS (
-            SELECT 1 FROM ${spacedRepetition} sr
-            WHERE sr.question_id = ${quizQuestions.id}
-            AND sr.next_review_date <= NOW()
-          )`
-        ),
-        with: {
-          spacedRepetition: true
-        }
-      });
+    const [savedQuestion] = await db.insert(quizQuestions).values({
+      text: question.question,
+      answer: question.answer,
+      subject
+    }).returning();
 
-      if (dueQuestion) {
-        console.log('Found due question:', dueQuestion); // Debug log
-        return res.json(dueQuestion);
-      }
-
-      // If no questions are due, generate a new question
-      const question = await generateQuestion(subject);
-      console.log('Generated new question:', question); // Debug log
-
-      // Save the new question
-      const [savedQuestion] = await db.insert(quizQuestions).values({
-        text: question.question,
-        answer: question.answer,
-        subject
-      }).returning();
-
-      console.log('Saved question:', savedQuestion); // Debug log
-
-      // Initialize spaced repetition for the new question
-      const [spaceRepData] = await db.insert(spacedRepetition).values({
-        questionId: savedQuestion.id,
-        nextReviewDate: new Date(),
-        interval: 1,
-        easeFactor: 2.5,
-        consecutiveCorrect: 0
-      }).returning();
-
-      console.log('Initialized spaced repetition:', spaceRepData); // Debug log
-
-      res.json({
-        id: savedQuestion.id,
-        text: savedQuestion.text,
-        answer: savedQuestion.answer,
-        subject: savedQuestion.subject,
-        createdAt: savedQuestion.createdAt,
-        spacedRepetition: spaceRepData
-      });
-    } catch (error) {
-      console.error('Error getting quiz question:', error);
-      res.status(500).json({ error: "Failed to get quiz question" });
-    }
+    res.json(savedQuestion);
   });
 
   app.post("/api/quiz/check", async (req, res) => {
     const { questionId, answer, timeSpent } = req.body;
 
     const question = await db.query.quizQuestions.findFirst({
-      where: eq(quizQuestions.id, questionId),
-      with: {
-        spacedRepetition: true
-      }
+      where: eq(quizQuestions.id, questionId)
     });
-
     if (!question) return res.status(404).json({ error: "Question not found" });
 
     try {
       const result = await checkAnswer(question.text, question.answer, answer);
-
-      // Update spaced repetition data
-      const currentDate = new Date();
-      let srData = question.spacedRepetition;
-
-      if (!srData) {
-        // Initialize if not exists
-        [srData] = await db.insert(spacedRepetition).values({
-          questionId,
-          nextReviewDate: currentDate,
-          interval: 1,
-          easeFactor: 2.5,
-          consecutiveCorrect: 0
-        }).returning();
-      }
-
-      // Calculate new spaced repetition values
-      const { interval, easeFactor, consecutiveCorrect } = calculateNextReview(
-        result.correct,
-        srData.interval,
-        srData.easeFactor,
-        srData.consecutiveCorrect
-      );
-
-      // Update spaced repetition record
-      const nextReviewDate = new Date();
-      nextReviewDate.setDate(nextReviewDate.getDate() + interval);
-
-      await db.update(spacedRepetition)
-        .set({
-          interval,
-          easeFactor,
-          consecutiveCorrect,
-          nextReviewDate,
-          lastReviewedAt: currentDate
-        })
-        .where(eq(spacedRepetition.questionId, questionId));
 
       // Get or create learning path progress
       let learningPath = await db.query.learningPaths.findFirst({

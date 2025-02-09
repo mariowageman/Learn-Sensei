@@ -6,10 +6,9 @@ import { queryClient } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle, XCircle, SkipForward, Calendar } from "lucide-react";
+import { CheckCircle, XCircle, SkipForward } from "lucide-react";
 import { apiRequest } from "@/lib/api";
 import { ProgressStats } from "./progress-stats";
-import { useToast } from "@/hooks/use-toast";
 
 interface QuizProps {
   subject: string;
@@ -19,10 +18,6 @@ interface Question {
   id: number;
   text: string;
   answer: string;
-  spacedRepetition?: {
-    nextReviewDate: string;
-    consecutiveCorrect: number;
-  };
 }
 
 interface VideoSuggestion {
@@ -44,7 +39,6 @@ export function Quiz({ subject }: QuizProps) {
     message: string;
     videoSuggestions?: VideoSuggestion[];
   } | null>(null);
-  const { toast } = useToast();
 
   // Reset timer when component mounts or subject changes
   useEffect(() => {
@@ -54,20 +48,6 @@ export function Quiz({ subject }: QuizProps) {
   const { data: question, isLoading: isQuestionLoading, refetch } = useQuery<Question>({
     queryKey: [`/api/quiz/${subject}`]
   });
-
-  const formatNextReview = (date: string) => {
-    const reviewDate = new Date(date);
-    const now = new Date();
-    const diffDays = Math.round((reviewDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (diffDays <= 0) {
-      return "Due now";
-    } else if (diffDays === 1) {
-      return "Due tomorrow";
-    } else {
-      return `Due in ${diffDays} days`;
-    }
-  };
 
   const mutation = useMutation<CheckAnswerResponse, Error, { answer: string, timeSpent: number }>({
     mutationFn: async ({ answer, timeSpent }) => {
@@ -120,7 +100,7 @@ export function Quiz({ subject }: QuizProps) {
     const endTime = new Date();
     const timeSpentMinutes = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
 
-    mutation.mutate({
+    mutation.mutate({ 
       answer: currentAnswer.trim(),
       timeSpent: timeSpentMinutes
     });
@@ -147,20 +127,7 @@ export function Quiz({ subject }: QuizProps) {
     <div className="space-y-4">
       <ProgressStats subject={subject} />
       <Card className="p-4">
-        <div className="flex justify-between items-start mb-4">
-          <h3 className="text-lg font-medium">Fill in the blank:</h3>
-          {question?.spacedRepetition && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              <span>{formatNextReview(question.spacedRepetition.nextReviewDate)}</span>
-              {question.spacedRepetition.consecutiveCorrect > 0 && (
-                <span className="text-green-500">
-                  ({question.spacedRepetition.consecutiveCorrect} streak)
-                </span>
-              )}
-            </div>
-          )}
-        </div>
+        <h3 className="text-lg font-medium mb-4">Fill in the blank:</h3>
         <p className="text-xl mb-6 break-words">{question?.text}</p>
 
         <div className="space-y-4">
