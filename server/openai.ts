@@ -43,13 +43,13 @@ export async function generateQuestion(subject: string) {
 
 export async function checkAnswer(question: string, expectedAnswer: string, userAnswer: string) {
   try {
-    // Get the specific topic and learning objective with more context
+    // Get the main educational concept being tested
     const topicResponse = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "Analyze the question and extract: 1) the main topic being tested, 2) the specific concept or skill being assessed, and 3) key terms needed to understand the answer. Return in JSON format with 'topic', 'concept', and 'keyTerms' fields. For keyTerms, provide a comma-separated string of terms that are DIRECTLY related to the specific concept being tested."
+          content: "Analyze the full question to understand: 1) the broader educational concept being tested, 2) any prerequisite concepts needed to understand this topic, and 3) specific technical terms used. Focus on what the student needs to learn to understand this topic, not just the specific answer. Return JSON with fields: 'mainConcept' (the primary concept), 'prerequisites' (comma-separated foundational concepts), and 'technicalTerms' (key vocabulary)."
         },
         {
           role: "user",
@@ -59,11 +59,10 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
       response_format: { type: "json_object" }
     });
 
-    const topicData = JSON.parse(topicResponse.choices[0].message.content || "{}");
-    const mainTopic = topicData.topic || "";
-    const specificConcept = topicData.concept || "";
-    // Ensure keyTerms is a string, default to empty string if undefined
-    const keyTerms = typeof topicData.keyTerms === 'string' ? topicData.keyTerms : '';
+    const conceptData = JSON.parse(topicResponse.choices[0].message.content || "{}");
+    const mainConcept = conceptData.mainConcept || "";
+    const prerequisites = typeof conceptData.prerequisites === 'string' ? conceptData.prerequisites : '';
+    const technicalTerms = typeof conceptData.technicalTerms === 'string' ? conceptData.technicalTerms : '';
 
     // Check the answer
     const response = await openai.chat.completions.create({
@@ -84,26 +83,19 @@ export async function checkAnswer(question: string, expectedAnswer: string, user
     const result = JSON.parse(response.choices[0].message.content || "{}");
 
     if (!result.correct) {
-      // Generate educational video search query using the specific topic and concept
-      const searchTerms = [
-        mainTopic,
-        specificConcept,
-        ...(keyTerms ? keyTerms.split(',').map(term => term.trim()) : [])
-      ].filter(Boolean);
+      // Create focused search queries for different aspects of the concept
+      const conceptQuery = `${mainConcept} explanation tutorial`;
+      const foundationQuery = prerequisites ? `${prerequisites.split(',')[0]} basics tutorial` : mainConcept;
 
-      // Create focused search queries for both topic and specific concept
-      const searchQuery = `${mainTopic} ${specificConcept} tutorial`;
-      const conceptQuery = `${specificConcept} ${keyTerms} explanation`;
-
-      // Get videos for both queries and combine results
-      const [topicVideos, conceptVideos] = await Promise.all([
-        searchEducationalVideos(searchQuery, 2),
-        searchEducationalVideos(conceptQuery, 2)
+      // Get videos for both concept explanation and foundational understanding
+      const [conceptVideos, foundationVideos] = await Promise.all([
+        searchEducationalVideos(conceptQuery, 2),
+        searchEducationalVideos(foundationQuery, 2)
       ]);
 
       // Combine and deduplicate videos, prioritizing concept-specific ones
       const seenIds = new Set();
-      const combinedVideos = [...conceptVideos, ...topicVideos].filter(video => {
+      const combinedVideos = [...conceptVideos, ...foundationVideos].filter(video => {
         if (seenIds.has(video.videoId)) return false;
         seenIds.add(video.videoId);
         return true;
