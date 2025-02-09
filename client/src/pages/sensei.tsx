@@ -2,6 +2,7 @@ import { Quiz } from "@/components/learning/quiz";
 import { SubjectForm } from "@/components/learning/subject-form";
 import { RecentSubjects } from "@/components/learning/recent-subjects";
 import { useState } from "react";
+import { RefreshCw } from "lucide-react";
 
 export default function SenseiMode() {
   const [subject, setSubject] = useState<string>("");
@@ -29,12 +30,14 @@ export default function SenseiMode() {
               <h2 className="text-xl sm:text-2xl font-bold break-words">
                 Testing knowledge: {subject}
               </h2>
-              <button
+              <Button
                 onClick={() => setSubject("")}
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                variant="outline"
+                size="sm"
               >
+                <RefreshCw className="h-4 w-4" />
                 Change subject
-              </button>
+              </Button>
             </div>
             <Quiz subject={subject} />
           </div>
