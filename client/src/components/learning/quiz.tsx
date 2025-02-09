@@ -124,6 +124,7 @@ export function Quiz({ subject }: QuizProps) {
   };
 
   return (
+    <TooltipProvider>
     <div className="space-y-4">
       <Card className="p-4">
         <h3 className="text-lg font-medium mb-4">Fill in the blank:</h3>
@@ -168,8 +169,7 @@ export function Quiz({ subject }: QuizProps) {
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-4">
               <h3 className="text-lg font-medium">Answer:</h3>
-              <TooltipProvider>
-                <Tooltip>
+              <Tooltip>
                   <TooltipTrigger>
                     <div className={`rounded-full p-1 ${feedback.correct ? 'bg-green-100' : 'bg-red-100'}`}>
                       {feedback.correct ? (
@@ -183,7 +183,6 @@ export function Quiz({ subject }: QuizProps) {
                     <p className="max-w-xs break-words">{feedback.message}</p>
                   </TooltipContent>
                 </Tooltip>
-              </TooltipProvider>
             </div>
             <p className="text-xl mb-6 break-words">{question?.answer}</p>
           </Card>
@@ -226,5 +225,6 @@ export function Quiz({ subject }: QuizProps) {
       )}
       <ProgressStats subject={subject} />
     </div>
+    </TooltipProvider>
   );
 }
