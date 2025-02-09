@@ -124,7 +124,6 @@ export function Quiz({ subject }: QuizProps) {
   };
 
   return (
-    <TooltipProvider>
     <div className="space-y-4">
       <Card className="p-4">
         <h3 className="text-lg font-medium mb-4">Fill in the blank:</h3>
@@ -221,6 +220,5 @@ export function Quiz({ subject }: QuizProps) {
       )}
       <ProgressStats subject={subject} />
     </div>
-    </TooltipProvider>
   );
 }
