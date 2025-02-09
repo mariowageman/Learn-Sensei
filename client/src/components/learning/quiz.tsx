@@ -125,7 +125,6 @@ export function Quiz({ subject }: QuizProps) {
 
   return (
     <div className="space-y-4">
-      <ProgressStats subject={subject} />
       <Card className="p-4">
         <h3 className="text-lg font-medium mb-4">Fill in the blank:</h3>
         <p className="text-xl mb-6 break-words">{question?.text}</p>
@@ -165,53 +164,61 @@ export function Quiz({ subject }: QuizProps) {
       </Card>
 
       {feedback && (
-        <div className="space-y-4">
-          <Alert
-            variant={feedback.correct ? "default" : "destructive"}
-            className="animate-in fade-in"
-          >
-            {feedback.correct ? (
-              <CheckCircle className="h-4 w-4" />
-            ) : (
-              <XCircle className="h-4 w-4" />
-            )}
-            <AlertDescription className="break-words">{feedback.message}</AlertDescription>
-          </Alert>
+        <>
+          <Card className="p-4">
+            <h3 className="text-lg font-medium mb-4">Answer:</h3>
+            <p className="text-xl mb-6 break-words">{question?.answer}</p>
+          </Card>
+          <div className="space-y-4">
+            <Alert
+              variant={feedback.correct ? "default" : "destructive"}
+              className="animate-in fade-in"
+            >
+              {feedback.correct ? (
+                <CheckCircle className="h-4 w-4" />
+              ) : (
+                <XCircle className="h-4 w-4" />
+              )}
+              <AlertDescription className="break-words">{feedback.message}</AlertDescription>
+            </Alert>
 
-          {!feedback.correct && feedback.videoSuggestions && feedback.videoSuggestions.length > 0 && (
-            <Card className="p-4">
-              <h4 className="font-medium mb-4">Suggested Learning Videos:</h4>
-              <div className="space-y-6">
-                {feedback.videoSuggestions.map((video, index) => (
-                  <div key={index} className="space-y-2">
-                    <h5 className="text-sm font-medium break-words">{video.title}</h5>
-                    <div className="relative w-full aspect-video rounded-lg overflow-hidden">
-                      <iframe
-                        className="absolute top-0 left-0 w-full h-full"
-                        src={`https://www.youtube.com/embed/${video.videoId}`}
-                        title={video.title}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
+            {!feedback.correct && feedback.videoSuggestions && feedback.videoSuggestions.length > 0 && (
+              <Card className="p-4">
+                <h4 className="font-medium mb-4">Suggested Learning Videos:</h4>
+                <div className="space-y-6">
+                  {feedback.videoSuggestions.map((video, index) => (
+                    <div key={index} className="space-y-2">
+                      <h5 className="text-sm font-medium break-words">{video.title}</h5>
+                      <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                        <iframe
+                          className="absolute top-0 left-0 w-full h-full"
+                          src={`https://www.youtube.com/embed/${video.videoId}`}
+                          title={video.title}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Can't see the video? <a
+                          href={`https://www.youtube.com/watch?v=${video.videoId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline hover:text-primary"
+                        >
+                          Watch on YouTube
+                        </a>
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Can't see the video? <a
-                        href={`https://www.youtube.com/watch?v=${video.videoId}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline hover:text-primary"
-                      >
-                        Watch on YouTube
-                      </a>
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
-        </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+          </div>
+        </>
       )}
+      <ProgressStats subject={subject} />
+      <div>Recent Attempts</div> {/* Placeholder for Recent Attempts card */}
     </div>
   );
 }
