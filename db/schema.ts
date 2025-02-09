@@ -106,8 +106,8 @@ export const progressAnalyticsRelations = relations(progressAnalytics, ({ one })
   })
 }));
 
-export const quizQuestionsRelations = relations(quizQuestions, ({ one }) => ({
-  spacedRepetition: one(spacedRepetition, {
+export const quizQuestionsRelations = relations(quizQuestions, ({ many }) => ({
+  spacedRepetition: many(spacedRepetition, {
     fields: [quizQuestions.id],
     references: [spacedRepetition.questionId],
   })

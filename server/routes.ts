@@ -97,9 +97,9 @@ export function registerRoutes(app: Express): Server {
         where: and(
           eq(quizQuestions.subject, subject),
           sql`EXISTS (
-            SELECT 1 FROM ${spacedRepetition}
-            WHERE ${spacedRepetition.questionId} = ${quizQuestions.id}
-            AND ${spacedRepetition.nextReviewDate} <= NOW()
+            SELECT 1 FROM ${spacedRepetition} sr
+            WHERE sr.question_id = ${quizQuestions.id}
+            AND sr.next_review_date <= NOW()
           )`
         ),
         with: {
@@ -108,32 +108,40 @@ export function registerRoutes(app: Express): Server {
       });
 
       if (dueQuestion) {
-        return res.json({
-          ...dueQuestion,
-          spacedRepetition: dueQuestion.spacedRepetition
-        });
+        console.log('Found due question:', dueQuestion); // Debug log
+        return res.json(dueQuestion);
       }
 
       // If no questions are due, generate a new question
       const question = await generateQuestion(subject);
+      console.log('Generated new question:', question); // Debug log
 
+      // Save the new question
       const [savedQuestion] = await db.insert(quizQuestions).values({
         text: question.question,
         answer: question.answer,
         subject
       }).returning();
 
+      console.log('Saved question:', savedQuestion); // Debug log
+
       // Initialize spaced repetition for the new question
       const [spaceRepData] = await db.insert(spacedRepetition).values({
         questionId: savedQuestion.id,
-        nextReviewDate: new Date(), // Due immediately
+        nextReviewDate: new Date(),
         interval: 1,
         easeFactor: 2.5,
         consecutiveCorrect: 0
       }).returning();
 
+      console.log('Initialized spaced repetition:', spaceRepData); // Debug log
+
       res.json({
-        ...savedQuestion,
+        id: savedQuestion.id,
+        text: savedQuestion.text,
+        answer: savedQuestion.answer,
+        subject: savedQuestion.subject,
+        createdAt: savedQuestion.createdAt,
         spacedRepetition: spaceRepData
       });
     } catch (error) {
