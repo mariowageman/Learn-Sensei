@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, boolean, integer, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, boolean, integer, jsonb, real } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
@@ -76,6 +76,17 @@ export const subjectHistory = pgTable("subject_history", {
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
 
+export const spacedRepetition = pgTable("spaced_repetition", {
+  id: serial("id").primaryKey(),
+  questionId: integer("question_id").references(() => quizQuestions.id),
+  nextReviewDate: timestamp("next_review_date").notNull(),
+  interval: real("interval").notNull().default(1), 
+  easeFactor: real("ease_factor").notNull().default(2.5), 
+  consecutiveCorrect: integer("consecutive_correct").notNull().default(0),
+  lastReviewedAt: timestamp("last_reviewed_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull()
+});
+
 export const learningPathsRelations = relations(learningPaths, ({ many }) => ({
   progress: many(learningPathProgress)
 }));
@@ -94,6 +105,21 @@ export const progressAnalyticsRelations = relations(progressAnalytics, ({ one })
   })
 }));
 
+export const quizQuestionsRelations = relations(quizQuestions, ({ one }) => ({
+  spacedRepetition: one(spacedRepetition, {
+    fields: [quizQuestions.id],
+    references: [spacedRepetition.questionId],
+  })
+}));
+
+export const spacedRepetitionRelations = relations(spacedRepetition, ({ one }) => ({
+  question: one(quizQuestions, {
+    fields: [spacedRepetition.questionId],
+    references: [quizQuestions.id],
+  })
+}));
+
+
 export const insertSessionSchema = createInsertSchema(sessions);
 export const selectSessionSchema = createSelectSchema(sessions);
 export const insertMessageSchema = createInsertSchema(messages);
@@ -110,6 +136,8 @@ export const insertProgressAnalyticsSchema = createInsertSchema(progressAnalytic
 export const selectProgressAnalyticsSchema = createSelectSchema(progressAnalytics);
 export const insertSubjectHistorySchema = createInsertSchema(subjectHistory);
 export const selectSubjectHistorySchema = createSelectSchema(subjectHistory);
+export const insertSpacedRepetitionSchema = createInsertSchema(spacedRepetition);
+export const selectSpacedRepetitionSchema = createSelectSchema(spacedRepetition);
 
 export type Session = typeof sessions.$inferSelect;
 export type Message = typeof messages.$inferSelect;
@@ -119,3 +147,4 @@ export type LearningPath = typeof learningPaths.$inferSelect;
 export type LearningPathProgress = typeof learningPathProgress.$inferSelect;
 export type ProgressAnalytics = typeof progressAnalytics.$inferSelect;
 export type SubjectHistory = typeof subjectHistory.$inferSelect;
+export type SpacedRepetition = typeof spacedRepetition.$inferSelect;
