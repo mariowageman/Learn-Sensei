@@ -1,6 +1,7 @@
 import { Quiz } from "@/components/learning/quiz";
 import { SubjectForm } from "@/components/learning/subject-form";
 import { RecentSubjects } from "@/components/learning/recent-subjects";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { RefreshCw } from "lucide-react";
 
