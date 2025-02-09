@@ -6,7 +6,7 @@ import { queryClient } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import { CheckCircle, XCircle, SkipForward } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { apiRequest } from "@/lib/api";
 import { ProgressStats } from "./progress-stats";
 
@@ -168,20 +168,22 @@ export function Quiz({ subject }: QuizProps) {
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-4">
               <h3 className="text-lg font-medium">Answer:</h3>
-              <Tooltip>
-                <TooltipTrigger>
-                  <div className={`rounded-full p-1 ${feedback.correct ? 'bg-green-100' : 'bg-red-100'}`}>
-                    {feedback.correct ? (
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <XCircle className="h-4 w-4 text-red-600" />
-                    )}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-xs break-words">{feedback.message}</p>
-                </TooltipContent>
-              </Tooltip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className={`rounded-full p-1 ${feedback.correct ? 'bg-green-100' : 'bg-red-100'}`}>
+                      {feedback.correct ? (
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <XCircle className="h-4 w-4 text-red-600" />
+                      )}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs break-words">{feedback.message}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
             <p className="text-xl mb-6 break-words">{question?.answer}</p>
           </Card>
