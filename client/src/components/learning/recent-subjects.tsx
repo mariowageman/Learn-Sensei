@@ -48,15 +48,16 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
         <History className="h-4 w-4" />
         <h3 className="text-sm font-medium">Recent Subjects</h3>
       </div>
-      <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
         {uniqueSubjects.map((subject) => (
           <Button
             key={subject.id}
             variant="outline"
-            className="w-full justify-start text-left"
+            size="sm"
+            className="inline-flex items-center hover:bg-accent/60"
             onClick={() => onSelectSubject(subject.subject)}
           >
-            <Clock className="mr-2 h-4 w-4" />
+            <Clock className="mr-1.5 h-3.5 w-3.5" />
             {subject.subject}
           </Button>
         ))}
