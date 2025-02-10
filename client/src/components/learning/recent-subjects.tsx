@@ -18,7 +18,8 @@ interface RecentSubjectsProps {
 export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
   const { data: recentSubjects, isLoading } = useQuery<RecentSubject[]>({
     queryKey: ["/api/recent-subjects"],
-    staleTime: 30000
+    staleTime: 0,
+    refetchOnWindowFocus: true
   });
 
   if (isLoading) {
