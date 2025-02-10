@@ -146,7 +146,7 @@ export function Quiz({ subject }: QuizProps) {
             <Button
               onClick={handleSubmit}
               disabled={!currentAnswer.trim() || mutation.isPending}
-              variant="blue"
+              variant={feedback ? (feedback.correct ? "success" : "destructive") : "blue"}
               className="w-full sm:w-auto transition-colors duration-300"
             >
               {mutation.isPending ? "Checking..." : "Submit Answer"}
