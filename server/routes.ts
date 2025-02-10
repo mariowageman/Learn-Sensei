@@ -631,7 +631,7 @@ export function registerRoutes(app: Express): Server {
     try {
       const recentSubjects = await db.query.subjectHistory.findMany({
         orderBy: (history, { desc }) => [desc(history.createdAt)],
-        limit: 5
+        limit: 10
       });
       res.json(recentSubjects);
     } catch (error) {

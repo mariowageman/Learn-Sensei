@@ -21,7 +21,9 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
     staleTime: 0,
     refetchInterval: 1000,
     refetchOnWindowFocus: true,
-    refetchOnMount: true
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    retry: 3
   });
 
   if (isLoading) {
