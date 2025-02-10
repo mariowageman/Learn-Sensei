@@ -19,7 +19,9 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
   const { data: recentSubjects, isLoading } = useQuery<RecentSubject[]>({
     queryKey: ["/api/recent-subjects"],
     staleTime: 0,
-    refetchOnWindowFocus: true
+    refetchInterval: 1000,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 
   if (isLoading) {
