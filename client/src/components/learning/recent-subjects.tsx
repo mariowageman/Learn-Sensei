@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,10 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
     return null;
   }
 
+  const uniqueSubjects = Array.from(new Set(recentSubjects.map(s => s.subject))).map(subject => 
+    recentSubjects.find(s => s.subject === subject)!
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-muted-foreground">
@@ -44,7 +49,7 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
         <h3 className="text-sm font-medium">Recent Subjects</h3>
       </div>
       <div className="space-y-2">
-        {recentSubjects.map((subject) => (
+        {uniqueSubjects.map((subject) => (
           <Button
             key={subject.id}
             variant="outline"
