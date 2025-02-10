@@ -121,8 +121,8 @@ function Navigation() {
           <div className="sm:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-8 w-8" />
+                <Button variant="ghost" size="icon" className="p-1">
+                  <Menu className="h-10 w-10" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-64">
