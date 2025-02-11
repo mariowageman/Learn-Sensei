@@ -168,7 +168,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
           <div className="flex flex-col sm:flex-row gap-2">
             {progress.subjects && progress.subjects.length > 1 && (
               <Select value={filterSubject} onValueChange={setFilterSubject}>
-                <SelectTrigger className="w-full sm:w-[130px]">
+                <SelectTrigger className="w-full sm:w-[130px] flex items-center justify-center sm:justify-start text-center">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Subject" />
                 </SelectTrigger>
@@ -182,7 +182,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
             )}
 
             <Select value={filterStatus} onValueChange={(value: 'all' | 'correct' | 'incorrect') => setFilterStatus(value)}>
-              <SelectTrigger className="w-full sm:w-[130px]">
+              <SelectTrigger className="w-full sm:w-[130px] flex items-center justify-center sm:justify-start text-center">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Filter by" />
               </SelectTrigger>
