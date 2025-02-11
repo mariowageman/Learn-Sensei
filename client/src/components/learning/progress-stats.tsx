@@ -1,9 +1,23 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, XCircle, Timer, TrendingUp, Target, Award } from "lucide-react";
+import { CheckCircle, XCircle, Timer, TrendingUp, Target, Award, Filter, Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface ProgressStatsProps {
   subject: string;
@@ -26,10 +40,20 @@ interface ProgressData {
     isCorrect: boolean;
     userAnswer: string;
     createdAt: string;
+    questionText: string;
+    correctAnswer: string;
+    videoSuggestions?: Array<{
+      title: string;
+      videoId: string;
+    }>;
   }>;
 }
 
 export function ProgressStats({ subject }: ProgressStatsProps) {
+  const [selectedAttempt, setSelectedAttempt] = useState<ProgressData['recentAttempts'][0] | null>(null);
+  const [filterStatus, setFilterStatus] = useState<'all' | 'correct' | 'incorrect'>('all');
+  const [sortBy, setSortBy] = useState<'date' | 'subject'>('date');
+
   const { data: progress, isLoading, error } = useQuery<ProgressData>({
     queryKey: [`/api/progress/${subject}`],
     refetchInterval: 30000,
@@ -54,6 +78,18 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
     }
     return `${hours}h ${mins}m`;
   };
+
+  const filteredAttempts = progress.recentAttempts.filter(attempt => {
+    if (filterStatus === 'all') return true;
+    return filterStatus === 'correct' ? attempt.isCorrect : !attempt.isCorrect;
+  });
+
+  const sortedAttempts = [...filteredAttempts].sort((a, b) => {
+    if (sortBy === 'date') {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+    return 0; // Default to date sorting
+  });
 
   return (
     <div className="grid gap-4">
@@ -143,24 +179,104 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
 
       {progress.recentAttempts?.length > 0 && (
         <Card className="p-4 space-y-4">
-          <h4 className="text-sm font-medium">Recent Attempts</h4>
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-sm font-medium">Learning History</h4>
+            <div className="flex items-center gap-2">
+              <Select value={filterStatus} onValueChange={(value: 'all' | 'correct' | 'incorrect') => setFilterStatus(value)}>
+                <SelectTrigger className="w-[130px]">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="correct">Correct</SelectItem>
+                  <SelectItem value="incorrect">Incorrect</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={sortBy} onValueChange={(value: 'date' | 'subject') => setSortBy(value)}>
+                <SelectTrigger className="w-[130px]">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date">Date</SelectItem>
+                  <SelectItem value="subject">Subject</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           <div className="space-y-2">
-            {progress.recentAttempts.map((attempt) => (
-              <div key={attempt.id} className="flex items-center gap-2 text-sm">
-                {attempt.isCorrect ? (
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                ) : (
-                  <XCircle className="h-4 w-4 text-red-500" />
-                )}
-                <span className="truncate flex-1">{attempt.userAnswer}</span>
-                <span className="text-muted-foreground">
-                  {new Date(attempt.createdAt).toLocaleTimeString()}
+            {sortedAttempts.map((attempt) => (
+              <Button
+                key={attempt.id}
+                variant="ghost"
+                className="w-full justify-between hover:bg-gray-100"
+                onClick={() => setSelectedAttempt(attempt)}
+              >
+                <div className="flex items-center gap-2">
+                  {attempt.isCorrect ? (
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <XCircle className="h-4 w-4 text-red-500" />
+                  )}
+                  <span className="truncate">{attempt.questionText}</span>
+                </div>
+                <span className="text-sm text-muted-foreground shrink-0">
+                  {new Date(attempt.createdAt).toLocaleDateString()}
                 </span>
-              </div>
+              </Button>
             ))}
           </div>
         </Card>
       )}
+
+      <Dialog open={!!selectedAttempt} onOpenChange={() => setSelectedAttempt(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Question Details</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium mb-2">Question:</h4>
+              <p className="text-lg">{selectedAttempt?.questionText}</p>
+            </div>
+            <div>
+              <h4 className="font-medium mb-2">Your Answer:</h4>
+              <p className={`text-lg ${selectedAttempt?.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                {selectedAttempt?.userAnswer}
+              </p>
+            </div>
+            {!selectedAttempt?.isCorrect && (
+              <div>
+                <h4 className="font-medium mb-2">Correct Answer:</h4>
+                <p className="text-lg text-green-600">{selectedAttempt?.correctAnswer}</p>
+              </div>
+            )}
+            {selectedAttempt?.videoSuggestions && selectedAttempt.videoSuggestions.length > 0 && (
+              <div>
+                <h4 className="font-medium mb-4">Suggested Videos:</h4>
+                <div className="grid gap-4">
+                  {selectedAttempt.videoSuggestions.map((video, index) => (
+                    <div key={index} className="space-y-2">
+                      <h5 className="text-sm font-medium">{video.title}</h5>
+                      <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                        <iframe
+                          className="absolute top-0 left-0 w-full h-full"
+                          src={`https://www.youtube.com/embed/${video.videoId}`}
+                          title={video.title}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

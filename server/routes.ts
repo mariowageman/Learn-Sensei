@@ -169,6 +169,9 @@ export function registerRoutes(app: Express): Server {
     try {
       const progress = await db.query.quizProgress.findMany({
         where: eq(quizProgress.subject, subject),
+        with: {
+          question: true
+        },
         orderBy: (quizProgress, { desc }) => [desc(quizProgress.createdAt)]
       });
 
@@ -216,6 +219,18 @@ export function registerRoutes(app: Express): Server {
         )
         : 0;
 
+      // Format recent attempts with full details
+      const recentAttempts = progress.map(attempt => ({
+        id: attempt.id,
+        isCorrect: attempt.isCorrect,
+        userAnswer: attempt.userAnswer,
+        createdAt: attempt.createdAt,
+        questionText: attempt.question.text,
+        correctAnswer: attempt.question.answer,
+        // Assuming videoSuggestions are stored in the database or can be retrieved
+        videoSuggestions: attempt.videoSuggestions || []
+      }));
+
       res.json({
         total,
         correct,
@@ -228,7 +243,7 @@ export function registerRoutes(app: Express): Server {
           correct: day.correctAnswers,
           total: day.totalAttempts
         })),
-        recentAttempts: progress.slice(0, 5)
+        recentAttempts
       });
     } catch (error) {
       console.error('Error fetching progress:', error);
