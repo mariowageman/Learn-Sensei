@@ -54,83 +54,50 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
   const [filterStatus, setFilterStatus] = useState<'all' | 'correct' | 'incorrect'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'subject'>('date');
 
-  const { data: progress, isLoading, error } = useQuery<ProgressData>({
+  const { data: progress, isLoading } = useQuery<ProgressData>({
     queryKey: [`/api/progress/${subject}`],
-    refetchInterval: 30000,
+    refetchInterval: 30000, // Refresh every 30 seconds
     staleTime: 30000,
-    retry: false
   });
 
   if (isLoading) {
     return <Skeleton className="h-96 w-full" />;
   }
 
-  if (error || !progress) {
-    return null;
+  if (!progress) {
+    return (
+      <Card className="p-4">
+        <div className="text-center text-muted-foreground">
+          <p>No progress data available yet.</p>
+          <p>Start answering questions to see your progress!</p>
+        </div>
+      </Card>
+    );
   }
 
   const formatTimeSpent = (minutes: number) => {
-    const roundedMinutes = Math.round(minutes);
-    const hours = Math.floor(roundedMinutes / 60);
-    const mins = roundedMinutes % 60;
-    if (hours === 0) {
-      return `${mins}m`;
-    }
+    const hours = Math.floor(minutes / 60);
+    const mins = Math.round(minutes % 60);
+    if (hours === 0) return `${mins}m`;
     return `${hours}h ${mins}m`;
   };
 
-  const filteredAttempts = progress.recentAttempts.filter(attempt => {
+  const filteredAttempts = progress.recentAttempts?.filter(attempt => {
     if (filterStatus === 'all') return true;
     return filterStatus === 'correct' ? attempt.isCorrect : !attempt.isCorrect;
-  });
+  }) || [];
 
   const sortedAttempts = [...filteredAttempts].sort((a, b) => {
     if (sortBy === 'date') {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     }
-    return 0; // Default to date sorting
+    return 0;
   });
 
   return (
-    <div className="grid gap-4">
-      {progress.weeklyProgress?.length > 0 && (
-        <Card className="p-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium">Weekly Progress</h4>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <TrendingUp className="h-4 w-4 text-[#3A3D98]" />
-              <span>Avg. Accuracy: {progress.avgAccuracy}%</span>
-            </div>
-          </div>
-          <div className="grid grid-cols-7 gap-1">
-            {progress.weeklyProgress.map((day, index) => (
-              <div key={day.date} className="text-center">
-                <div className="h-20 relative">
-                  <div
-                    className="absolute bottom-0 w-full bg-gray-100 rounded-sm"
-                    style={{
-                      height: `${(day.correct / Math.max(...progress.weeklyProgress.map(d => d.total))) * 100}%`
-                    }}
-                  >
-                    <div
-                      className="absolute bottom-0 w-full bg-gradient-to-r from-green-500 to-green-600 rounded-sm"
-                      style={{
-                        height: `${(day.correct / day.total) * 100}%`
-                      }}
-                    />
-                  </div>
-                </div>
-                <span className="text-xs text-muted-foreground">
-                  {new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      <Card className="p-4 space-y-4">
-        <div className="flex justify-between items-center">
+    <div className="space-y-4">
+      <Card className="p-4">
+        <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium text-[#3A3D98]">Learning Progress</h3>
           <span className="text-2xl font-bold text-[#3A3D98]">{progress.percentage}%</span>
         </div>
@@ -140,7 +107,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
           className="h-2 bg-gray-100 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-green-500 [&>[role=progressbar]]:to-green-600" 
         />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Target className="h-4 w-4 text-[#3A3D98]" />
@@ -177,7 +144,43 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
         </div>
       </Card>
 
-      {progress.recentAttempts?.length > 0 && (
+      {progress.weeklyProgress?.length > 0 && (
+        <Card className="p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium">Weekly Progress</h4>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <TrendingUp className="h-4 w-4 text-[#3A3D98]" />
+              <span>Avg. Accuracy: {progress.avgAccuracy}%</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {progress.weeklyProgress.map((day, index) => (
+              <div key={day.date} className="text-center">
+                <div className="h-20 relative">
+                  <div
+                    className="absolute bottom-0 w-full bg-gray-100 rounded-sm"
+                    style={{
+                      height: `${(day.correct / Math.max(...progress.weeklyProgress.map(d => d.total))) * 100}%`
+                    }}
+                  >
+                    <div
+                      className="absolute bottom-0 w-full bg-gradient-to-r from-green-500 to-green-600 rounded-sm"
+                      style={{
+                        height: `${(day.correct / day.total) * 100}%`
+                      }}
+                    />
+                  </div>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {sortedAttempts.length > 0 && (
         <Card className="p-4 space-y-4">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-sm font-medium">Learning History</h4>
