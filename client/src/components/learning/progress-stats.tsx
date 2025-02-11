@@ -1,23 +1,12 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle, XCircle, Timer, TrendingUp, Target, Award, Filter, Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 
 interface ProgressStatsProps {
   subject: string;
@@ -56,6 +45,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
   const [filterStatus, setFilterStatus] = useState<'all' | 'correct' | 'incorrect'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'subject'>('date');
   const [filterSubject, setFilterSubject] = useState<string>('all');
+  const [pageSize, setPageSize] = useState<number>(5);
 
   const { data: progress, isLoading } = useQuery<ProgressData>({
     queryKey: [`/api/progress/${subject}`],
@@ -101,6 +91,8 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
     }
     return a.subject.localeCompare(b.subject);
   });
+
+  const visibleAttempts = sortedAttempts.slice(0, pageSize);
 
   return (
     <div className="space-y-4">
@@ -182,8 +174,9 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
               </Select>
             </div>
           </div>
-          <div className="space-y-2">
-            {sortedAttempts.map((attempt) => (
+
+          <div className="max-h-[600px] overflow-y-auto space-y-2 mb-4">
+            {visibleAttempts.map((attempt) => (
               <Button
                 key={attempt.id}
                 variant="ghost"
@@ -206,6 +199,27 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                 </span>
               </Button>
             ))}
+          </div>
+
+          <div className="flex justify-between items-center border-t pt-4">
+            <span className="text-sm text-muted-foreground">
+              Showing {Math.min(pageSize, sortedAttempts.length)} of {sortedAttempts.length} entries
+            </span>
+            <Select 
+              value={pageSize.toString()} 
+              onValueChange={(value) => setPageSize(parseInt(value))}
+            >
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Show entries" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">Show 5</SelectItem>
+                <SelectItem value="10">Show 10</SelectItem>
+                <SelectItem value="20">Show 20</SelectItem>
+                <SelectItem value="50">Show 50</SelectItem>
+                <SelectItem value="100">Show 100</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </Card>
       )}
