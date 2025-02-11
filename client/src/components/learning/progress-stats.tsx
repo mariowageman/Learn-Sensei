@@ -196,7 +196,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
             <div className="flex items-center gap-1">
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full sm:w-[150px] justify-start">
+                  <Button variant="outline" className="w-full sm:w-[150px] flex items-center justify-center sm:justify-start text-center">
                     <Calendar className="h-4 w-4 mr-2" />
                     {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
                   </Button>
