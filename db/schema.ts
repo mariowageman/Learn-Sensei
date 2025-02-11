@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
+// Keep existing table definitions
 export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
   subject: text("subject").notNull(),
@@ -31,7 +32,8 @@ export const quizProgress = pgTable("quiz_progress", {
   subject: text("subject").notNull(),
   isCorrect: boolean("is_correct").notNull(),
   userAnswer: text("user_answer").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull()
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  videoSuggestions: jsonb("video_suggestions").default(sql`'[]'::jsonb`)
 });
 
 export const learningPaths = pgTable("learning_paths", {
@@ -91,6 +93,17 @@ export const progressAnalyticsRelations = relations(progressAnalytics, ({ one })
   path: one(learningPaths, {
     fields: [progressAnalytics.pathId],
     references: [learningPaths.id],
+  })
+}));
+
+export const quizQuestionsRelations = relations(quizQuestions, ({ many }) => ({
+  progress: many(quizProgress)
+}));
+
+export const quizProgressRelations = relations(quizProgress, ({ one }) => ({
+  question: one(quizQuestions, {
+    fields: [quizProgress.questionId],
+    references: [quizQuestions.id],
   })
 }));
 
