@@ -7,6 +7,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 interface ProgressStatsProps {
   subject: string;
@@ -47,6 +50,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
   const [filterSubject, setFilterSubject] = useState<string>('all');
   const [pageSize, setPageSize] = useState<number>(5);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   const { data: progress, isLoading } = useQuery<ProgressData>({
     queryKey: [`/api/progress/${subject}`],
@@ -76,12 +80,26 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
     return `${hours}h ${mins}m`;
   };
 
+  const isSameDay = (date1: Date, date2: Date) => {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
+  };
+
   const filteredAttempts = progress.recentAttempts?.filter(attempt => {
     if (filterStatus !== 'all' && filterStatus === 'correct' !== attempt.isCorrect) {
       return false;
     }
     if (filterSubject !== 'all' && attempt.subject !== filterSubject) {
       return false;
+    }
+    if (selectedDate) {
+      const attemptDate = new Date(attempt.createdAt);
+      if (!isSameDay(attemptDate, selectedDate)) {
+        return false;
+      }
     }
     return true;
   }) || [];
@@ -144,6 +162,23 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <h4 className="text-sm font-medium">Learning History</h4>
             <div className="flex flex-col sm:flex-row gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full sm:w-[150px] justify-start">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <CalendarComponent
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+
               {progress.subjects && progress.subjects.length > 1 && (
                 <Select value={filterSubject} onValueChange={setFilterSubject}>
                   <SelectTrigger className="w-full sm:w-[130px]">
@@ -158,6 +193,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                   </SelectContent>
                 </Select>
               )}
+
               <Select value={filterStatus} onValueChange={(value: 'all' | 'correct' | 'incorrect') => setFilterStatus(value)}>
                 <SelectTrigger className="w-full sm:w-[130px]">
                   <Filter className="h-4 w-4 mr-2" />
@@ -169,6 +205,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                   <SelectItem value="incorrect">Incorrect</SelectItem>
                 </SelectContent>
               </Select>
+
               <Select value={sortBy} onValueChange={(value: 'date' | 'subject') => setSortBy(value)}>
                 <SelectTrigger className="w-full sm:w-[130px]">
                   <Calendar className="h-4 w-4 mr-2" />
@@ -179,6 +216,16 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                   <SelectItem value="subject">Subject</SelectItem>
                 </SelectContent>
               </Select>
+              {selectedDate && (
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => setSelectedDate(undefined)}
+                  className="px-2"
+                >
+                  Clear date
+                </Button>
+              )}
             </div>
           </div>
 
