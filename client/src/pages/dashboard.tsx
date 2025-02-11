@@ -100,9 +100,9 @@ export function DashboardPage() {
           <Book className="h-5 w-5 text-[#3A3D98]" />
           <h3 className="text-xl font-medium">Subject Performance</h3>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-8">
           {dashboardData.subjectPerformance.map((subject) => (
-            <div key={subject.subject}>
+            <div key={subject.subject} className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="font-medium">{subject.subject}</span>
                 <span className="text-sm text-muted-foreground">
@@ -113,8 +113,8 @@ export function DashboardPage() {
                 value={subject.accuracy}
                 className="bg-gray-100 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-green-500 [&>[role=progressbar]]:to-green-600"
               />
-              {/* Add ProgressStats component for each subject */}
-              <div className="mt-4">
+              {/* Learning History for each subject */}
+              <div className="mt-4 border-t pt-4">
                 <ProgressStats subject={subject.subject} />
               </div>
             </div>
