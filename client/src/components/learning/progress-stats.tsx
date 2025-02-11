@@ -46,7 +46,6 @@ interface ProgressData {
 export function ProgressStats({ subject }: ProgressStatsProps) {
   const [selectedAttempt, setSelectedAttempt] = useState<ProgressData['recentAttempts'][0] | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | 'correct' | 'incorrect'>('all');
-  const [sortBy, setSortBy] = useState<'date' | 'subject'>('date');
   const [filterSubject, setFilterSubject] = useState<string>('all');
   const [pageSize, setPageSize] = useState<number>(5);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -109,12 +108,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
     return true;
   }) || [];
 
-  const sortedAttempts = [...filteredAttempts].sort((a, b) => {
-    if (sortBy === 'date') {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    }
-    return a.subject.localeCompare(b.subject);
-  });
+  const sortedAttempts = [...filteredAttempts]; // Removed sorting logic
 
   const totalPages = Math.ceil(sortedAttempts.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
@@ -196,17 +190,6 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                 <SelectItem value="all">All Results</SelectItem>
                 <SelectItem value="correct">Correct</SelectItem>
                 <SelectItem value="incorrect">Incorrect</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={sortBy} onValueChange={(value: 'date' | 'subject') => setSortBy(value)}>
-              <SelectTrigger className="w-full sm:w-[130px]">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="date">Date</SelectItem>
-                <SelectItem value="subject">Subject</SelectItem>
               </SelectContent>
             </Select>
 
