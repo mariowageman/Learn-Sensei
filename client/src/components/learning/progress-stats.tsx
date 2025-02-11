@@ -56,7 +56,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
 
   const { data: progress, isLoading } = useQuery<ProgressData>({
     queryKey: [`/api/progress/${subject}`],
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 30000,
     staleTime: 30000,
   });
 
@@ -96,54 +96,6 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
 
   return (
     <div className="space-y-4">
-      <Card className="p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-[#3A3D98]">Learning Progress</h3>
-          <span className="text-2xl font-bold text-[#3A3D98]">{progress.percentage}%</span>
-        </div>
-
-        <Progress 
-          value={progress.percentage} 
-          className="h-2 bg-gray-100 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-green-500 [&>[role=progressbar]]:to-green-600" 
-        />
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Target className="h-4 w-4 text-[#3A3D98]" />
-              <span>Total Questions</span>
-            </div>
-            <p className="text-lg font-semibold">{progress.total}</p>
-          </div>
-
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <CheckCircle className="h-4 w-4 text-[#3A3D98]" />
-              <span>Correct Answers</span>
-            </div>
-            <p className="text-lg font-semibold">{progress.correct}</p>
-          </div>
-
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Timer className="h-4 w-4 text-[#3A3D98]" />
-              <span>Time Spent</span>
-            </div>
-            <p className="text-lg font-semibold">
-              {formatTimeSpent(progress.timeSpentMinutes)}
-            </p>
-          </div>
-
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Award className="h-4 w-4 text-[#3A3D98]" />
-              <span>Current Streak</span>
-            </div>
-            <p className="text-lg font-semibold">{progress.streakDays} days</p>
-          </div>
-        </div>
-      </Card>
-
       {progress.weeklyProgress?.length > 0 && (
         <Card className="p-4 space-y-4">
           <div className="flex items-center justify-between">
@@ -181,12 +133,12 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
       )}
 
       {sortedAttempts.length > 0 && (
-        <Card className="p-4 space-y-4">
-          <div className="flex items-center justify-between mb-4">
+        <Card className="p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <h4 className="text-sm font-medium">Learning History</h4>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Select value={filterStatus} onValueChange={(value: 'all' | 'correct' | 'incorrect') => setFilterStatus(value)}>
-                <SelectTrigger className="w-[130px]">
+                <SelectTrigger className="w-full sm:w-[130px]">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Filter by" />
                 </SelectTrigger>
@@ -197,7 +149,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                 </SelectContent>
               </Select>
               <Select value={sortBy} onValueChange={(value: 'date' | 'subject') => setSortBy(value)}>
-                <SelectTrigger className="w-[130px]">
+                <SelectTrigger className="w-full sm:w-[130px]">
                   <Calendar className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
@@ -213,16 +165,16 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
               <Button
                 key={attempt.id}
                 variant="ghost"
-                className="w-full justify-between hover:bg-gray-100"
+                className="w-full justify-between hover:bg-gray-100 px-4 py-3"
                 onClick={() => setSelectedAttempt(attempt)}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 max-w-[70%]">
                   {attempt.isCorrect ? (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <CheckCircle className="h-4 w-4 shrink-0 text-green-500" />
                   ) : (
-                    <XCircle className="h-4 w-4 text-red-500" />
+                    <XCircle className="h-4 w-4 shrink-0 text-red-500" />
                   )}
-                  <span className="truncate">{attempt.questionText}</span>
+                  <span className="truncate text-left">{attempt.questionText}</span>
                 </div>
                 <span className="text-sm text-muted-foreground shrink-0">
                   {new Date(attempt.createdAt).toLocaleDateString()}
@@ -241,18 +193,18 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
           <div className="space-y-4">
             <div>
               <h4 className="font-medium mb-2">Question:</h4>
-              <p className="text-lg">{selectedAttempt?.questionText}</p>
+              <p className="text-lg break-words">{selectedAttempt?.questionText}</p>
             </div>
             <div>
               <h4 className="font-medium mb-2">Your Answer:</h4>
-              <p className={`text-lg ${selectedAttempt?.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+              <p className={`text-lg break-words ${selectedAttempt?.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
                 {selectedAttempt?.userAnswer}
               </p>
             </div>
             {!selectedAttempt?.isCorrect && (
               <div>
                 <h4 className="font-medium mb-2">Correct Answer:</h4>
-                <p className="text-lg text-green-600">{selectedAttempt?.correctAnswer}</p>
+                <p className="text-lg text-green-600 break-words">{selectedAttempt?.correctAnswer}</p>
               </div>
             )}
             {selectedAttempt?.videoSuggestions && selectedAttempt.videoSuggestions.length > 0 && (
@@ -261,7 +213,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                 <div className="grid gap-4">
                   {selectedAttempt.videoSuggestions.map((video, index) => (
                     <div key={index} className="space-y-2">
-                      <h5 className="text-sm font-medium">{video.title}</h5>
+                      <h5 className="text-sm font-medium break-words">{video.title}</h5>
                       <div className="relative w-full aspect-video rounded-lg overflow-hidden">
                         <iframe
                           className="absolute top-0 left-0 w-full h-full"
