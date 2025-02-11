@@ -108,7 +108,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
     return true;
   }) || [];
 
-  const sortedAttempts = [...filteredAttempts]; // Removed sorting logic
+  const sortedAttempts = [...filteredAttempts]; 
 
   const totalPages = Math.ceil(sortedAttempts.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
@@ -197,6 +197,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full sm:w-[150px] justify-start">
+                    <Calendar className="h-4 w-4 mr-2" />
                     {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
@@ -266,7 +267,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
               value={pageSize.toString()} 
               onValueChange={(value) => {
                 setPageSize(parseInt(value));
-                setCurrentPage(1); // Reset to first page when changing page size
+                setCurrentPage(1); 
               }}
             >
               <SelectTrigger className="w-[120px]">
