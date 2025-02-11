@@ -102,7 +102,7 @@ export function DashboardPage() {
         </div>
         <div className="space-y-4">
           {dashboardData.subjectPerformance.map((subject) => (
-            <div key={subject.subject} className="space-y-2">
+            <div key={subject.subject}>
               <div className="flex justify-between items-center">
                 <span className="font-medium">{subject.subject}</span>
                 <span className="text-sm text-muted-foreground">
@@ -113,31 +113,9 @@ export function DashboardPage() {
                 value={subject.accuracy}
                 className="bg-gray-100 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-green-500 [&>[role=progressbar]]:to-green-600"
               />
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Recent Activity */}
-      <Card className="p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Clock className="h-5 w-5 text-[#3A3D98]" />
-          <h3 className="text-xl font-medium">Recent Activity</h3>
-        </div>
-        <div className="space-y-4">
-          {dashboardData.recentActivity.map((activity, index) => (
-            <div key={index} className="flex items-center justify-between">
-              <div>
-                <span className="font-medium">{activity.subject}</span>
-                <p className="text-sm text-muted-foreground">{activity.type}</p>
-              </div>
-              <div className="text-right">
-                <span className={activity.result === 'Correct' ? 'text-green-500' : 'text-red-500'}>
-                  {activity.result}
-                </span>
-                <p className="text-sm text-muted-foreground">
-                  {new Date(activity.timestamp).toLocaleDateString()}
-                </p>
+              {/* Add ProgressStats component for each subject */}
+              <div className="mt-4">
+                <ProgressStats subject={subject.subject} />
               </div>
             </div>
           ))}
