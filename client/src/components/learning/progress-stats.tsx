@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -51,6 +51,11 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
   const [pageSize, setPageSize] = useState<number>(5);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+
+  // Reset current page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedDate, filterStatus, filterSubject, pageSize]);
 
   const { data: progress, isLoading } = useQuery<ProgressData>({
     queryKey: [`/api/progress/${subject}`],
@@ -119,6 +124,12 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
     setCurrentPage(Math.max(1, Math.min(newPage, totalPages)));
   };
 
+  // Handle date selection with page reset
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="space-y-4">
       {progress.weeklyProgress?.length > 0 && (
@@ -157,7 +168,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
         </Card>
       )}
 
-      {sortedAttempts.length > 0 && (
+      {sortedAttempts.length > 0 ? (
         <Card className="p-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <h4 className="text-sm font-medium">Learning History</h4>
@@ -173,7 +184,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                   <CalendarComponent
                     mode="single"
                     selected={selectedDate}
-                    onSelect={setSelectedDate}
+                    onSelect={handleDateSelect}
                     initialFocus
                   />
                 </PopoverContent>
@@ -220,7 +231,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                 <Button 
                   variant="outline" 
                   size="icon"
-                  onClick={() => setSelectedDate(undefined)}
+                  onClick={() => handleDateSelect(undefined)}
                   className="px-2"
                 >
                   Clear date
@@ -302,6 +313,13 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                 </Button>
               </div>
             </div>
+          </div>
+        </Card>
+      ) : (
+        <Card className="p-4">
+          <div className="text-center text-muted-foreground">
+            <p>No history entries match your current filters.</p>
+            <p>Try adjusting your filters to see more results.</p>
           </div>
         </Card>
       )}
