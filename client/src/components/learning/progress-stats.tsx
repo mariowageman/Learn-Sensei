@@ -168,80 +168,80 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
         </Card>
       )}
 
-      {sortedAttempts.length > 0 ? (
-        <Card className="p-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <h4 className="text-sm font-medium">Learning History</h4>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full sm:w-[150px] justify-start">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="end">
-                  <CalendarComponent
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={handleDateSelect}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+      <Card className="p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <h4 className="text-sm font-medium">Learning History</h4>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full sm:w-[150px] justify-start">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <CalendarComponent
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={handleDateSelect}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
 
-              {progress.subjects && progress.subjects.length > 1 && (
-                <Select value={filterSubject} onValueChange={setFilterSubject}>
-                  <SelectTrigger className="w-full sm:w-[130px]">
-                    <Filter className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Subject" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Subjects</SelectItem>
-                    {progress.subjects.map(subj => (
-                      <SelectItem key={subj} value={subj}>{subj}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-
-              <Select value={filterStatus} onValueChange={(value: 'all' | 'correct' | 'incorrect') => setFilterStatus(value)}>
+            {progress.subjects && progress.subjects.length > 1 && (
+              <Select value={filterSubject} onValueChange={setFilterSubject}>
                 <SelectTrigger className="w-full sm:w-[130px]">
                   <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Filter by" />
+                  <SelectValue placeholder="Subject" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Results</SelectItem>
-                  <SelectItem value="correct">Correct</SelectItem>
-                  <SelectItem value="incorrect">Incorrect</SelectItem>
+                  <SelectItem value="all">All Subjects</SelectItem>
+                  {progress.subjects.map(subj => (
+                    <SelectItem key={subj} value={subj}>{subj}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+            )}
 
-              <Select value={sortBy} onValueChange={(value: 'date' | 'subject') => setSortBy(value)}>
-                <SelectTrigger className="w-full sm:w-[130px]">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="date">Date</SelectItem>
-                  <SelectItem value="subject">Subject</SelectItem>
-                </SelectContent>
-              </Select>
-              {selectedDate && (
-                <Button 
-                  variant="outline" 
-                  size="icon"
-                  onClick={() => handleDateSelect(undefined)}
-                  className="px-2"
-                >
-                  Clear date
-                </Button>
-              )}
-            </div>
+            <Select value={filterStatus} onValueChange={(value: 'all' | 'correct' | 'incorrect') => setFilterStatus(value)}>
+              <SelectTrigger className="w-full sm:w-[130px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Filter by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Results</SelectItem>
+                <SelectItem value="correct">Correct</SelectItem>
+                <SelectItem value="incorrect">Incorrect</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={sortBy} onValueChange={(value: 'date' | 'subject') => setSortBy(value)}>
+              <SelectTrigger className="w-full sm:w-[130px]">
+                <Calendar className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="date">Date</SelectItem>
+                <SelectItem value="subject">Subject</SelectItem>
+              </SelectContent>
+            </Select>
+            {selectedDate && (
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => handleDateSelect(undefined)}
+                className="px-2"
+              >
+                Clear date
+              </Button>
+            )}
           </div>
+        </div>
 
-          <div className="max-h-[600px] overflow-y-auto space-y-2 mb-4">
-            {visibleAttempts.map((attempt) => (
+        <div className="max-h-[600px] overflow-y-auto space-y-2 mb-4">
+          {sortedAttempts.length > 0 ? (
+            visibleAttempts.map((attempt) => (
               <Button
                 key={attempt.id}
                 variant="ghost"
@@ -263,66 +263,64 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                   {new Date(attempt.createdAt).toLocaleDateString()}
                 </span>
               </Button>
-            ))}
-          </div>
+            ))
+          ) : (
+            <div className="text-center text-muted-foreground py-8">
+              <p>No history entries match your current filters.</p>
+              <p>Try adjusting your filters to see more results.</p>
+            </div>
+          )}
+        </div>
 
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-t pt-4">
-            <span className="text-sm text-muted-foreground">
-              Showing {startIndex + 1}-{Math.min(startIndex + pageSize, sortedAttempts.length)} of {sortedAttempts.length} entries
-            </span>
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-t pt-4">
+          <span className="text-sm text-muted-foreground">
+            Showing {sortedAttempts.length > 0 ? `${startIndex + 1}-${Math.min(startIndex + pageSize, sortedAttempts.length)} of ${sortedAttempts.length}` : '0'} entries
+          </span>
 
-            <div className="flex items-center gap-2">
-              <Select 
-                value={pageSize.toString()} 
-                onValueChange={(value) => {
-                  setPageSize(parseInt(value));
-                  setCurrentPage(1); // Reset to first page when changing page size
-                }}
+          <div className="flex items-center gap-2">
+            <Select 
+              value={pageSize.toString()} 
+              onValueChange={(value) => {
+                setPageSize(parseInt(value));
+                setCurrentPage(1); // Reset to first page when changing page size
+              }}
+            >
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Show entries" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">Show 5</SelectItem>
+                <SelectItem value="10">Show 10</SelectItem>
+                <SelectItem value="20">Show 20</SelectItem>
+                <SelectItem value="50">Show 50</SelectItem>
+                <SelectItem value="100">Show 100</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
               >
-                <SelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Show entries" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="5">Show 5</SelectItem>
-                  <SelectItem value="10">Show 10</SelectItem>
-                  <SelectItem value="20">Show 20</SelectItem>
-                  <SelectItem value="50">Show 50</SelectItem>
-                  <SelectItem value="100">Show 100</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <span className="text-sm min-w-[80px] text-center">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm min-w-[80px] text-center">
+                Page {currentPage} of {totalPages || 1}
+              </span>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages || totalPages === 0}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
           </div>
-        </Card>
-      ) : (
-        <Card className="p-4">
-          <div className="text-center text-muted-foreground">
-            <p>No history entries match your current filters.</p>
-            <p>Try adjusting your filters to see more results.</p>
-          </div>
-        </Card>
-      )}
+        </div>
+      </Card>
 
       <Dialog open={!!selectedAttempt} onOpenChange={() => setSelectedAttempt(null)}>
         <DialogContent className="max-w-3xl">
