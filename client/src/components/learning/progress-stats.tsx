@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, XCircle, Timer, TrendingUp, Target, Award, Filter, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { CheckCircle, XCircle, Timer, TrendingUp, Target, Award, Filter, Calendar, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -172,23 +172,6 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <h4 className="text-sm font-medium">Learning History</h4>
           <div className="flex flex-col sm:flex-row gap-2">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full sm:w-[150px] justify-start">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
-                <CalendarComponent
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={handleDateSelect}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-
             {progress.subjects && progress.subjects.length > 1 && (
               <Select value={filterSubject} onValueChange={setFilterSubject}>
                 <SelectTrigger className="w-full sm:w-[130px]">
@@ -218,7 +201,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
 
             <Select value={sortBy} onValueChange={(value: 'date' | 'subject') => setSortBy(value)}>
               <SelectTrigger className="w-full sm:w-[130px]">
-                <Calendar className="h-4 w-4 mr-2" />
+                <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -226,16 +209,34 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                 <SelectItem value="subject">Subject</SelectItem>
               </SelectContent>
             </Select>
-            {selectedDate && (
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={() => handleDateSelect(undefined)}
-                className="px-2"
-              >
-                Clear date
-              </Button>
-            )}
+
+            <div className="flex items-center gap-1">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full sm:w-[150px] justify-start">
+                    {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <CalendarComponent
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={handleDateSelect}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              {selectedDate && (
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => handleDateSelect(undefined)}
+                  className="h-10 w-10"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
