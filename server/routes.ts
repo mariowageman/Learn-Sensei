@@ -167,13 +167,23 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/progress/:subject", async (req, res) => {
     const { subject } = req.params;
     try {
-      const progress = await db.query.quizProgress.findMany({
-        where: eq(quizProgress.subject, subject),
+      let progressQuery = db.query.quizProgress;
+      let whereClause = undefined;
+
+      if (subject !== 'all') {
+        whereClause = eq(quizProgress.subject, subject);
+      }
+
+      const progress = await progressQuery.findMany({
+        where: whereClause,
         with: {
           question: true
         },
         orderBy: (quizProgress, { desc }) => [desc(quizProgress.createdAt)]
       });
+
+      // Get unique subjects
+      const subjects = [...new Set(progress.map(p => p.subject))];
 
       // Calculate total stats
       const total = progress.length;
@@ -181,8 +191,8 @@ export function registerRoutes(app: Express): Server {
       const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
 
       // Calculate time spent and streak
-      const learningPath = await db.query.learningPaths.findFirst({
-        where: eq(learningPaths.title, subject),
+      const learningPaths = await db.query.learningPaths.findMany({
+        where: subject !== 'all' ? eq(learningPaths.title, subject) : undefined,
         with: {
           progress: {
             orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
@@ -193,18 +203,19 @@ export function registerRoutes(app: Express): Server {
       let timeSpentMinutes = 0;
       let streakDays = 0;
 
-      if (learningPath?.progress?.[0]) {
-        const pathProgress = learningPath.progress[0];
-        // Sum up time spent across all topics
-        const timeSpentObj = pathProgress.timeSpentMinutes as Record<string, number> || {};
-        timeSpentMinutes = Object.values(timeSpentObj).reduce((sum, time) => sum + (time || 0), 0);
-        streakDays = pathProgress.streakDays || 0;
-      }
+      learningPaths.forEach(path => {
+        if (path.progress?.[0]) {
+          const pathProgress = path.progress[0];
+          const timeSpentObj = pathProgress.timeSpentMinutes as Record<string, number>;
+          timeSpentMinutes += Object.values(timeSpentObj).reduce((sum, time) => sum + (time || 0), 0);
+          streakDays = Math.max(streakDays, pathProgress.streakDays || 0);
+        }
+      });
 
       // Calculate weekly progress
       const weeklyProgress = await db.query.progressAnalytics.findMany({
         where: and(
-          eq(progressAnalytics.pathId, learningPath?.id ?? 0),
+          subject !== 'all' ? eq(progressAnalytics.pathId, learningPaths[0]?.id ?? 0) : undefined,
           sql`date >= NOW() - INTERVAL '7 days'`
         ),
         orderBy: (analytics, { asc }) => [asc(analytics.date)]
@@ -225,9 +236,9 @@ export function registerRoutes(app: Express): Server {
         isCorrect: attempt.isCorrect,
         userAnswer: attempt.userAnswer,
         createdAt: attempt.createdAt,
-        questionText: attempt.question.text,
-        correctAnswer: attempt.question.answer,
-        // Assuming videoSuggestions are stored in the database or can be retrieved
+        questionText: attempt.question?.text || '',
+        correctAnswer: attempt.question?.answer || '',
+        subject: attempt.subject,
         videoSuggestions: attempt.videoSuggestions || []
       }));
 
@@ -238,6 +249,7 @@ export function registerRoutes(app: Express): Server {
         timeSpentMinutes: timeSpentMinutes || 0,
         streakDays: streakDays || 0,
         avgAccuracy,
+        subjects,
         weeklyProgress: weeklyProgress.map(day => ({
           date: day.date,
           correct: day.correctAnswers,

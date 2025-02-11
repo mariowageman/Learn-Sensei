@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Brain, Target, TrendingUp, Clock, Award, Book } from "lucide-react";
+import { Brain, Target, Award, Book } from "lucide-react";
 import { ProgressStats } from "@/components/learning/progress-stats";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -88,11 +88,11 @@ export function DashboardPage() {
         </Card>
       </div>
 
-      {/* Subject Performance and History */}
-      {dashboardData.subjectPerformance.map((subject) => (
-        <Card key={subject.subject} className="p-6">
-          <div className="space-y-6">
-            {/* Subject Header */}
+      {/* Subject Performance */}
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold text-[#3A3D98]">Subject Performance</h2>
+        {dashboardData.subjectPerformance.map((subject) => (
+          <Card key={subject.subject} className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Book className="h-5 w-5 text-[#3A3D98]" />
@@ -102,20 +102,20 @@ export function DashboardPage() {
                 {subject.accuracy}% accuracy
               </span>
             </div>
-
-            {/* Progress Bar */}
             <Progress 
               value={subject.accuracy}
-              className="bg-gray-100 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-green-500 [&>[role=progressbar]]:to-green-600"
+              className="mt-4 bg-gray-100 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-green-500 [&>[role=progressbar]]:to-green-600"
             />
+          </Card>
+        ))}
+      </div>
 
-            {/* Learning History */}
-            <div className="border-t pt-4">
-              <ProgressStats subject={subject.subject} />
-            </div>
-          </div>
-        </Card>
-      ))}
+      {/* Unified Learning History */}
+      <div className="p-4">
+        <h2 className="text-2xl font-semibold text-[#3A3D98]">Learning History</h2>
+        <ProgressStats subject="all" />
+      </div>
+
     </div>
   );
 }

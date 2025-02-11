@@ -30,6 +30,7 @@ interface ProgressData {
   streakDays: number;
   timeSpentMinutes: number;
   avgAccuracy: number;
+  subjects?: string[];
   weeklyProgress: Array<{
     date: string;
     correct: number;
@@ -42,6 +43,7 @@ interface ProgressData {
     createdAt: string;
     questionText: string;
     correctAnswer: string;
+    subject: string;
     videoSuggestions?: Array<{
       title: string;
       videoId: string;
@@ -53,6 +55,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
   const [selectedAttempt, setSelectedAttempt] = useState<ProgressData['recentAttempts'][0] | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | 'correct' | 'incorrect'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'subject'>('date');
+  const [filterSubject, setFilterSubject] = useState<string>('all');
 
   const { data: progress, isLoading } = useQuery<ProgressData>({
     queryKey: [`/api/progress/${subject}`],
@@ -83,15 +86,20 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
   };
 
   const filteredAttempts = progress.recentAttempts?.filter(attempt => {
-    if (filterStatus === 'all') return true;
-    return filterStatus === 'correct' ? attempt.isCorrect : !attempt.isCorrect;
+    if (filterStatus !== 'all' && filterStatus === 'correct' !== attempt.isCorrect) {
+      return false;
+    }
+    if (filterSubject !== 'all' && attempt.subject !== filterSubject) {
+      return false;
+    }
+    return true;
   }) || [];
 
   const sortedAttempts = [...filteredAttempts].sort((a, b) => {
     if (sortBy === 'date') {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     }
-    return 0;
+    return a.subject.localeCompare(b.subject);
   });
 
   return (
@@ -137,13 +145,27 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <h4 className="text-sm font-medium">Learning History</h4>
             <div className="flex flex-col sm:flex-row gap-2">
+              {progress.subjects && progress.subjects.length > 1 && (
+                <Select value={filterSubject} onValueChange={setFilterSubject}>
+                  <SelectTrigger className="w-full sm:w-[130px]">
+                    <Filter className="h-4 w-4 mr-2" />
+                    <SelectValue placeholder="Subject" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Subjects</SelectItem>
+                    {progress.subjects.map(subj => (
+                      <SelectItem key={subj} value={subj}>{subj}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
               <Select value={filterStatus} onValueChange={(value: 'all' | 'correct' | 'incorrect') => setFilterStatus(value)}>
                 <SelectTrigger className="w-full sm:w-[130px]">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Filter by" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="all">All Results</SelectItem>
                   <SelectItem value="correct">Correct</SelectItem>
                   <SelectItem value="incorrect">Incorrect</SelectItem>
                 </SelectContent>
@@ -174,7 +196,10 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                   ) : (
                     <XCircle className="h-4 w-4 shrink-0 text-red-500" />
                   )}
-                  <span className="truncate text-left">{attempt.questionText}</span>
+                  <div className="truncate text-left">
+                    <span className="block truncate">{attempt.questionText}</span>
+                    <span className="text-sm text-muted-foreground">{attempt.subject}</span>
+                  </div>
                 </div>
                 <span className="text-sm text-muted-foreground shrink-0">
                   {new Date(attempt.createdAt).toLocaleDateString()}
