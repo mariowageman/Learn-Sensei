@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, XCircle, Timer, TrendingUp, Target, Award, Filter, Calendar } from "lucide-react";
+import { CheckCircle, XCircle, Timer, TrendingUp, Target, Award, Filter, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -46,6 +46,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
   const [sortBy, setSortBy] = useState<'date' | 'subject'>('date');
   const [filterSubject, setFilterSubject] = useState<string>('all');
   const [pageSize, setPageSize] = useState<number>(5);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const { data: progress, isLoading } = useQuery<ProgressData>({
     queryKey: [`/api/progress/${subject}`],
@@ -92,7 +93,13 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
     return a.subject.localeCompare(b.subject);
   });
 
-  const visibleAttempts = sortedAttempts.slice(0, pageSize);
+  const totalPages = Math.ceil(sortedAttempts.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const visibleAttempts = sortedAttempts.slice(startIndex, startIndex + pageSize);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(Math.max(1, Math.min(newPage, totalPages)));
+  };
 
   return (
     <div className="space-y-4">
@@ -201,25 +208,53 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
             ))}
           </div>
 
-          <div className="flex justify-between items-center border-t pt-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-t pt-4">
             <span className="text-sm text-muted-foreground">
-              Showing {Math.min(pageSize, sortedAttempts.length)} of {sortedAttempts.length} entries
+              Showing {startIndex + 1}-{Math.min(startIndex + pageSize, sortedAttempts.length)} of {sortedAttempts.length} entries
             </span>
-            <Select 
-              value={pageSize.toString()} 
-              onValueChange={(value) => setPageSize(parseInt(value))}
-            >
-              <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="Show entries" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="5">Show 5</SelectItem>
-                <SelectItem value="10">Show 10</SelectItem>
-                <SelectItem value="20">Show 20</SelectItem>
-                <SelectItem value="50">Show 50</SelectItem>
-                <SelectItem value="100">Show 100</SelectItem>
-              </SelectContent>
-            </Select>
+
+            <div className="flex items-center gap-2">
+              <Select 
+                value={pageSize.toString()} 
+                onValueChange={(value) => {
+                  setPageSize(parseInt(value));
+                  setCurrentPage(1); // Reset to first page when changing page size
+                }}
+              >
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue placeholder="Show entries" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">Show 5</SelectItem>
+                  <SelectItem value="10">Show 10</SelectItem>
+                  <SelectItem value="20">Show 20</SelectItem>
+                  <SelectItem value="50">Show 50</SelectItem>
+                  <SelectItem value="100">Show 100</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-sm min-w-[80px] text-center">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         </Card>
       )}
