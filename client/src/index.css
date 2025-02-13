@@ -11,6 +11,10 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 
+  .dark body {
+    background-color: #111C2A;
+  }
+
   /* Single, quick transition for all theme-related color changes */
   :root * {
     @apply transition-colors duration-100;
