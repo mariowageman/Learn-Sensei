@@ -12,7 +12,7 @@ export default function SenseiMode() {
     <div className="min-h-screen bg-background px-4 py-8">
       <div className="w-full max-w-[800px] mx-auto space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-3xl sm:text-4xl font-bold">Sensei Mode</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#3F3EED] to-[#3F3EED]/80">Sensei Mode</h1>
           <p className="text-muted-foreground">
             Test your knowledge with AI-powered quizzes and get instant feedback
           </p>

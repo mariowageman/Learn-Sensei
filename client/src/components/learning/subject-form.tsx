@@ -41,7 +41,7 @@ export function SubjectForm({ onSubmit }: SubjectFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">Start Learning</Button>
+        <Button type="submit" className="w-full bg-[#3F3EED] hover:bg-[#3F3EED]/90 text-white">Start Learning</Button>
       </form>
     </Form>
   );
