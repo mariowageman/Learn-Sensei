@@ -21,8 +21,15 @@
   .dark h3,
   .dark h4,
   .dark h5,
-  .dark h6 {
+  .dark h6,
+  .dark [data-radix-menu-content] *,
+  .dark nav *,
+  .dark .sidebar * {
     color: white;
+  }
+
+  .dark svg:not([class*="text-"]) {
+    color: #3F3EED;
   }
 
   /* Single, quick transition for all theme-related color changes */
