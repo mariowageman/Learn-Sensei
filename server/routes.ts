@@ -145,7 +145,8 @@ export function registerRoutes(app: Express): Server {
         questionId,
         subject: question.subject,
         isCorrect: result.correct,
-        userAnswer: answer
+        userAnswer: answer,
+        videoSuggestions: !result.correct && result.videoSuggestions ? result.videoSuggestions : []
       });
 
       res.json({
