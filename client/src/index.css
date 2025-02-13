@@ -32,6 +32,13 @@
     color: #3F3EED;
   }
 
+  .dark [role="menuitem"],
+  .dark [data-radix-menu-content] *,
+  .dark [data-state="open"] *,
+  .dark .mobile-menu * {
+    color: white;
+  }
+
   /* Single, quick transition for all theme-related color changes */
   :root * {
     @apply transition-colors duration-100;
