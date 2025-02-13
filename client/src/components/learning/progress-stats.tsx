@@ -308,63 +308,65 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
       </Card>
 
       <Dialog open={!!selectedAttempt} onOpenChange={() => setSelectedAttempt(null)}>
-        <DialogContent className="sm:max-w-[95vw] md:max-w-[90vw] lg:max-w-[1200px] max-h-[90vh] overflow-y-auto p-6">
+        <DialogContent className="w-[95vw] max-w-[1200px] h-[90vh] p-6">
           <DialogHeader>
             <DialogTitle className="text-2xl">Question Details</DialogTitle>
           </DialogHeader>
-          <div className="space-y-8">
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-lg font-medium mb-2">Question:</h4>
-                  <p className="text-lg break-words">{selectedAttempt?.questionText}</p>
-                </div>
-                <div>
-                  <h4 className="text-lg font-medium mb-2">Your Answer:</h4>
-                  <p className={`text-lg break-words ${selectedAttempt?.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-                    {selectedAttempt?.userAnswer}
-                  </p>
-                </div>
-                {!selectedAttempt?.isCorrect && (
+          <div className="h-[calc(90vh-120px)] overflow-y-auto">
+            <div className="space-y-8">
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-6">
                   <div>
-                    <h4 className="text-lg font-medium mb-2">Correct Answer:</h4>
-                    <p className="text-lg text-green-600 break-words">{selectedAttempt?.correctAnswer}</p>
+                    <h4 className="text-lg font-medium mb-2">Question:</h4>
+                    <p className="text-lg break-words">{selectedAttempt?.questionText}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-medium mb-2">Your Answer:</h4>
+                    <p className={`text-lg break-words ${selectedAttempt?.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                      {selectedAttempt?.userAnswer}
+                    </p>
+                  </div>
+                  {!selectedAttempt?.isCorrect && (
+                    <div>
+                      <h4 className="text-lg font-medium mb-2">Correct Answer:</h4>
+                      <p className="text-lg text-green-600 break-words">{selectedAttempt?.correctAnswer}</p>
+                    </div>
+                  )}
+                </div>
+
+                {selectedAttempt?.videoSuggestions && selectedAttempt.videoSuggestions.length > 0 && (
+                  <div className="space-y-6">
+                    <h4 className="text-lg font-medium">Suggested Learning Videos</h4>
+                    <div className="space-y-8">
+                      {selectedAttempt.videoSuggestions.map((video, index) => (
+                        <div key={index} className="space-y-3">
+                          <h5 className="text-base font-medium break-words">{video.title}</h5>
+                          <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
+                            <iframe
+                              className="absolute top-0 left-0 w-full h-full"
+                              src={`https://www.youtube.com/embed/${video.videoId}`}
+                              title={video.title}
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Can't see the video? <a
+                              href={`https://www.youtube.com/watch?v=${video.videoId}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline hover:text-primary"
+                            >
+                              Watch on YouTube
+                            </a>
+                          </p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
-
-              {selectedAttempt?.videoSuggestions && selectedAttempt.videoSuggestions.length > 0 && (
-                <div className="space-y-6">
-                  <h4 className="text-lg font-medium">Suggested Learning Videos</h4>
-                  <div className="space-y-8">
-                    {selectedAttempt.videoSuggestions.map((video, index) => (
-                      <div key={index} className="space-y-3">
-                        <h5 className="text-base font-medium break-words">{video.title}</h5>
-                        <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
-                          <iframe
-                            className="absolute top-0 left-0 w-full h-full"
-                            src={`https://www.youtube.com/embed/${video.videoId}`}
-                            title={video.title}
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                          />
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Can't see the video? <a
-                            href={`https://www.youtube.com/watch?v=${video.videoId}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="underline hover:text-primary"
-                          >
-                            Watch on YouTube
-                          </a>
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </DialogContent>
