@@ -111,8 +111,24 @@ export function DashboardPage() {
           </Card>
         ))}
         {dashboardData.subjectPerformance.length > 3 && (
-          <button onClick={() => setShowAllSubjects(!showAllSubjects)} className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          <button 
+            onClick={() => setShowAllSubjects(!showAllSubjects)} 
+            className="mt-4 text-[#3A3D98] hover:text-[#2A2D88] text-sm font-medium flex items-center gap-1 transition-colors"
+          >
             {showAllSubjects ? 'Show Less' : 'Show More'}
+            <svg 
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+              className={`transform transition-transform ${showAllSubjects ? 'rotate-180' : ''}`}
+            >
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
           </button>
         )}
       </div>
