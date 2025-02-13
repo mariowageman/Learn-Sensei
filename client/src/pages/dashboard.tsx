@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Brain, Target, Award, Book } from "lucide-react";
 import { ProgressStats } from "@/components/learning/progress-stats";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from 'react';
 
 interface SubjectPerformance {
   subject: string;
@@ -24,6 +25,7 @@ interface DashboardData {
 }
 
 export function DashboardPage() {
+  const [showAllSubjects, setShowAllSubjects] = useState(false);
   const { data: dashboardData, isLoading } = useQuery<DashboardData>({
     queryKey: ['/api/dashboard'],
   });
@@ -91,7 +93,7 @@ export function DashboardPage() {
       {/* Subject Performance */}
       <div className="space-y-4">
         <h2 className="text-2xl font-semibold text-[#3A3D98]">Subject Performance</h2>
-        {dashboardData.subjectPerformance.map((subject) => (
+        {dashboardData.subjectPerformance.slice(0, showAllSubjects ? dashboardData.subjectPerformance.length : 3).map((subject) => (
           <Card key={subject.subject} className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -108,6 +110,11 @@ export function DashboardPage() {
             />
           </Card>
         ))}
+        {dashboardData.subjectPerformance.length > 3 && (
+          <button onClick={() => setShowAllSubjects(!showAllSubjects)} className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            {showAllSubjects ? 'Show Less' : 'Show More'}
+          </button>
+        )}
       </div>
 
       {/* Unified Learning History */}
