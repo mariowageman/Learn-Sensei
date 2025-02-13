@@ -45,6 +45,13 @@ interface ProgressData {
 
 export function ProgressStats({ subject }: ProgressStatsProps) {
   const [selectedAttempt, setSelectedAttempt] = useState<ProgressData['recentAttempts'][0] | null>(null);
+  
+  useEffect(() => {
+    if (selectedAttempt) {
+      console.log('Selected attempt:', selectedAttempt);
+      console.log('Video suggestions:', selectedAttempt.videoSuggestions);
+    }
+  }, [selectedAttempt]);
   const [filterStatus, setFilterStatus] = useState<'all' | 'correct' | 'incorrect'>('all');
   const [filterSubject, setFilterSubject] = useState<string>('all');
   const [pageSize, setPageSize] = useState<number>(5);
@@ -329,7 +336,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                   <h4 className="font-medium mb-2">Correct Answer:</h4>
                   <p className="text-lg text-green-600 break-words">{selectedAttempt?.correctAnswer}</p>
                 </div>
-                {selectedAttempt?.videoSuggestions && selectedAttempt.videoSuggestions.length > 0 && (
+                {selectedAttempt?.videoSuggestions && Array.isArray(selectedAttempt.videoSuggestions) && selectedAttempt.videoSuggestions.length > 0 && (
                   <div>
                     <h4 className="font-medium mb-4">Suggested Videos:</h4>
                     <div className="grid gap-4">
