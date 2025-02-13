@@ -137,10 +137,9 @@ function Navigation() {
           <div className="absolute left-1/2 -translate-x-1/2 sm:static sm:transform-none sm:left-0">
             <Link href="/" className="flex items-center">
               <img 
-                src="/src/assets/learn-sensei-logo-icon.svg"
+                src="/logo.svg"
                 alt="Learn Sensei Logo"
-                className="h-12 w-12 -my-2 hover:opacity-90 transition-opacity"
-                style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
+                className="h-12 w-12 -my-2"
               />
             </Link>
           </div>
