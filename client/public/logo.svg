@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Brain circle background -->
+  <circle cx="24" cy="24" r="22" fill="#3A3D98"/>
+  <!-- Stylized brain paths -->
+  <path d="M24 12C19 12 15 16 15 21C15 24 17 27 20 28C20 28 19 30 17 31C22 31 24 28 24 28C24 28 26 31 31 31C29 30 28 28 28 28C31 27 33 24 33 21C33 16 29 12 24 12Z" fill="white"/>
+  <!-- Academic cap -->
+  <path d="M16 20L24 16L32 20L24 24L16 20Z" fill="white"/>
+  <path d="M20 21.5V25.5L24 27.5L28 25.5V21.5" stroke="white" stroke-width="1.5"/>
+</svg>
