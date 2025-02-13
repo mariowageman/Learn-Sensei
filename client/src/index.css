@@ -39,6 +39,15 @@
     color: white;
   }
 
+  /* Active menu styles */
+  [data-active="true"] {
+    color: #3F3EED !important;
+  }
+
+  [data-active="true"] svg {
+    color: #3F3EED !important;
+  }
+
   /* Single, quick transition for all theme-related color changes */
   :root * {
     @apply transition-colors duration-100;
