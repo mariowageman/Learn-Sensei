@@ -16,6 +16,15 @@
     background-color: #111C2A;
   }
 
+  .dark h1,
+  .dark h2,
+  .dark h3,
+  .dark h4,
+  .dark h5,
+  .dark h6 {
+    color: white;
+  }
+
   /* Single, quick transition for all theme-related color changes */
   :root * {
     @apply transition-colors duration-100;
