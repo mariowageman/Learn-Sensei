@@ -82,7 +82,7 @@ export default function LearningPath() {
 
   const difficultyColors = {
     beginner: "bg-green-500 hover:bg-green-600",
-    intermediate: "bg-blue-500 hover:bg-blue-600",
+    intermediate: "bg-[#3F3EED] hover:bg-[#3F3EED]/90",
     advanced: "bg-[#C7AB62] hover:bg-[#B69B52]",
   } as const;
 
