@@ -336,15 +336,18 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                   {selectedAttempt.videoSuggestions.map((video, index) => (
                     <div key={index} className="space-y-2">
                       <h5 className="text-sm font-medium break-words">{video.title}</h5>
-                      <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                      <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
                         <iframe
                           className="absolute top-0 left-0 w-full h-full"
-                          src={`https://www.youtube.com/embed/${video.videoId}`}
+                          src={`https://www.youtube.com/embed/${video.videoId}?rel=0`}
                           title={video.title}
                           frameBorder="0"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen
                         />
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Video ID: {video.videoId}
                       </div>
                     </div>
                   ))}
