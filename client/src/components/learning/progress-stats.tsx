@@ -332,7 +332,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
             {selectedAttempt?.videoSuggestions && selectedAttempt.videoSuggestions.length > 0 && (
               <div>
                 <h4 className="font-medium mb-4">Suggested Videos:</h4>
-                <div className="grid gap-4">
+                <div className="space-y-6">
                   {selectedAttempt.videoSuggestions.map((video, index) => (
                     <div key={index} className="space-y-2">
                       <h5 className="text-sm font-medium break-words">{video.title}</h5>
@@ -346,6 +346,16 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                           allowFullScreen
                         />
                       </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Can't see the video? <a
+                          href={`https://www.youtube.com/watch?v=${video.videoId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline hover:text-primary"
+                        >
+                          Watch on YouTube
+                        </a>
+                      </p>
                     </div>
                   ))}
                 </div>
