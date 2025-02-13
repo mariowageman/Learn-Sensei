@@ -45,13 +45,6 @@ interface ProgressData {
 
 export function ProgressStats({ subject }: ProgressStatsProps) {
   const [selectedAttempt, setSelectedAttempt] = useState<ProgressData['recentAttempts'][0] | null>(null);
-  
-  useEffect(() => {
-    if (selectedAttempt) {
-      console.log('Selected attempt:', selectedAttempt);
-      console.log('Video suggestions:', selectedAttempt.videoSuggestions);
-    }
-  }, [selectedAttempt]);
   const [filterStatus, setFilterStatus] = useState<'all' | 'correct' | 'incorrect'>('all');
   const [filterSubject, setFilterSubject] = useState<string>('all');
   const [pageSize, setPageSize] = useState<number>(5);
@@ -315,7 +308,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
       </Card>
 
       <Dialog open={!!selectedAttempt} onOpenChange={() => setSelectedAttempt(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Question Details</DialogTitle>
           </DialogHeader>
@@ -331,36 +324,31 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
               </p>
             </div>
             {!selectedAttempt?.isCorrect && (
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-2">Correct Answer:</h4>
-                  <p className="text-lg text-green-600 break-words">{selectedAttempt?.correctAnswer}</p>
-                </div>
-                {selectedAttempt?.videoSuggestions && Array.isArray(selectedAttempt.videoSuggestions) && selectedAttempt.videoSuggestions.length > 0 && (
-                  <div>
-                    <h4 className="font-medium mb-4">Suggested Videos:</h4>
-                    <div className="grid gap-4">
+              <div>
+                <h4 className="font-medium mb-2">Correct Answer:</h4>
+                <p className="text-lg text-green-600 break-words">{selectedAttempt?.correctAnswer}</p>
+              </div>
+            )}
+            {selectedAttempt?.videoSuggestions && selectedAttempt.videoSuggestions.length > 0 && (
+              <div>
+                <h4 className="font-medium mb-4">Suggested Videos:</h4>
+                <div className="grid gap-4">
                   {selectedAttempt.videoSuggestions.map((video, index) => (
                     <div key={index} className="space-y-2">
                       <h5 className="text-sm font-medium break-words">{video.title}</h5>
-                      <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
+                      <div className="relative w-full aspect-video rounded-lg overflow-hidden">
                         <iframe
                           className="absolute top-0 left-0 w-full h-full"
-                          src={`https://www.youtube.com/embed/${video.videoId}?rel=0`}
+                          src={`https://www.youtube.com/embed/${video.videoId}`}
                           title={video.title}
                           frameBorder="0"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen
                         />
                       </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Video ID: {video.videoId}
-                      </div>
                     </div>
                   ))}
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             )}
           </div>

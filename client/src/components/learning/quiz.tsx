@@ -18,10 +18,6 @@ interface Question {
   id: number;
   text: string;
   answer: string;
-  videoSuggestions?: Array<{
-    title: string;
-    videoId: string;
-  }>;
 }
 
 interface VideoSuggestion {
