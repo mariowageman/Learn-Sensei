@@ -40,11 +40,20 @@
   }
 
   /* Active menu styles */
-  [data-active="true"] {
+  [data-active="true"],
+  [data-state="active"],
+  .active {
     color: #3F3EED !important;
   }
 
-  [data-active="true"] svg {
+  [data-active="true"] svg,
+  [data-state="active"] svg,
+  .active svg {
+    color: #3F3EED !important;
+  }
+
+  nav [aria-current="page"],
+  nav [aria-current="page"] svg {
     color: #3F3EED !important;
   }
 
