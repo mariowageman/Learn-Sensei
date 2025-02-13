@@ -324,15 +324,15 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
               </p>
             </div>
             {!selectedAttempt?.isCorrect && (
-              <>
+              <div className="space-y-4">
                 <div>
                   <h4 className="font-medium mb-2">Correct Answer:</h4>
                   <p className="text-lg text-green-600 break-words">{selectedAttempt?.correctAnswer}</p>
                 </div>
                 {selectedAttempt?.videoSuggestions && selectedAttempt.videoSuggestions.length > 0 && (
-              <div>
-                <h4 className="font-medium mb-4">Suggested Videos:</h4>
-                <div className="grid gap-4">
+                  <div>
+                    <h4 className="font-medium mb-4">Suggested Videos:</h4>
+                    <div className="grid gap-4">
                   {selectedAttempt.videoSuggestions.map((video, index) => (
                     <div key={index} className="space-y-2">
                       <h5 className="text-sm font-medium break-words">{video.title}</h5>
@@ -348,10 +348,10 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                       </div>
                     </div>
                   ))}
-                </div>
-              </div>
+                    </div>
+                  </div>
                 )}
-              </>
+              </div>
             )}
           </div>
         </DialogContent>
