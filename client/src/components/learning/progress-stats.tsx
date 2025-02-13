@@ -308,7 +308,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
       </Card>
 
       <Dialog open={!!selectedAttempt} onOpenChange={() => setSelectedAttempt(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[80vw] md:max-w-[800px] h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Question Details</DialogTitle>
           </DialogHeader>
