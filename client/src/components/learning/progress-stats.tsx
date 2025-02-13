@@ -308,11 +308,11 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
       </Card>
 
       <Dialog open={!!selectedAttempt} onOpenChange={() => setSelectedAttempt(null)}>
-        <DialogContent className="sm:max-w-[80vw] md:max-w-[800px] h-[80vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[80vw] md:max-w-[800px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Question Details</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
               <h4 className="font-medium mb-2">Question:</h4>
               <p className="text-lg break-words">{selectedAttempt?.questionText}</p>
@@ -329,9 +329,10 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                 <p className="text-lg text-green-600 break-words">{selectedAttempt?.correctAnswer}</p>
               </div>
             )}
+
             {selectedAttempt?.videoSuggestions && selectedAttempt.videoSuggestions.length > 0 && (
               <div>
-                <h4 className="font-medium mb-4">Suggested Videos:</h4>
+                <h4 className="font-medium mb-4">Suggested Learning Videos:</h4>
                 <div className="space-y-6">
                   {selectedAttempt.videoSuggestions.map((video, index) => (
                     <div key={index} className="space-y-2">
