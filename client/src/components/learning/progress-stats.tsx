@@ -324,12 +324,12 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
               </p>
             </div>
             {!selectedAttempt?.isCorrect && (
-              <div>
-                <h4 className="font-medium mb-2">Correct Answer:</h4>
-                <p className="text-lg text-green-600 break-words">{selectedAttempt?.correctAnswer}</p>
-              </div>
-            )}
-            {selectedAttempt?.videoSuggestions && selectedAttempt.videoSuggestions.length > 0 && (
+              <>
+                <div>
+                  <h4 className="font-medium mb-2">Correct Answer:</h4>
+                  <p className="text-lg text-green-600 break-words">{selectedAttempt?.correctAnswer}</p>
+                </div>
+                {selectedAttempt?.videoSuggestions && selectedAttempt.videoSuggestions.length > 0 && (
               <div>
                 <h4 className="font-medium mb-4">Suggested Videos:</h4>
                 <div className="grid gap-4">
@@ -350,6 +350,8 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                   ))}
                 </div>
               </div>
+                )}
+              </>
             )}
           </div>
         </DialogContent>
