@@ -174,7 +174,7 @@ function Navigation() {
                 </svg>
               ) : (
                 <img
-                  src="/public/learn-sensei-logo-icon.png"
+                  src="/learn-sensei-logo-icon.png"
                   alt="Learn Sensei Logo"
                   className="h-12 w-12 -my-2"
                   onError={(e) => {
