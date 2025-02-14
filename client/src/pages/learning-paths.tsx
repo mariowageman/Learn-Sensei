@@ -97,7 +97,8 @@ export default function LearningPaths() {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto px-8 py-8 space-y-8">
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background">
+      <div className="container max-w-6xl mx-auto px-8 py-8 space-y-8">
       <div className="space-y-6">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">Coursera Courses</h1>
