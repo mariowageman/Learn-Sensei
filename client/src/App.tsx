@@ -72,6 +72,22 @@ function Navigation() {
   const [logoError, setLogoError] = useState(false);
 
   useEffect(() => {
+    // Check if logo file exists on component mount
+    fetch('/debug/check-logo')
+      .then(res => res.json())
+      .then(data => {
+        console.log('Logo file check:', data);
+        if (!data.exists) {
+          setLogoError(true);
+        }
+      })
+      .catch(err => {
+        console.error('Error checking logo:', err);
+        setLogoError(true);
+      });
+  }, []);
+
+  useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       const touch = e.touches[0];
       if (!isOpen && touch.clientX < 30) {
@@ -162,7 +178,7 @@ function Navigation() {
                   alt="Learn Sensei Logo"
                   className="h-12 w-12 -my-2"
                   onError={(e) => {
-                    console.error('Logo failed to load');
+                    console.error('Logo failed to load:', e);
                     setLogoError(true);
                   }}
                 />

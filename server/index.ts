@@ -2,12 +2,22 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
+import fs from "fs";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Serve static files from client/public directory with proper MIME types
+// Serve static files from public directory with proper MIME types
+app.use(express.static(path.join(process.cwd(), 'public'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.png')) {
+      res.setHeader('Content-Type', 'image/png');
+    }
+  }
+}));
+
+// Also serve static files from client/public directory
 app.use('/public', express.static(path.join(process.cwd(), 'client', 'public'), {
   setHeaders: (res, filePath) => {
     if (filePath.endsWith('.png')) {
@@ -15,6 +25,17 @@ app.use('/public', express.static(path.join(process.cwd(), 'client', 'public'), 
     }
   }
 }));
+
+// Debug endpoint to check if the file exists
+app.get('/debug/check-logo', (req, res) => {
+  const logoPath = path.join(process.cwd(), 'client', 'public', 'learn-sensei-logo-icon.png');
+  const exists = fs.existsSync(logoPath);
+  res.json({
+    exists,
+    path: logoPath,
+    size: exists ? fs.statSync(logoPath).size : null
+  });
+});
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -57,17 +78,12 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client
   const PORT = 5000;
   server.listen(PORT, "0.0.0.0", () => {
     log(`serving on port ${PORT}`);
