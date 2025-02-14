@@ -49,9 +49,9 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 text-muted-foreground dark:text-gray-400">
+      <div className="flex items-center gap-2 text-muted-foreground">
         <History className="h-4 w-4" />
-        <h3 className="text-sm font-medium">Recent Subjects</h3>
+        <h3 className="text-sm font-medium text-muted-foreground">Recent Subjects</h3>
       </div>
       <div className="flex flex-wrap gap-2">
         {uniqueSubjects.map((subject) => (
