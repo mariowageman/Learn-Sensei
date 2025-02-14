@@ -137,12 +137,11 @@ function Navigation() {
           <div className="absolute left-1/2 -translate-x-1/2 sm:static sm:transform-none sm:left-0">
             <Link href="/" className="flex items-center">
               <img 
-                src={import.meta.env.BASE_URL + 'learn-sensei-logo-icon.png'}
+                src="/learn-sensei-logo-icon.png"
                 alt="Learn Sensei Logo"
                 className="h-12 w-12 -my-2"
                 onError={(e) => {
                   console.error('Logo failed to load:', e);
-                  e.currentTarget.style.display = 'none';
                 }}
               />
             </Link>
