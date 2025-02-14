@@ -59,7 +59,7 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
             key={subject.id}
             variant="outline"
             size="sm"
-            className="inline-flex items-center hover:bg-accent/60"
+            className="inline-flex items-center hover:bg-accent/60 dark:text-white"
             onClick={() => onSelectSubject(subject.subject)}
           >
             <Clock className="mr-1.5 h-3.5 w-3.5" />
