@@ -131,7 +131,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-medium">Weekly Progress</h4>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <TrendingUp className="h-4 w-4 text-[#3A3D98]" />
+              <TrendingUp className="h-4 w-4 text-[#3F3EED]" />
               <span>Avg. Accuracy: {progress.avgAccuracy}%</span>
             </div>
           </div>
