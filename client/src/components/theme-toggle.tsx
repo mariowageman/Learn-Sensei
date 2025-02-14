@@ -7,13 +7,13 @@ export function ThemeToggle() {
 
   return (
     <div className="flex items-center gap-2">
-      <Sun className="h-4 w-4 text-[#3F3EED] dark:text-white" />
+      <Sun className="h-4 w-4 text-primary dark:text-white" />
       <Switch
         checked={theme === "dark"}
         onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
         className="dark:bg-white/20"
       />
-      <Moon className="h-4 w-4 text-[#3F3EED] dark:text-white" />
+      <Moon className="h-4 w-4 text-primary dark:text-white" />
     </div>
   );
 }
