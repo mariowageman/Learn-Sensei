@@ -165,14 +165,40 @@ function Router() {
   return (
     <>
       <Navigation />
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/dashboard" component={DashboardPage} />
-        <Route path="/learning-paths" component={LearningPaths} />
-        <Route path="/learning-paths/:id" component={LearningPath} />
-        <Route path="/sensei" component={SenseiMode} />
-        <Route component={NotFound} />
-      </Switch>
+      <div className="flex flex-col min-h-screen">
+        <Switch>
+          <Route path="/">
+            <div data-page="home">
+              <Home />
+            </div>
+          </Route>
+          <Route path="/dashboard">
+            <div data-page="dashboard">
+              <DashboardPage />
+            </div>
+          </Route>
+          <Route path="/learning-paths">
+            <div data-page="learning-paths">
+              <LearningPaths />
+            </div>
+          </Route>
+          <Route path="/learning-paths/:id">
+            <div data-page="learning-paths">
+              <LearningPath />
+            </div>
+          </Route>
+          <Route path="/sensei">
+            <div data-page="sensei">
+              <SenseiMode />
+            </div>
+          </Route>
+          <Route>
+            <div data-page="not-found">
+              <NotFound />
+            </div>
+          </Route>
+        </Switch>
+      </div>
     </>
   );
 }

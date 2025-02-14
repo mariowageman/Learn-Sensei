@@ -21,26 +21,13 @@
     @apply bg-background;
   }
 
-  main {
-    @apply min-h-screen;
-    background-color: #F5F7FA;
-  }
-
-  .dark main {
-    background-color: #111C2A;
-  }
-
   /* Ensure consistent page backgrounds */
-  [data-page="sensei"],
-  [data-page="learning-paths"],
-  [data-page="dashboard"] {
+  [data-page] {
     @apply min-h-screen;
     background-color: #F5F7FA;
   }
 
-  .dark [data-page="sensei"],
-  .dark [data-page="learning-paths"],
-  .dark [data-page="dashboard"] {
+  .dark [data-page] {
     background-color: #111C2A;
   }
 
