@@ -64,7 +64,7 @@ export default function LearningPath() {
 
   if (isLoading || !path) {
     return (
-      <div className="container max-w-4xl mx-auto px-6 py-6 space-y-4">
+      <div className="container max-w-6xl mx-auto px-6 py-6 space-y-4">
         <Skeleton className="h-8 w-64" />
         <Skeleton className="h-32" />
         <div className="grid gap-4">
@@ -87,7 +87,7 @@ export default function LearningPath() {
   } as const;
 
   return (
-    <div className="container max-w-4xl mx-auto px-6 py-6 space-y-6">
+    <div className="container max-w-6xl mx-auto px-6 py-6 space-y-6">
       <div className="space-y-4">
         <div className="flex flex-col gap-2">
           <Badge
