@@ -12,7 +12,7 @@ export default function Home() {
         <div className="relative max-w-6xl mx-auto text-center space-y-8">
           <div className="space-y-4">
             <div className="flex justify-center">
-              <img src="/logo.svg" alt="Learn Sensei Logo" className="h-16 w-auto" />
+              <img src="/assets/learn-sensei-logo-icon.svg" alt="Learn Sensei Logo" className="h-16 w-auto" />
             </div>
             <p className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto">
               Your AI-powered learning companion for personalized&nbsp;education
