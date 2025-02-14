@@ -7,8 +7,14 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Serve static files from client/public directory
-app.use('/public', express.static(path.join(process.cwd(), 'client', 'public')));
+// Serve static files from client/public directory with proper MIME types
+app.use('/public', express.static(path.join(process.cwd(), 'client', 'public'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.png')) {
+      res.setHeader('Content-Type', 'image/png');
+    }
+  }
+}));
 
 app.use((req, res, next) => {
   const start = Date.now();
