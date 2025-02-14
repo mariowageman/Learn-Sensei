@@ -8,11 +8,21 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background;
+    @apply font-sans antialiased;
+    background-color: #F5F7FA;
     color: #283951;
   }
 
   .dark body {
+    background-color: #111C2A;
+  }
+
+  main {
+    @apply min-h-screen;
+    background-color: #F5F7FA;
+  }
+
+  .dark main {
     background-color: #111C2A;
   }
 
