@@ -22,12 +22,16 @@
   }
 
   /* Ensure consistent page backgrounds */
-  [data-page] {
+  [data-page],
+  [data-page] > div,
+  [data-page] > main {
     @apply min-h-screen;
     background-color: #F5F7FA;
   }
 
-  .dark [data-page] {
+  .dark [data-page],
+  .dark [data-page] > div,
+  .dark [data-page] > main {
     background-color: #111C2A;
   }
 
