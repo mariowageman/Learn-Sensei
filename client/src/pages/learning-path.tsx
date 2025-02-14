@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useRoute } from "wouter";
 import { Card } from "@/components/ui/card";
@@ -88,86 +87,86 @@ export default function LearningPath() {
   } as const;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background">
-      <div className="container max-w-6xl mx-auto px-6 py-6 space-y-6">
-        <div className="space-y-4">
-          <div className="flex flex-col gap-2">
-            <Badge className={`w-fit ${difficultyColors[path.difficulty]}`}>
-              {path.difficulty}
-            </Badge>
-            <h1 className="text-3xl font-bold">{path.title}</h1>
-          </div>
-          <p className="text-muted-foreground">{path.description}</p>
+    <div className="container max-w-6xl mx-auto px-6 py-6 space-y-6">
+      <div className="space-y-4">
+        <div className="flex flex-col gap-2">
+          <Badge
+            className={`w-fit ${difficultyColors[path.difficulty]}`}
+          >
+            {path.difficulty}
+          </Badge>
+          <h1 className="text-3xl font-bold">{path.title}</h1>
         </div>
+        <p className="text-muted-foreground">{path.description}</p>
+      </div>
 
-        <Card className="p-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-sm font-medium">Overall Progress</p>
-              <div className="text-sm text-muted-foreground">
-                {completedCount} of {path.topics.length} topics completed
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Timer className="h-4 w-4" />
-                <span className="text-sm">{path.estimatedHours} hours estimated</span>
-              </div>
+      <Card className="p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <p className="text-sm font-medium">Overall Progress</p>
+            <div className="text-sm text-muted-foreground">
+              {completedCount} of {path.topics.length} topics completed
             </div>
           </div>
-          <Progress value={progressPercent} className="h-2" />
-        </Card>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Timer className="h-4 w-4" />
+              <span className="text-sm">{path.estimatedHours} hours estimated</span>
+            </div>
+          </div>
+        </div>
+        <Progress value={progressPercent} className="h-2" />
+      </Card>
 
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Topics</h2>
-          <div className="grid gap-4">
-            {path.topics.map((topic, index) => {
-              const isCompleted = progress?.completedTopics?.includes(index);
-              const isLocked = index > 0 && !progress?.completedTopics?.includes(index - 1);
-              const isCurrent = progress?.currentTopic === index;
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Topics</h2>
+        <div className="grid gap-4">
+          {path.topics.map((topic, index) => {
+            const isCompleted = progress?.completedTopics?.includes(index);
+            const isLocked = index > 0 && !progress?.completedTopics?.includes(index - 1);
+            const isCurrent = progress?.currentTopic === index;
 
-              return (
-                <Card key={index} className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      {isCompleted ? (
-                        <CheckCircle className="h-5 w-5 text-green-500" />
-                      ) : isLocked ? (
-                        <Lock className="h-5 w-5 text-muted-foreground" />
-                      ) : (
-                        <BookOpen className="h-5 w-5 text-primary" />
-                      )}
-                      <div>
-                        <h3 className="font-medium">{topic}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {isCompleted ? "Completed" : isLocked ? "Locked" : "Ready to start"}
-                        </p>
-                      </div>
-                    </div>
-                    {!isLocked && (
-                      <Button
-                        onClick={() => {
-                          if (!progress) {
-                            startMutation.mutate(index);
-                          } else if (!isCompleted && (index === 0 || progress.completedTopics?.includes(index - 1))) {
-                            completeMutation.mutate(index);
-                          }
-                        }}
-                        disabled={
-                          startMutation.isPending ||
-                          completeMutation.isPending ||
-                          isCompleted ||
-                          (!!progress && !isCompleted && index !== progress.currentTopic)
-                        }
-                      >
-                        {!progress ? "Start Learning" : "Complete Topic"}
-                      </Button>
+            return (
+              <Card key={index} className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {isCompleted ? (
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                    ) : isLocked ? (
+                      <Lock className="h-5 w-5 text-muted-foreground" />
+                    ) : (
+                      <BookOpen className="h-5 w-5 text-primary" />
                     )}
+                    <div>
+                      <h3 className="font-medium">{topic}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {isCompleted ? "Completed" : isLocked ? "Locked" : "Ready to start"}
+                      </p>
+                    </div>
                   </div>
-                </Card>
-              );
-            })}
-          </div>
+                  {!isLocked && (
+                    <Button
+                      onClick={() => {
+                        if (!progress) {
+                          startMutation.mutate(index);
+                        } else if (!isCompleted && (index === 0 || progress.completedTopics?.includes(index - 1))) {
+                          completeMutation.mutate(index);
+                        }
+                      }}
+                      disabled={
+                        startMutation.isPending ||
+                        completeMutation.isPending ||
+                        isCompleted ||
+                        (!!progress && !isCompleted && index !== progress.currentTopic)
+                      }
+                    >
+                      {!progress ? "Start Learning" : "Complete Topic"}
+                    </Button>
+                  )}
+                </div>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>
