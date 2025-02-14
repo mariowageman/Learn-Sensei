@@ -30,6 +30,25 @@
     background-color: #111C2A;
   }
 
+  /* Ensure consistent page backgrounds */
+  [data-page="sensei"],
+  [data-page="learning-paths"],
+  [data-page="dashboard"] {
+    @apply min-h-screen;
+    background-color: #F5F7FA;
+  }
+
+  .dark [data-page="sensei"],
+  .dark [data-page="learning-paths"],
+  .dark [data-page="dashboard"] {
+    background-color: #111C2A;
+  }
+
+  /* Center content sections */
+  .content-section {
+    @apply mx-auto max-w-6xl px-4;
+  }
+
   .dark h1,
   .dark h2,
   .dark h3,
