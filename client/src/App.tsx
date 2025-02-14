@@ -69,6 +69,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
 function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+  const [logoError, setLogoError] = useState(false);
 
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
@@ -136,23 +137,36 @@ function Navigation() {
           {/* Logo - centered on mobile, left-aligned on desktop */}
           <div className="absolute left-1/2 -translate-x-1/2 sm:static sm:transform-none sm:left-0">
             <Link href="/" className="flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                className="h-12 w-12 -my-2 text-primary dark:text-white"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                <path d="M6 8h4" />
-                <path d="M14 8h4" />
-                <path d="M6 12h4" />
-                <path d="M14 12h4" />
-              </svg>
+              {logoError ? (
+                // Fallback SVG logo
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  className="h-12 w-12 -my-2 text-primary dark:text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                  <path d="M6 8h4" />
+                  <path d="M14 8h4" />
+                  <path d="M6 12h4" />
+                  <path d="M14 12h4" />
+                </svg>
+              ) : (
+                <img
+                  src="/public/assets/logo.svg"
+                  alt="Learn Sensei Logo"
+                  className="h-12 w-12 -my-2"
+                  onError={(e) => {
+                    console.error('Logo failed to load');
+                    setLogoError(true);
+                  }}
+                />
+              )}
               <span className="sr-only">Learn Sensei</span>
             </Link>
           </div>
