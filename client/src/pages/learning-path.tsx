@@ -89,7 +89,7 @@ export default function LearningPath() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background">
       <div className="container max-w-6xl mx-auto px-6 py-6 space-y-6">
-      <div className="space-y-4">
+        <div className="space-y-4">
         <div className="flex flex-col gap-2">
           <Badge
             className={`w-fit ${difficultyColors[path.difficulty]}`}
