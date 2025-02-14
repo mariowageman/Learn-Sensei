@@ -11,9 +11,9 @@ export default function Home() {
         <div className="absolute inset-0 bg-grid-white/10" />
         <div className="relative max-w-6xl mx-auto text-center space-y-8">
           <div className="space-y-4">
-            <div className="flex justify-center">
-              <img src="/assets/learn-sensei-logo-icon.svg" alt="Learn Sensei Logo" className="h-16 w-auto" />
-            </div>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#3F3EED] to-[#3F3EED]/80">
+              Learn Sensei
+            </h1>
             <p className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto">
               Your AI-powered learning companion for personalized&nbsp;education
             </p>
