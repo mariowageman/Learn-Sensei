@@ -17,6 +17,10 @@
     background-color: #111C2A;
   }
 
+  nav {
+    @apply bg-background;
+  }
+
   main {
     @apply min-h-screen;
     background-color: #F5F7FA;
