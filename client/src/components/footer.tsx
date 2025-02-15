@@ -56,7 +56,9 @@ export function Footer() {
                 <a href="https://learnsensei.tawk.help/" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Documentation</a>
               </li>
               <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Blog</a>
+                <Link href="/blog">
+  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Blog</a>
+</Link>
               </li>
               <li>
                 <a href="mailto:support@learnsensei.com" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Support</a>
