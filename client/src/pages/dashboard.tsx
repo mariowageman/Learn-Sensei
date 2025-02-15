@@ -165,7 +165,30 @@ export function DashboardPage() {
                   <div key={day.date} className="text-center group relative">
                     <div className="h-32 flex items-end">
                       <div className="w-full relative">
-                        <div
+                        <div className="absolute bottom-0 w-full bg-gray-100 rounded-t-lg" style={{ height: `${height}%` }}>
+                          <div 
+                            className="absolute bottom-0 w-full bg-gradient-to-t from-primary/90 to-primary/50 rounded-t-lg transition-all duration-300 group-hover:from-primary/100 group-hover:to-primary/60" 
+                            style={{ height: `${accuracy}%` }} 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-2">
+                      <span className="text-sm font-medium">
+                        {new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}
+                      </span>
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-10 left-1/2 -translate-x-1/2 bg-background border px-2 py-1 rounded shadow-lg">
+                        <p className="text-xs whitespace-nowrap">
+                          {day.correct}/{day.total} correct ({Math.round(accuracy)}%)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        )}
                           className="w-full bg-primary/10 rounded-lg transition-all duration-200 group-hover:bg-primary/20"
                           style={{ height: `${Math.max(height, 15)}%` }}
                         >
