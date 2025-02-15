@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Share2, Linkedin, Facebook } from "lucide-react";
-import { RiTwitterXFill } from "react-icons/ri";
+import { Share2, X, Linkedin, Facebook } from "lucide-react";
 
 interface ShareButtonsProps {
   url: string;
@@ -58,7 +57,7 @@ export function ShareButtons({ url, title, description }: ShareButtonsProps) {
         onClick={shareToTwitter}
         className="gap-2"
       >
-        <RiTwitterXFill className="h-4 w-4" />
+        <X className="h-4 w-4" />
         <span className="sr-only">Share on X</span>
       </Button>
 
