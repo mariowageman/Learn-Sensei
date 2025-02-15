@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Brain, Target, Award, Book } from "lucide-react";
+import { Brain, Target, Award, Book, TrendingUp } from "lucide-react";
 import { ProgressStats } from "@/components/learning/progress-stats";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Footer } from "@/components/footer";
@@ -23,6 +23,12 @@ interface DashboardData {
     currentStreak: number;
   };
   subjectPerformance: SubjectPerformance[];
+  weeklyProgress: {
+    date: string;
+    correct: number;
+    total: number;
+  }[];
+  avgAccuracy: number;
 }
 
 export function DashboardPage() {
@@ -134,6 +140,63 @@ export function DashboardPage() {
             </button>
           )}
         </div>
+
+        {/* Weekly Progress */}
+        {dashboardData.weeklyProgress?.length > 0 && (
+          <Card className="p-6 space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <h4 className="text-lg font-semibold">Weekly Progress</h4>
+                <p className="text-sm text-muted-foreground">Your learning journey this week</p>
+              </div>
+              <div className="flex items-center gap-3 px-4 py-2 bg-primary/10 rounded-lg">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                <div className="space-y-0.5">
+                  <span className="text-sm text-muted-foreground">Average Accuracy</span>
+                  <p className="text-lg font-semibold text-primary">{dashboardData.avgAccuracy}%</p>
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-7 gap-3">
+              {dashboardData.weeklyProgress.map((day, index) => {
+                const accuracy = day.total > 0 ? (day.correct / day.total) * 100 : 0;
+                const height = day.total > 0 ? (day.correct / Math.max(...dashboardData.weeklyProgress.map(d => d.total))) * 100 : 0;
+                return (
+                  <div key={day.date} className="text-center group relative">
+                    <div className="h-32 flex items-end">
+                      <div className="w-full relative">
+                        <div
+                          className="w-full bg-primary/10 rounded-lg transition-all duration-200 group-hover:bg-primary/20"
+                          style={{ height: `${Math.max(height, 15)}%` }}
+                        >
+                          <div
+                            className="absolute bottom-0 w-full bg-gradient-to-t from-primary to-primary/80 rounded-lg transition-all duration-200"
+                            style={{ height: `${Math.max(accuracy, 5)}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-2 space-y-1">
+                      <span className="text-sm font-medium">
+                        {new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}
+                      </span>
+                      <div className="text-xs text-muted-foreground">
+                        {day.correct}/{day.total}
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground px-3 py-2 rounded-lg shadow-lg text-sm whitespace-nowrap">
+                        <p className="font-medium">{Math.round(accuracy)}% accuracy</p>
+                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-popover rotate-45" />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        )}
+
 
         {/* Unified Learning History - Unchanged */}
         <div className="p-4">
