@@ -69,10 +69,14 @@ export function Footer() {
             <h3 className="text-lg font-semibold">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Terms of Service</a>
+                <Link href="/terms">
+                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Terms of Service</a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Privacy Policy</a>
+                <Link href="/privacy">
+                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Privacy Policy</a>
+                </Link>
               </li>
               <li>
                 <Link href="/cookie-policy">
@@ -88,7 +92,6 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} Learn Sensei. All rights reserved.
             </p>
-
           </div>
         </div>
       </div>

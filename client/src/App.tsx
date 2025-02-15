@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, Home as HomeIcon, Brain, Menu, LayoutDashboard } from "lucide-react";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
+import Terms from "@/pages/terms";
+import Privacy from "@/pages/privacy";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -236,6 +238,16 @@ function Router() {
           <Route path="/cookie-policy">
             <div data-page="cookie-policy">
               <CookiePolicy />
+            </div>
+          </Route>
+          <Route path="/terms">
+            <div data-page="terms">
+              <Terms />
+            </div>
+          </Route>
+          <Route path="/privacy">
+            <div data-page="privacy">
+              <Privacy />
             </div>
           </Route>
           <Route>
