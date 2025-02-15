@@ -377,7 +377,7 @@ export default function BlogPage() {
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <p className="text-muted-foreground mb-4 line-clamp-3">{post.description}</p>
-                  <div className="space-y-8">
+                  <div className="space-y-12">
                     <div className="flex flex-wrap gap-2">
                       {post.tags.map((tag) => (
                         <Badge
