@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Github, X, Linkedin } from "lucide-react";
+import { Github, Linkedin } from "lucide-react";
 
 export function Footer() {
   return (
@@ -17,7 +17,7 @@ export function Footer() {
                 <Github className="h-5 w-5" />
               </a>
               <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#3F3EED]">
-                <X className="h-5 w-5 font-bold" />
+                <img src="/assets/x-logo.svg" alt="X (Twitter)" className="h-5 w-5" />
               </a>
               <a href="https://www.linkedin.com/company/learn-sensei/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#3F3EED]">
                 <Linkedin className="h-5 w-5" />
