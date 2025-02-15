@@ -136,9 +136,11 @@ export function DashboardPage() {
         </div>
 
         {/* Unified Learning History */}
-        <div className="p-4">
-          <h2 className="text-2xl font-semibold text-[#111C2A] mb-6">Learning History</h2>
-          <ProgressStats subject="all" />
+        <div>
+          <h2 className="text-2xl font-semibold text-[#111C2A] mb-4">Learning History</h2>
+          <Card className="p-4">
+            <ProgressStats subject="all" />
+          </Card>
         </div>
       </div>
       <Footer />
