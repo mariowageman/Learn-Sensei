@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Share2, Twitter, Linkedin, Facebook } from "lucide-react";
+import { Share2, X, Linkedin, Facebook } from "lucide-react";
 
 interface ShareButtonsProps {
   url: string;
@@ -50,17 +50,17 @@ export function ShareButtons({ url, title, description }: ShareButtonsProps) {
           Share
         </Button>
       )}
-      
+
       <Button
         variant="outline"
         size="sm"
         onClick={shareToTwitter}
         className="gap-2"
       >
-        <Twitter className="h-4 w-4" />
-        <span className="sr-only">Share on Twitter</span>
+        <X className="h-4 w-4" />
+        <span className="sr-only">Share on X</span>
       </Button>
-      
+
       <Button
         variant="outline"
         size="sm"
@@ -70,7 +70,7 @@ export function ShareButtons({ url, title, description }: ShareButtonsProps) {
         <Linkedin className="h-4 w-4" />
         <span className="sr-only">Share on LinkedIn</span>
       </Button>
-      
+
       <Button
         variant="outline"
         size="sm"
