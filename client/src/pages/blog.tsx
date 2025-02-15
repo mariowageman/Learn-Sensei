@@ -309,7 +309,7 @@ export default function BlogPage() {
             <div 
               className={cn(
                 "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2",
-                !isTagsExpanded && "h-[4.5rem] overflow-hidden"
+                !isTagsExpanded && "max-h-[4.5rem] overflow-hidden"
               )}
             >
               {allTags.map((tag) => (
@@ -339,18 +339,15 @@ export default function BlogPage() {
             {allTags.length > 12 && (
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={toggleTagsExpansion}
-                className="absolute bottom-[-1.5rem] left-1/2 transform -translate-x-1/2 h-6 w-6 rounded-full hover:bg-accent"
+                className="mt-2 w-full flex items-center justify-center gap-2"
               >
                 {isTagsExpanded ? (
-                  <ChevronUp className="h-4 w-4" />
+                  <>Show Less <ChevronUp className="h-4 w-4" /></>
                 ) : (
-                  <ChevronDown className="h-4 w-4" />
+                  <>Show More Tags <ChevronDown className="h-4 w-4" /></>
                 )}
-                <span className="sr-only">
-                  {isTagsExpanded ? 'Show less tags' : 'Show more tags'}
-                </span>
               </Button>
             )}
           </div>
