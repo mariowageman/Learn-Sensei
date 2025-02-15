@@ -279,35 +279,34 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                 <div className="mt-8">
                   <h4 className="text-lg font-medium mb-4">Suggested Learning Videos</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                      {selectedAttempt.videoSuggestions.map((video, index) => (
-                        <div key={index} className="flex flex-col bg-card rounded-lg p-3 border">
-                          <h5 className="text-sm font-medium break-words mb-2">{video.title}</h5>
-                          <div className="relative w-full aspect-video rounded-md overflow-hidden bg-black mb-2">
-                            <iframe
-                              className="absolute top-0 left-0 w-full h-full"
-                              src={`https://www.youtube.com/embed/${video.videoId}`}
-                              title={video.title}
-                              frameBorder="0"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                            />
-                          </div>
-                          <p className="text-sm text-muted-foreground mt-auto">
-                            Can't see the video? <a
-                              href={`https://www.youtube.com/watch?v=${video.videoId}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="underline hover:text-primary"
-                            >
-                              Watch on YouTube
-                            </a>
-                          </p>
+                    {selectedAttempt.videoSuggestions.map((video, index) => (
+                      <div key={index} className="flex flex-col bg-card rounded-lg p-3 border">
+                        <h5 className="text-sm font-medium break-words mb-2">{video.title}</h5>
+                        <div className="relative w-full aspect-video rounded-md overflow-hidden bg-black mb-2">
+                          <iframe
+                            className="absolute top-0 left-0 w-full h-full"
+                            src={`https://www.youtube.com/embed/${video.videoId}`}
+                            title={video.title}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
                         </div>
-                      ))}
-                    </div>
+                        <p className="text-sm text-muted-foreground mt-auto">
+                          Can't see the video? <a
+                            href={`https://www.youtube.com/watch?v=${video.videoId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline hover:text-primary"
+                          >
+                            Watch on YouTube
+                          </a>
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </DialogContent>
