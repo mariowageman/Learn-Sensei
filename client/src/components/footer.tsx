@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Github, Twitter, Linkedin, Mail } from "lucide-react";
+import { Github, Twitter, Linkedin } from "lucide-react";
 
 export function Footer() {
   return (
@@ -87,12 +87,7 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} Learn Sensei. All rights reserved.
             </p>
-            <div className="flex items-center space-x-4">
-              <a href="mailto:contact@learnsensei.com" className="text-sm text-muted-foreground hover:text-[#3F3EED] flex items-center gap-2">
-                <Mail className="h-4 w-4" />
-                contact@learnsensei.com
-              </a>
-            </div>
+            
           </div>
         </div>
       </div>
