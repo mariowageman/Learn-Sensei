@@ -7,10 +7,15 @@ import { Clock, ArrowLeft, Share2 } from "lucide-react";
 import { Link } from "wouter";
 import { blogPosts, type BlogPost } from "./blog";
 import { calculateReadingTime } from "@/lib/utils";
+import { useEffect } from "react";
 
 export default function BlogPost() {
   const [, params] = useRoute("/blog/:id");
   const post = blogPosts.find((p: BlogPost) => p.id === params?.id);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [params?.id]);
 
   if (!post) {
     return (
