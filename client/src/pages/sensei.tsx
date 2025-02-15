@@ -13,8 +13,8 @@ export default function SenseiMode() {
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="text-center space-y-4">
           <h1 className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#3F3EED] to-[#3F3EED]/80">Sensei Mode</h1>
-          <p className="text-muted-foreground">
-            Answer AI-powered questions and get instant video explanations to deepen your knowledge and improve your skills
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Enter a subject, answer AI-generated questions, and get immediate feedback. If you answer incorrectly, Sensei Mode provides a video explanation so you can learn and improve on the spot. No more wasted time—just focused learning tailored to you.
           </p>
         </div>
 
