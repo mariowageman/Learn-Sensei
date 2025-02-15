@@ -14,7 +14,7 @@ export default function SenseiMode() {
         <div className="text-center space-y-4">
           <h1 className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#3F3EED] to-[#3F3EED]/80">Sensei Mode</h1>
           <p className="text-muted-foreground">
-            Test your knowledge with AI-powered quizzes and get instant feedback
+            Answer AI-powered questions and get instant video explanations to deepen your knowledge and improve your skills
           </p>
         </div>
 
