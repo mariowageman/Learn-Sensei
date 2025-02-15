@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Clock, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import { Footer } from "@/components/footer";
+import { calculateReadingTime } from "@/lib/utils";
 
 export interface BlogPost {
   id: string;
@@ -17,7 +18,6 @@ export interface BlogPost {
   image: string;
   tags: string[];
   content: string;
-  estimatedReadTime: number;
 }
 
 export const blogPosts: BlogPost[] = [
@@ -29,8 +29,54 @@ export const blogPosts: BlogPost[] = [
     category: "AI Education",
     image: "/assets/blog/ai-education.jpg",
     tags: ["AI", "Education", "Technology", "Learning"],
-    content: "Full article content here...",
-    estimatedReadTime: 5
+    content: `
+      Artificial Intelligence is transforming education in unprecedented ways. From personalized learning paths to intelligent tutoring systems, AI is making education more accessible and effective than ever before.
+
+      How AI Enhances Learning
+      AI-powered systems can analyze a student's learning patterns, identify areas of struggle, and adapt content delivery in real-time. This personalization ensures that each student receives the support they need to succeed.
+
+      Key Benefits:
+      1. Personalized Learning Paths
+      2. Immediate Feedback
+      3. Adaptive Content Delivery
+      4. Progress Tracking
+      5. Engagement Analytics
+
+      The Future of AI in Education
+      As AI technology continues to evolve, we can expect even more innovative applications in education. Virtual reality integrations, natural language processing for better interaction, and predictive analytics for student success are just the beginning.
+
+      Implementation Strategies
+      Educational institutions can start small with AI implementation:
+      - Begin with basic analytics
+      - Introduce adaptive learning platforms
+      - Train educators on AI tools
+      - Monitor and adjust based on feedback
+
+      Challenges and Considerations
+      While AI brings many benefits, it's important to consider:
+      - Data privacy and security
+      - Equal access to technology
+      - Balance between AI and human interaction
+      - Cost of implementation
+
+      Getting Started
+      To begin implementing AI in your learning journey:
+      1. Identify your learning goals
+      2. Research available AI learning tools
+      3. Start with one or two tools
+      4. Track your progress
+      5. Adjust based on results
+
+      The Impact on Traditional Education
+      AI is not replacing traditional education but enhancing it. By automating routine tasks, AI allows educators to focus on:
+      - Complex problem-solving
+      - Creative thinking
+      - Social-emotional learning
+      - Personal mentorship
+
+      Conclusion
+      AI-powered learning represents a significant step forward in education. By embracing these technologies thoughtfully, we can create more effective, engaging, and accessible learning experiences for everyone.
+    `
   },
   {
     id: "effective-online-learning",
@@ -40,8 +86,80 @@ export const blogPosts: BlogPost[] = [
     category: "Learning Tips",
     image: "/assets/blog/learning-tips.jpg",
     tags: ["Online Learning", "Study Tips", "Productivity"],
-    content: "Full article content here...",
-    estimatedReadTime: 4
+    content: `
+      Online learning has become increasingly popular, offering flexibility and accessibility. However, it requires different strategies than traditional classroom learning. Here are five essential tips for success in online education.
+
+      1. Create a Dedicated Study Space
+      Your environment plays a crucial role in learning effectiveness. Set up a quiet, organized space specifically for studying. This helps:
+      - Minimize distractions
+      - Maintain focus
+      - Establish routine
+      - Separate work and relaxation
+
+      2. Develop a Schedule
+      Time management is crucial for online learning success:
+      - Set specific study hours
+      - Break large tasks into smaller chunks
+      - Use a calendar for deadlines
+      - Include regular breaks
+      - Stay consistent with your routine
+
+      3. Active Engagement
+      Passive reading isn't enough. Engage actively with the material:
+      - Take detailed notes
+      - Participate in discussions
+      - Ask questions
+      - Complete practice exercises
+      - Teach concepts to others
+
+      4. Utilize Available Resources
+      Most online learning platforms offer various tools and resources:
+      - Video tutorials
+      - Interactive exercises
+      - Discussion forums
+      - Study guides
+      - Virtual office hours
+
+      5. Stay Connected
+      Build a support network:
+      - Join study groups
+      - Participate in online forums
+      - Connect with instructors
+      - Share resources with peers
+      - Seek help when needed
+
+      Implementation Strategy
+      Start by implementing one tip at a time:
+      Week 1: Set up your study space
+      Week 2: Create and follow a schedule
+      Week 3: Practice active learning techniques
+      Week 4: Explore available resources
+      Week 5: Build your learning network
+
+      Measuring Success
+      Track your progress by:
+      - Monitoring grades
+      - Recording study hours
+      - Evaluating comprehension
+      - Getting feedback
+      - Adjusting strategies as needed
+
+      Common Challenges and Solutions
+      Challenge: Procrastination
+      Solution: Break tasks into smaller, manageable pieces
+
+      Challenge: Technical issues
+      Solution: Have backup plans and alternative devices ready
+
+      Challenge: Motivation
+      Solution: Set small, achievable goals and celebrate progress
+
+      Challenge: Isolation
+      Solution: Actively participate in online communities
+
+      Conclusion
+      Successful online learning requires dedication, organization, and the right strategies. By implementing these tips and consistently evaluating your progress, you can maximize your online learning experience and achieve your educational goals.
+    `
   },
   {
     id: "future-educational-technology",
@@ -51,8 +169,79 @@ export const blogPosts: BlogPost[] = [
     category: "EdTech",
     image: "/assets/blog/edtech-future.jpg",
     tags: ["EdTech", "Innovation", "Future", "Technology"],
-    content: "Full article content here...",
-    estimatedReadTime: 6
+    content: `
+      Educational technology is rapidly evolving, reshaping how we learn and teach. This article explores the latest trends and innovations that are transforming education.
+
+      Virtual and Augmented Reality
+      VR and AR are creating immersive learning experiences:
+      - Virtual field trips
+      - 3D model exploration
+      - Interactive simulations
+      - Hands-on training in safe environments
+
+      Artificial Intelligence in Education
+      AI is personalizing the learning experience:
+      - Adaptive learning paths
+      - Automated grading
+      - Intelligent tutoring
+      - Predictive analytics
+      - Learning pattern analysis
+
+      Blockchain in Education
+      Blockchain technology is revolutionizing credentials:
+      - Secure certification
+      - Skill verification
+      - Credit transfer
+      - Achievement tracking
+
+      Internet of Things (IoT)
+      IoT devices are enhancing the learning environment:
+      - Smart classrooms
+      - Connected devices
+      - Real-time feedback
+      - Environmental optimization
+
+      Mobile Learning
+      Mobile technology is making education more accessible:
+      - Microlearning
+      - Just-in-time learning
+      - Social learning
+      - Gamification
+
+      Impact on Traditional Education
+      These technologies are changing traditional education:
+      - Blended learning models
+      - Flipped classrooms
+      - Personalized curriculum
+      - Remote learning options
+
+      Implementation Challenges
+      Educational institutions face several challenges:
+      - Cost of implementation
+      - Teacher training
+      - Infrastructure requirements
+      - Technology integration
+      - Privacy concerns
+
+      Future Predictions
+      Looking ahead, we can expect:
+      - More personalized learning
+      - Increased accessibility
+      - Global collaboration
+      - Real-time assessment
+      - Lifelong learning support
+
+      Best Practices for Adoption
+      For successful implementation:
+      1. Start with clear objectives
+      2. Invest in training
+      3. Build infrastructure gradually
+      4. Monitor and evaluate
+      5. Adapt based on feedback
+
+      Conclusion
+      Educational technology continues to evolve, offering new opportunities for learning and teaching. By staying informed and carefully implementing these technologies, we can create more effective and engaging educational experiences for all learners.
+    `
   }
 ];
 
@@ -89,7 +278,7 @@ export default function BlogPage() {
                     <Badge variant="secondary">{post.category}</Badge>
                     <div className="flex items-center text-sm text-muted-foreground">
                       <Clock className="h-4 w-4 mr-1" />
-                      {post.estimatedReadTime} min read
+                      {calculateReadingTime(post.content)} min read
                     </div>
                   </div>
                   <CardTitle className="line-clamp-2 hover:text-primary transition-colors">

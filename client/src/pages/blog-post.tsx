@@ -6,6 +6,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Clock, ArrowLeft, Share2 } from "lucide-react";
 import { Link } from "wouter";
 import { blogPosts, type BlogPost } from "./blog";
+import { calculateReadingTime } from "@/lib/utils";
 
 export default function BlogPost() {
   const [, params] = useRoute("/blog/:id");
@@ -53,7 +54,7 @@ export default function BlogPost() {
                 <span className="text-muted-foreground">{post.date}</span>
                 <div className="flex items-center text-muted-foreground">
                   <Clock className="h-4 w-4 mr-1" />
-                  {post.estimatedReadTime} min read
+                  {calculateReadingTime(post.content)} min read
                 </div>
               </div>
               <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
