@@ -141,54 +141,7 @@ export function DashboardPage() {
           )}
         </div>
 
-        {/* Weekly Progress */}
-        {dashboardData.weeklyProgress?.length > 0 && (
-          <Card className="p-6 space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <h4 className="text-lg font-semibold">Weekly Progress</h4>
-                <p className="text-sm text-muted-foreground">Your learning journey this week</p>
-              </div>
-              <div className="flex items-center gap-3 px-4 py-2 bg-primary/10 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                <div className="space-y-0.5">
-                  <span className="text-sm text-muted-foreground">Average Accuracy</span>
-                  <p className="text-lg font-semibold text-primary">{dashboardData.avgAccuracy}%</p>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-7 gap-3">
-              {dashboardData.weeklyProgress.map((day, index) => {
-                const accuracy = day.total > 0 ? (day.correct / day.total) * 100 : 0;
-                const height = day.total > 0 ? (day.correct / Math.max(...dashboardData.weeklyProgress.map(d => d.total))) * 100 : 0;
-                return (
-                  <div key={day.date} className="text-center group relative">
-                    <div className="h-32 flex items-end">
-                      <div className="w-full relative">
-                        <div className="absolute bottom-0 w-full bg-gray-100 rounded-t-lg" style={{ height: `${height}%` }}>
-                          <div 
-                            className="absolute bottom-0 w-full bg-gradient-to-t from-primary/90 to-primary/50 rounded-t-lg transition-all duration-300 group-hover:from-primary/100 group-hover:to-primary/60" 
-                            style={{ height: `${accuracy}%` }} 
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      <span className="text-sm font-medium">
-                        {new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}
-                      </span>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-10 left-1/2 -translate-x-1/2 bg-background border px-2 py-1 rounded shadow-lg">
-                        <p className="text-xs whitespace-nowrap">
-                          {day.correct}/{day.total} correct ({Math.round(accuracy)}%)
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
-        )}
+        
 
         {/* Unified Learning History - Unchanged */}
         <div className="p-4">
