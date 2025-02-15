@@ -67,14 +67,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
   }
 
   if (!progress) {
-    return (
-      <Card className="p-4">
-        <div className="text-center text-muted-foreground">
-          <p>No progress data available yet.</p>
-          <p>Start answering questions to see your progress!</p>
-        </div>
-      </Card>
-    );
+    return null;
   }
 
   const formatTimeSpent = (minutes: number) => {
