@@ -42,7 +42,7 @@ export function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container max-w-6xl mx-auto px-4 md:px-6 py-8 space-y-8">
-        <h1 className="text-4xl font-bold mb-8 text-[#3A3D98] text-center">Learning Progress</h1>
+        <h1 className="text-4xl font-bold mb-8 text-[#111C2A] text-center">Learning Progress</h1>
 
         {/* Overall Progress Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -94,7 +94,7 @@ export function DashboardPage() {
 
         {/* Subject Performance */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold text-[#3A3D98]">Subject Performance</h2>
+          <h2 className="text-2xl font-semibold text-[#111C2A]">Subject Performance</h2>
           {dashboardData.subjectPerformance.slice(0, showAllSubjects ? dashboardData.subjectPerformance.length : 3).map((subject) => (
             <Card key={subject.subject} className="p-4">
               <div className="flex items-center justify-between">
@@ -137,7 +137,7 @@ export function DashboardPage() {
 
         {/* Unified Learning History */}
         <div className="p-4">
-          <h2 className="text-2xl font-semibold text-[#3A3D98]">Learning History</h2>
+          <h2 className="text-2xl font-semibold text-[#111C2A]">Learning History</h2>
           <ProgressStats subject="all" />
         </div>
       </div>
