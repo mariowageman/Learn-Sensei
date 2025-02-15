@@ -7,6 +7,7 @@ import LearningPaths from "@/pages/learning-paths";
 import LearningPath from "@/pages/learning-path";
 import SenseiMode from "@/pages/sensei";
 import { DashboardPage } from "@/pages/dashboard";
+import { Footer } from "@/components/footer";
 
 function App() {
   return (
