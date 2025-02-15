@@ -42,7 +42,7 @@ export function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container max-w-6xl mx-auto px-4 md:px-6 py-8 space-y-8">
-        <h1 className="text-4xl font-bold mb-8 text-[#111C2A] text-center">Learning Progress</h1>
+        <h1 className="text-4xl font-bold mb-8 text-[#111C2A]">Learning Progress</h1>
 
         {/* Overall Progress Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
