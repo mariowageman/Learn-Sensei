@@ -3,10 +3,11 @@ import { Footer } from "@/components/footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Clock, ArrowLeft, Share2 } from "lucide-react";
+import { Clock, ArrowLeft } from "lucide-react";
 import { blogPosts, type BlogPost } from "./blog";
 import { calculateReadingTime } from "@/lib/utils";
 import { useEffect } from "react";
+import { ShareButtons } from "@/components/share-buttons";
 
 export default function BlogPost() {
   const [, params] = useRoute("/blog/:id");
@@ -35,11 +36,6 @@ export default function BlogPost() {
       </div>
     );
   }
-
-  const relatedPosts = blogPosts
-    .filter((p: BlogPost) => p.id !== post.id)
-    .filter((p: BlogPost) => p.tags.some((tag: string) => post.tags.includes(tag)))
-    .slice(0, 2);
 
   return (
     <div className="min-h-screen bg-background">
@@ -93,19 +89,11 @@ export default function BlogPost() {
           </div>
 
           <div className="flex justify-between items-center border-t pt-4">
-            <Button
-              variant="outline"
-              onClick={() => {
-                navigator.share({
-                  title: post.title,
-                  text: post.description,
-                  url: window.location.href,
-                });
-              }}
-            >
-              <Share2 className="mr-2 h-4 w-4" />
-              Share Article
-            </Button>
+            <ShareButtons
+              url={window.location.href}
+              title={post.title}
+              description={post.description}
+            />
           </div>
 
           {relatedPosts.length > 0 && (

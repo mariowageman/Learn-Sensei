@@ -9,6 +9,7 @@ import { Link, useLocation } from "wouter";
 import { Footer } from "@/components/footer";
 import { calculateReadingTime } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { ShareButtons } from "@/components/share-buttons";
 
 export interface BlogPost {
   id: string;
@@ -250,7 +251,6 @@ export default function BlogPage() {
   const [location, setLocation] = useLocation();
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
-  // Extract tag from URL if present
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tag = params.get('tag');
@@ -259,12 +259,10 @@ export default function BlogPage() {
     }
   }, []);
 
-  // Filter posts based on selected tag
   const filteredPosts = selectedTag
     ? blogPosts.filter(post => post.tags.includes(selectedTag))
     : blogPosts;
 
-  // Get all unique tags
   const allTags = Array.from(
     new Set(blogPosts.flatMap(post => post.tags))
   ).sort();
@@ -283,7 +281,6 @@ export default function BlogPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-4 mb-8">
-          {/* Header with title and RSS button */}
           <div className="flex flex-col space-y-4">
             <div className="flex items-center justify-between">
               <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
@@ -304,7 +301,6 @@ export default function BlogPage() {
             </p>
           </div>
 
-          {/* Tags filter section */}
           <div className="flex flex-wrap gap-2 py-4">
             {allTags.map((tag) => (
               <Badge
@@ -397,12 +393,19 @@ export default function BlogPage() {
                         </Badge>
                       ))}
                     </div>
-                    <Link href={`/blog/${post.id}`}>
-                      <Button variant="primary" className="w-full group hover:bg-blue-600"> {/* Added hover effect and changed variant */}
-                        Read More
-                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                      </Button>
-                    </Link>
+                    <div className="flex justify-between items-center gap-2">
+                      <Link href={`/blog/${post.id}`} className="flex-1">
+                        <Button className="w-full group">
+                          Read More
+                          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        </Button>
+                      </Link>
+                      <ShareButtons
+                        url={`${window.location.origin}/blog/${post.id}`}
+                        title={post.title}
+                        description={post.description}
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
