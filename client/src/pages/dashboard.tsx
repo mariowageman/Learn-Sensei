@@ -48,7 +48,7 @@ export function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-4">
             <div className="flex items-center gap-2">
-              <Brain className="h-5 w-5 text-[#3A3D98]" />
+              <Brain className="h-5 w-5 text-[#3F3EED]" />
               <h3 className="font-medium">Overall Progress</h3>
             </div>
             <div className="mt-2">
@@ -69,11 +69,11 @@ export function DashboardPage() {
 
           <Card className="p-4">
             <div className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-[#3A3D98]" />
+              <Target className="h-5 w-5 text-[#3F3EED]" />
               <h3 className="font-medium">Average Accuracy</h3>
             </div>
             <div className="mt-4">
-              <span className="text-3xl font-bold text-[#3A3D98]">
+              <span className="text-3xl font-bold text-[#3F3EED]">
                 {dashboardData.overallProgress.averageAccuracy}%
               </span>
             </div>
@@ -81,11 +81,11 @@ export function DashboardPage() {
 
           <Card className="p-4">
             <div className="flex items-center gap-2">
-              <Award className="h-5 w-5 text-[#3A3D98]" />
+              <Award className="h-5 w-5 text-[#3F3EED]" />
               <h3 className="font-medium">Learning Streak</h3>
             </div>
             <div className="mt-4">
-              <span className="text-3xl font-bold text-[#3A3D98]">
+              <span className="text-3xl font-bold text-[#3F3EED]">
                 {dashboardData.overallProgress.currentStreak} days
               </span>
             </div>
@@ -99,7 +99,7 @@ export function DashboardPage() {
             <Card key={subject.subject} className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Book className="h-5 w-5 text-[#3A3D98]" />
+                  <Book className="h-5 w-5 text-[#3F3EED]" />
                   <h3 className="text-xl font-medium">{subject.subject}</h3>
                 </div>
                 <span className="text-sm text-muted-foreground">
@@ -115,7 +115,7 @@ export function DashboardPage() {
           {dashboardData.subjectPerformance.length > 3 && (
             <button 
               onClick={() => setShowAllSubjects(!showAllSubjects)} 
-              className="mt-4 text-[#3A3D98] hover:text-[#2A2D88] text-sm font-medium flex items-center gap-1 transition-colors"
+              className="mt-4 text-[#3F3EED] hover:text-[#2A2D88] text-sm font-medium flex items-center gap-1 transition-colors"
             >
               {showAllSubjects ? 'Show Less' : 'Show More'}
               <svg 
