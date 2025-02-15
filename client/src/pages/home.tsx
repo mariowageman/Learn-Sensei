@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { LearningRecommendations } from "@/components/learning/recommendations";
 import { GraduationCap, Brain, Target, Sparkles } from "lucide-react";
 import { Footer } from "@/components/footer";
+import { TawkTo } from "@/components/TawkTo";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
+      <TawkTo />
       {/* Hero Section */}
       <section className="relative py-20 px-4 overflow-hidden bg-gradient-to-b from-primary/5 to-background">
         <div className="absolute inset-0 bg-grid-white/10" />
