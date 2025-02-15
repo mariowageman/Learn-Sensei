@@ -279,13 +279,13 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                 </div>
 
                 {selectedAttempt?.videoSuggestions && selectedAttempt.videoSuggestions.length > 0 && (
-                  <div className="space-y-6">
-                    <h4 className="text-lg font-medium">Suggested Learning Videos</h4>
-                    <div className="space-y-8">
+                  <div className="mt-6">
+                    <h4 className="text-lg font-medium mb-4">Suggested Learning Videos</h4>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {selectedAttempt.videoSuggestions.map((video, index) => (
-                        <div key={index} className="space-y-3">
-                          <h5 className="text-base font-medium break-words">{video.title}</h5>
-                          <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
+                        <div key={index} className="flex flex-col bg-card rounded-lg p-4 shadow-sm">
+                          <h5 className="text-base font-medium break-words mb-3">{video.title}</h5>
+                          <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black mb-3">
                             <iframe
                               className="absolute top-0 left-0 w-full h-full"
                               src={`https://www.youtube.com/embed/${video.videoId}`}
@@ -295,7 +295,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                               allowFullScreen
                             />
                           </div>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-muted-foreground mt-auto">
                             Can't see the video? <a
                               href={`https://www.youtube.com/watch?v=${video.videoId}`}
                               target="_blank"
