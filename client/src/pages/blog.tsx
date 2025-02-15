@@ -16,14 +16,14 @@ const blogPosts = [
     date: "February 14, 2025",
     description: "Master the art of online learning with these proven strategies for success.",
     category: "Learning Tips",
-    image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 800 400'%3E%3Crect fill='%23283951' width='800' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='%23ffffff'%3ELearning Tips%3C/text%3E%3C/svg%3E"
+    image: "/assets/blog/learning-tips.jpg"
   },
   {
     title: "The Future of Educational Technology",
     date: "February 13, 2025",
     description: "Explore emerging trends in educational technology and their impact on modern learning.",
     category: "EdTech",
-    image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 800 400'%3E%3Crect fill='%23283951' width='800' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='%23ffffff'%3EEdTech%3C/text%3E%3C/svg%3E"
+    image: "/assets/blog/edtech-future.jpg"
   }
 ];
 
