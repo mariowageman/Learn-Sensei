@@ -12,7 +12,7 @@ export default function Home() {
         <div className="relative max-w-6xl mx-auto text-center space-y-8">
           <div className="space-y-4">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#3F3EED] to-[#3F3EED]/80">
-              Learn Sensei helps you learn smarter with AI
+              Learn Sensei Smarter Learning
             </h1>
             <p className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto">
               Answer questions, track your progress, and get instant video explanations to master any subject
