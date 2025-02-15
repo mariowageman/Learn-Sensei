@@ -9,7 +9,7 @@ const blogPosts = [
     date: "February 15, 2025",
     description: "Discover how artificial intelligence is revolutionizing the way we learn and acquire new skills.",
     category: "AI Education",
-    image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 800 400'%3E%3Crect fill='%23283951' width='800' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='%23ffffff'%3EAI Education%3C/text%3E%3C/svg%3E"
+    image: "/assets/blog/ai-education.jpg"
   },
   {
     title: "5 Tips for Effective Online Learning",
