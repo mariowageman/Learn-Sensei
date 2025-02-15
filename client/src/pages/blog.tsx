@@ -285,15 +285,12 @@ export default function BlogPage() {
         <div className="space-y-4 mb-8">
           {/* Header with title and RSS button */}
           <div className="flex flex-col space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
             <div className="flex items-center justify-between">
-              <p className="text-lg text-muted-foreground">
-                Explore the latest insights in AI-powered learning and educational technology
-              </p>
+              <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
               <Button 
                 variant="outline" 
                 size="sm"
-                className="gap-2 ml-4 whitespace-nowrap"
+                className="gap-2 whitespace-nowrap"
                 onClick={() => {
                   window.location.href = '/feed.xml';
                 }}
@@ -302,6 +299,9 @@ export default function BlogPage() {
                 RSS Feed
               </Button>
             </div>
+            <p className="text-lg text-muted-foreground">
+              Explore the latest insights in AI-powered learning and educational technology
+            </p>
           </div>
 
           {/* Tags filter section */}
