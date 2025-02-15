@@ -53,7 +53,7 @@ export function Footer() {
             <h3 className="text-lg font-semibold">Resources</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Documentation</a>
+                <a href="https://learnsensei.tawk.help/" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Documentation</a>
               </li>
               <li>
                 <a href="#" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Blog</a>
