@@ -32,17 +32,17 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/sensei">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Sensei Mode</a>
+                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Sensei Mode</a>
                 </Link>
               </li>
               <li>
                 <Link href="/learning-paths">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Learning Paths</a>
+                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Learning Paths</a>
                 </Link>
               </li>
               <li>
                 <Link href="/dashboard">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Dashboard</a>
+                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Dashboard</a>
                 </Link>
               </li>
             </ul>
@@ -72,17 +72,17 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/terms">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Terms of Service</a>
+                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Terms of Service</a>
                 </Link>
               </li>
               <li>
                 <Link href="/privacy">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Privacy Policy</a>
+                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Privacy Policy</a>
                 </Link>
               </li>
               <li>
                 <Link href="/cookie-policy">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Cookie Policy</a>
+                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Cookie Policy</a>
                 </Link>
               </li>
             </ul>
