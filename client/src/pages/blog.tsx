@@ -4,12 +4,11 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Clock, ArrowRight, X, Rss } from "lucide-react";
+import { Clock, ArrowRight, X, Rss, ChevronDown, ChevronUp } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Footer } from "@/components/footer";
 import { calculateReadingTime } from "@/lib/utils";
 import { useState, useEffect } from "react";
-//import { ShareButtons } from "@/components/share-buttons"; //Removed import
 
 export interface BlogPost {
   id: string;
@@ -250,6 +249,7 @@ export const blogPosts: BlogPost[] = [
 export default function BlogPage() {
   const [location, setLocation] = useLocation();
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [isTagsExpanded, setIsTagsExpanded] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -277,6 +277,10 @@ export default function BlogPage() {
     }
   };
 
+  const toggleTagsExpansion = () => {
+    setIsTagsExpanded(!isTagsExpanded);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -301,27 +305,51 @@ export default function BlogPage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2 py-4">
-            {allTags.map((tag) => (
-              <Badge
-                key={tag}
-                variant={selectedTag === tag ? "default" : "outline"}
-                className={cn(
-                  "cursor-pointer hover:bg-primary/80",
-                  selectedTag === tag && "bg-primary text-primary-foreground"
-                )}
-                onClick={() => handleTagClick(tag)}
+          <div className="relative">
+            <div 
+              className={cn(
+                "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2",
+                !isTagsExpanded && "max-h-[4.5rem] overflow-hidden"
+              )}
+            >
+              {allTags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant={selectedTag === tag ? "default" : "outline"}
+                  className={cn(
+                    "cursor-pointer hover:bg-primary/80",
+                    selectedTag === tag && "bg-primary text-primary-foreground"
+                  )}
+                  onClick={() => handleTagClick(tag)}
+                >
+                  {tag}
+                  {selectedTag === tag && (
+                    <X 
+                      className="ml-1 h-3 w-3" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedTag(null);
+                        setLocation('/blog');
+                      }} 
+                    />
+                  )}
+                </Badge>
+              ))}
+            </div>
+            {allTags.length > 12 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleTagsExpansion}
+                className="mt-2 w-full flex items-center justify-center gap-2"
               >
-                {tag}
-                {selectedTag === tag && (
-                  <X className="ml-1 h-3 w-3" onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedTag(null);
-                    setLocation('/blog');
-                  }} />
+                {isTagsExpanded ? (
+                  <>Show Less <ChevronUp className="h-4 w-4" /></>
+                ) : (
+                  <>Show More Tags <ChevronDown className="h-4 w-4" /></>
                 )}
-              </Badge>
-            ))}
+              </Button>
+            )}
           </div>
 
           {selectedTag && (
