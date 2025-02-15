@@ -37,6 +37,12 @@ export default function BlogPost() {
     );
   }
 
+  // Get related posts based on shared tags
+  const relatedPosts = blogPosts
+    .filter((p: BlogPost) => p.id !== post.id)
+    .filter((p: BlogPost) => p.tags.some((tag: string) => post.tags.includes(tag)))
+    .slice(0, 2);
+
   return (
     <div className="min-h-screen bg-background">
       <article className="container mx-auto px-4 py-8">

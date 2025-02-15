@@ -9,7 +9,7 @@ import { Link, useLocation } from "wouter";
 import { Footer } from "@/components/footer";
 import { calculateReadingTime } from "@/lib/utils";
 import { useState, useEffect } from "react";
-import { ShareButtons } from "@/components/share-buttons";
+//import { ShareButtons } from "@/components/share-buttons"; //Removed import
 
 export interface BlogPost {
   id: string;
@@ -393,19 +393,12 @@ export default function BlogPage() {
                         </Badge>
                       ))}
                     </div>
-                    <div className="flex justify-between items-center gap-2">
-                      <Link href={`/blog/${post.id}`} className="flex-1">
-                        <Button className="w-full group">
-                          Read More
-                          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </Button>
-                      </Link>
-                      <ShareButtons
-                        url={`${window.location.origin}/blog/${post.id}`}
-                        title={post.title}
-                        description={post.description}
-                      />
-                    </div>
+                    <Link href={`/blog/${post.id}`}>
+                      <Button className="w-full group">
+                        Read More
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
