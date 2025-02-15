@@ -4,10 +4,11 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Clock, ArrowRight } from "lucide-react";
-import { Link } from "wouter";
+import { Clock, ArrowRight, X } from "lucide-react";
+import { Link, useLocation } from "wouter";
 import { Footer } from "@/components/footer";
 import { calculateReadingTime } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 export interface BlogPost {
   id: string;
@@ -246,6 +247,38 @@ export const blogPosts: BlogPost[] = [
 ];
 
 export default function BlogPage() {
+  const [location, setLocation] = useLocation();
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+
+  // Extract tag from URL if present
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tag = params.get('tag');
+    if (tag) {
+      setSelectedTag(tag);
+    }
+  }, []);
+
+  // Filter posts based on selected tag
+  const filteredPosts = selectedTag
+    ? blogPosts.filter(post => post.tags.includes(selectedTag))
+    : blogPosts;
+
+  // Get all unique tags
+  const allTags = Array.from(
+    new Set(blogPosts.flatMap(post => post.tags))
+  ).sort();
+
+  const handleTagClick = (tag: string) => {
+    if (selectedTag === tag) {
+      setSelectedTag(null);
+      setLocation('/blog');
+    } else {
+      setSelectedTag(tag);
+      setLocation(`/blog?tag=${encodeURIComponent(tag)}`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -254,11 +287,53 @@ export default function BlogPage() {
           <p className="text-lg text-muted-foreground">
             Explore the latest insights in AI-powered learning and educational technology
           </p>
+
+          {/* Tags filter section */}
+          <div className="flex flex-wrap gap-2 py-4">
+            {allTags.map((tag) => (
+              <Badge
+                key={tag}
+                variant={selectedTag === tag ? "default" : "outline"}
+                className={cn(
+                  "cursor-pointer hover:bg-primary/80",
+                  selectedTag === tag && "bg-primary text-primary-foreground"
+                )}
+                onClick={() => handleTagClick(tag)}
+              >
+                {tag}
+                {selectedTag === tag && (
+                  <X className="ml-1 h-3 w-3" onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedTag(null);
+                    setLocation('/blog');
+                  }} />
+                )}
+              </Badge>
+            ))}
+          </div>
+
+          {selectedTag && (
+            <div className="flex items-center justify-between bg-muted p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                Showing posts tagged with "{selectedTag}"
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSelectedTag(null);
+                  setLocation('/blog');
+                }}
+              >
+                Clear filter
+              </Button>
+            </div>
+          )}
         </div>
 
         <ScrollArea className="h-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {blogPosts.map((post) => (
+            {filteredPosts.map((post) => (
               <Card key={post.id} className="flex flex-col overflow-hidden hover:shadow-lg transition-shadow group">
                 <div className="relative overflow-hidden">
                   <AspectRatio ratio={16/9} className="bg-muted">
@@ -293,7 +368,15 @@ export default function BlogPage() {
                   <div className="space-y-4">
                     <div className="flex flex-wrap gap-2">
                       {post.tags.map((tag) => (
-                        <Badge key={tag} variant="outline">
+                        <Badge
+                          key={tag}
+                          variant={selectedTag === tag ? "default" : "outline"}
+                          className="cursor-pointer hover:bg-primary/80"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleTagClick(tag);
+                          }}
+                        >
                           {tag}
                         </Badge>
                       ))}

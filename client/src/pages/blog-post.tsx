@@ -1,10 +1,9 @@
-import { useRoute } from "wouter";
+import { useRoute, Link } from "wouter";
 import { Footer } from "@/components/footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Clock, ArrowLeft, Share2 } from "lucide-react";
-import { Link } from "wouter";
 import { blogPosts, type BlogPost } from "./blog";
 import { calculateReadingTime } from "@/lib/utils";
 import { useEffect } from "react";
@@ -82,9 +81,14 @@ export default function BlogPost() {
 
           <div className="flex flex-wrap gap-2 mb-8">
             {post.tags.map((tag: string) => (
-              <Badge key={tag} variant="outline">
-                {tag}
-              </Badge>
+              <Link key={tag} href={`/blog?tag=${encodeURIComponent(tag)}`}>
+                <Badge
+                  variant="outline"
+                  className="cursor-pointer hover:bg-primary/80"
+                >
+                  {tag}
+                </Badge>
+              </Link>
             ))}
           </div>
 
