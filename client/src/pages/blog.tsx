@@ -382,8 +382,8 @@ export default function BlogPage() {
                       ))}
                     </div>
                     <Link href={`/blog/${post.id}`}>
-                      <Button variant="ghost" className="w-full group">
-                        Read More 
+                      <Button variant="primary" className="w-full group hover:bg-blue-600"> {/* Added hover effect and changed variant */}
+                        Read More
                         <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                       </Button>
                     </Link>
