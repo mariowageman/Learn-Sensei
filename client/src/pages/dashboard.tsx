@@ -189,12 +189,6 @@ export function DashboardPage() {
             </div>
           </Card>
         )}
-                );
-              })}
-            </div>
-          </Card>
-        )}
-
 
         {/* Unified Learning History - Unchanged */}
         <div className="p-4">
