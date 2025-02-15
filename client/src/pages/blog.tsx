@@ -25,9 +25,9 @@ export interface BlogPost {
 export const blogPosts: BlogPost[] = [
   {
     id: "getting-started-ai-learning",
-    title: "Getting Started with AI-Powered Learning",
+    title: "Your New Title",
     date: "February 15, 2025",
-    description: "Discover how artificial intelligence is revolutionizing the way we learn and acquire new skills. We'll explore the latest trends and technologies that are shaping the future of education.",
+    description: "Your new description goes here. Make it engaging and informative to attract readers.",
     category: "AI Education",
     image: "/assets/blog/ai-education.jpg",
     tags: ["AI", "Education", "Technology", "Learning"],
