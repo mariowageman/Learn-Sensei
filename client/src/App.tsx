@@ -7,24 +7,22 @@ import Home from "@/pages/home";
 import LearningPaths from "@/pages/learning-paths";
 import LearningPath from "@/pages/learning-path";
 import SenseiMode from "@/pages/sensei";
+import CookiePolicy from "@/pages/cookie-policy";
 import { DashboardPage } from "@/pages/dashboard";
+import { CookieConsent } from "@/components/cookie-consent";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Home as HomeIcon, Brain, Menu, LayoutDashboard } from "lucide-react";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { useState, useEffect } from "react";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       <Link href="/">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className="w-full justify-start gap-2"
           onClick={onNavigate}
         >
@@ -33,8 +31,8 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
         </Button>
       </Link>
       <Link href="/sensei">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className="w-full justify-start gap-2"
           onClick={onNavigate}
         >
@@ -43,8 +41,8 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
         </Button>
       </Link>
       <Link href="/learning-paths">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className="w-full justify-start gap-2"
           onClick={onNavigate}
         >
@@ -53,8 +51,8 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
         </Button>
       </Link>
       <Link href="/dashboard">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className="w-full justify-start gap-2"
           onClick={onNavigate}
         >
@@ -235,6 +233,11 @@ function Router() {
               <SenseiMode />
             </div>
           </Route>
+          <Route path="/cookie-policy">
+            <div data-page="cookie-policy">
+              <CookiePolicy />
+            </div>
+          </Route>
           <Route>
             <div data-page="not-found">
               <NotFound />
@@ -242,6 +245,7 @@ function Router() {
           </Route>
         </Switch>
       </div>
+      <CookieConsent />
     </>
   );
 }

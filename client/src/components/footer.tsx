@@ -74,7 +74,9 @@ export function Footer() {
                 <a href="#" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Privacy Policy</a>
               </li>
               <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Cookie Policy</a>
+                <Link href="/cookie-policy">
+                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Cookie Policy</a>
+                </Link>
               </li>
             </ul>
           </div>
