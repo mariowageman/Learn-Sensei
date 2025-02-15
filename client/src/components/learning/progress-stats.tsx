@@ -66,10 +66,6 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
     return <Skeleton className="h-96 w-full" />;
   }
 
-  if (!progress || !progress.recentAttempts?.length) {
-    return null;
-  }
-
   if (!progress) {
     return (
       <Card className="p-4">
