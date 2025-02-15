@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { Github, Linkedin } from "lucide-react";
+import { RiTwitterXFill } from "react-icons/ri";
 
 export function Footer() {
   return (
@@ -17,7 +18,7 @@ export function Footer() {
                 <Github className="h-5 w-5" />
               </a>
               <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#3F3EED]">
-                <img src="/assets/x-logo.svg" alt="X (Twitter)" className="h-5 w-5" />
+                <RiTwitterXFill className="h-5 w-5" />
               </a>
               <a href="https://www.linkedin.com/company/learn-sensei/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#3F3EED]">
                 <Linkedin className="h-5 w-5" />
@@ -87,7 +88,7 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} Learn Sensei. All rights reserved.
             </p>
-            
+
           </div>
         </div>
       </div>
