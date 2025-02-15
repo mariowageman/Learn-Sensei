@@ -283,22 +283,25 @@ export default function BlogPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-4 mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
+          {/* Header with title and RSS button */}
+          <div className="flex flex-col space-y-4">
+            <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
+            <div className="flex items-center justify-between">
               <p className="text-lg text-muted-foreground">
                 Explore the latest insights in AI-powered learning and educational technology
               </p>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="gap-2 ml-4 whitespace-nowrap"
+                onClick={() => {
+                  window.location.href = '/feed.xml';
+                }}
+              >
+                <Rss className="h-4 w-4" />
+                RSS Feed
+              </Button>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="gap-2"
-              onClick={() => window.location.href = '/feed.xml'}
-            >
-              <Rss className="h-4 w-4" />
-              RSS Feed
-            </Button>
           </div>
 
           {/* Tags filter section */}

@@ -22,8 +22,11 @@ export function registerRoutes(app: Express): Server {
   // Add RSS feed endpoint
   app.get("/feed.xml", (req, res) => {
     try {
-      const feed = generateRSSFeed();
+      const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+      const baseUrl = `${protocol}://${req.get('host')}`;
+      const feed = generateRSSFeed(baseUrl);
       res.set('Content-Type', 'application/xml');
+      res.attachment('feed.xml');  // This will force download
       res.send(feed);
     } catch (error) {
       console.error('Error generating RSS feed:', error);

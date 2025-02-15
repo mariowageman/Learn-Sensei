@@ -1,7 +1,6 @@
 import { blogPosts } from "@/pages/blog";
 
-export function generateRSSFeed(): string {
-  const baseUrl = window.location.origin;
+export function generateRSSFeed(baseUrl: string): string {
   const latestPosts = [...blogPosts].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
