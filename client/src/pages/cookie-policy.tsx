@@ -102,7 +102,7 @@ export default function CookiePolicy() {
             <h2>Contact Us</h2>
             <p>
               If you have any questions about our use of cookies or this Cookie Policy, please contact us at:{" "}
-              <a href="mailto:privacy@learnsensei.com">privacy@learnsensei.com</a>
+              <a href="mailto:support@learnsensei.com">support@learnsensei.com</a>
             </p>
           </section>
         </article>
