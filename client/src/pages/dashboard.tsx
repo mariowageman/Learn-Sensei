@@ -189,31 +189,6 @@ export function DashboardPage() {
             </div>
           </Card>
         )}
-                          className="w-full bg-primary/10 rounded-lg transition-all duration-200 group-hover:bg-primary/20"
-                          style={{ height: `${Math.max(height, 15)}%` }}
-                        >
-                          <div
-                            className="absolute bottom-0 w-full bg-gradient-to-t from-primary to-primary/80 rounded-lg transition-all duration-200"
-                            style={{ height: `${Math.max(accuracy, 5)}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-2 space-y-1">
-                      <span className="text-sm font-medium">
-                        {new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}
-                      </span>
-                      <div className="text-xs text-muted-foreground">
-                        {day.correct}/{day.total}
-                      </div>
-                    </div>
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground px-3 py-2 rounded-lg shadow-lg text-sm whitespace-nowrap">
-                        <p className="font-medium">{Math.round(accuracy)}% accuracy</p>
-                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-popover rotate-45" />
-                      </div>
-                    </div>
-                  </div>
                 );
               })}
             </div>
