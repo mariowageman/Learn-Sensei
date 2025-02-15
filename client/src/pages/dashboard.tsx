@@ -62,7 +62,8 @@ export function DashboardPage() {
               <Progress 
                 value={(dashboardData.overallProgress.completedSubjects / 
                   Math.max(dashboardData.overallProgress.totalSubjects, 1)) * 100}
-                className="bg-gray-100 [&>[role=progressbar]]:bg-[#3F3EED]"
+                className="h-2 bg-gray-100"
+                indicatorClassName="bg-[#3F3EED]"
               />
             </div>
           </Card>
@@ -108,7 +109,8 @@ export function DashboardPage() {
               </div>
               <Progress 
                 value={subject.accuracy}
-                className="mt-4 bg-gray-100 [&>[role=progressbar]]:bg-[#3F3EED]"
+                className="mt-4 h-2 bg-gray-100"
+                indicatorClassName="bg-[#3F3EED]"
               />
             </Card>
           ))}
