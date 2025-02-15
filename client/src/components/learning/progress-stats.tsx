@@ -252,11 +252,11 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
       </Card>
 
       <Dialog open={!!selectedAttempt} onOpenChange={() => setSelectedAttempt(null)}>
-        <DialogContent className="w-[95vw] max-w-[1200px] h-[90vh] p-6">
+        <DialogContent className="w-[95vw] max-w-[1200px] min-h-[50vh] max-h-[90vh] p-6">
           <DialogHeader>
             <DialogTitle className="text-2xl">Question Details</DialogTitle>
           </DialogHeader>
-          <div className="h-[calc(90vh-120px)] overflow-y-auto">
+          <div className="max-h-[calc(85vh-120px)] overflow-y-auto">
             <div className="space-y-6">
               <div>
                 <h4 className="text-lg font-medium mb-2">Question:</h4>
