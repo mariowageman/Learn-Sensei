@@ -15,7 +15,7 @@ export default function Home() {
               Learn Sensei helps you learn smarter with AI
             </h1>
             <p className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Learn Sensei helps you learn smarter with AI
+              Answer questions, track your progress, and get instant video explanations to master any subject
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
