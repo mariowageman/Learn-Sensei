@@ -16,8 +16,8 @@ export function Footer() {
               <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#3F3EED]">
                 <Github className="h-5 w-5" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#3F3EED]">
-                <X className="h-5 w-5" />
+              <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#3F3EED]">
+                <X className="h-5 w-5 font-bold" />
               </a>
               <a href="https://www.linkedin.com/company/learn-sensei/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[#3F3EED]">
                 <Linkedin className="h-5 w-5" />
