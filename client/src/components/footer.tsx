@@ -59,7 +59,7 @@ export function Footer() {
                 <a href="#" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Blog</a>
               </li>
               <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Support</a>
+                <a href="mailto:support@learnsensei.com" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Support</a>
               </li>
             </ul>
           </div>
