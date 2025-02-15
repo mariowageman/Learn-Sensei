@@ -40,15 +40,17 @@ export default function BlogPage() {
       <ScrollArea className="h-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           {blogPosts.map((post, index) => (
-            <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="relative">
-                <AspectRatio ratio={2/1}>
+            <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow group">
+              <div className="relative overflow-hidden">
+                <AspectRatio ratio={2/1} className="bg-muted">
                   <img 
                     src={post.image} 
                     alt={post.title}
                     className={cn(
                       "object-cover w-full h-full",
-                      "transition-transform duration-300 hover:scale-105"
+                      "transition-all duration-500 ease-in-out transform",
+                      "group-hover:scale-125",
+                      "will-change-transform"
                     )}
                   />
                 </AspectRatio>
