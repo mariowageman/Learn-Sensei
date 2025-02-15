@@ -1,11 +1,22 @@
 import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { resetCookieConsent } from "@/components/cookie-consent";
 
 export default function CookiePolicy() {
   return (
     <div className="min-h-screen bg-background">
       <main className="container max-w-4xl mx-auto py-12 px-4">
         <article className="prose dark:prose-invert max-w-none">
-          <h1>Cookie Policy</h1>
+          <div className="flex items-center justify-between">
+            <h1>Cookie Policy</h1>
+            <Button
+              onClick={resetCookieConsent}
+              variant="outline"
+              className="ml-4"
+            >
+              Reset Cookie Preferences
+            </Button>
+          </div>
           <p className="lead">
             Last updated: {new Date().toLocaleDateString()}
           </p>
@@ -30,7 +41,7 @@ export default function CookiePolicy() {
 
           <section>
             <h2>Types of Cookies We Use</h2>
-            
+
             <h3>Essential Cookies</h3>
             <p>
               These cookies are strictly necessary for the website to function properly. They enable core functionality

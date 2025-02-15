@@ -9,6 +9,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+// Create a function to reset cookie consent that can be imported by other components
+export function resetCookieConsent() {
+  localStorage.removeItem("cookie-consent");
+  // Force a page reload to show the banner
+  window.location.reload();
+}
+
 export function CookieConsent() {
   const [showBanner, setShowBanner] = useState(false);
   const [preferences, setPreferences] = useState({
