@@ -14,15 +14,22 @@ import {
   subjectHistory
 } from "@db/schema";
 import { fetchCourseraCourses, type CourseraCourse } from "./coursera";
-
-// Initialize Coursera API configuration
-const courseraConfig = {
-  apiKey: process.env.COURSERA_API_KEY,
-  apiSecret: process.env.COURSERA_API_SECRET
-};
+import { generateRSSFeed } from "../client/src/lib/rss";
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
+
+  // Add RSS feed endpoint
+  app.get("/feed.xml", (req, res) => {
+    try {
+      const feed = generateRSSFeed();
+      res.set('Content-Type', 'application/xml');
+      res.send(feed);
+    } catch (error) {
+      console.error('Error generating RSS feed:', error);
+      res.status(500).send('Error generating RSS feed');
+    }
+  });
 
   app.get("/api/session", async (req, res) => {
     const session = await db.query.sessions.findFirst({

@@ -4,7 +4,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Clock, ArrowRight, X } from "lucide-react";
+import { Clock, ArrowRight, X, Rss } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Footer } from "@/components/footer";
 import { calculateReadingTime } from "@/lib/utils";
@@ -283,10 +283,23 @@ export default function BlogPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-4 mb-8">
-          <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
-          <p className="text-lg text-muted-foreground">
-            Explore the latest insights in AI-powered learning and educational technology
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
+              <p className="text-lg text-muted-foreground">
+                Explore the latest insights in AI-powered learning and educational technology
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="gap-2"
+              onClick={() => window.location.href = '/feed.xml'}
+            >
+              <Rss className="h-4 w-4" />
+              RSS Feed
+            </Button>
+          </div>
 
           {/* Tags filter section */}
           <div className="flex flex-wrap gap-2 py-4">
