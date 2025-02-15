@@ -11,13 +11,19 @@ import { DashboardPage } from "@/pages/dashboard";
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/dashboard" component={DashboardPage} />
-        <Route path="/learning-paths" component={LearningPaths} />
-        <Route path="/learning-path" component={LearningPath} />
-        <Route path="/sensei" component={SenseiMode} />
-      </Switch>
+      <div className="min-h-screen flex flex-col">
+        <main className="flex-1">
+          <Switch>
+            <Route path="/" component={Home} />
+            <Route path="/dashboard" component={DashboardPage} />
+            <Route path="/learning-paths" component={LearningPaths} />
+            <Route path="/learning-path" component={LearningPath} />
+            <Route path="/sensei" component={SenseiMode} />
+            <Route path="/cookie-policy" component={() => import('@/pages/cookie-policy')} />
+          </Switch>
+        </main>
+        <Footer />
+      </div>
     </QueryClientProvider>
   );
 }

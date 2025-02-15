@@ -30,18 +30,18 @@ export function Footer() {
             <h3 className="text-lg font-semibold">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/sensei">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Sensei Mode</a>
+                <Link className="text-sm text-muted-foreground hover:text-[#3F3EED]" href="/sensei">
+                  Sensei Mode
                 </Link>
               </li>
               <li>
-                <Link href="/learning-paths">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Learning Paths</a>
+                <Link className="text-sm text-muted-foreground hover:text-[#3F3EED]" href="/learning-paths">
+                  Learning Paths
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Dashboard</a>
+                <Link className="text-sm text-muted-foreground hover:text-[#3F3EED]" href="/dashboard">
+                  Dashboard
                 </Link>
               </li>
             </ul>
