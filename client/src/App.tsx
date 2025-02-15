@@ -9,11 +9,12 @@ import LearningPath from "@/pages/learning-path";
 import SenseiMode from "@/pages/sensei";
 import CookiePolicy from "@/pages/cookie-policy";
 import { DashboardPage } from "@/pages/dashboard";
+import BlogPage from "@/pages/blog";
 import { CookieConsent } from "@/components/cookie-consent";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Home as HomeIcon, Brain, Menu, LayoutDashboard } from "lucide-react";
+import { BookOpen, Home as HomeIcon, Brain, Menu, LayoutDashboard, BookText } from "lucide-react";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Terms from "@/pages/terms";
@@ -60,6 +61,16 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
         >
           <LayoutDashboard className="h-4 w-4" />
           Progress
+        </Button>
+      </Link>
+      <Link href="/blog">
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2"
+          onClick={onNavigate}
+        >
+          <BookText className="h-4 w-4" />
+          Blog
         </Button>
       </Link>
     </>
@@ -233,6 +244,11 @@ function Router() {
           <Route path="/sensei">
             <div data-page="sensei">
               <SenseiMode />
+            </div>
+          </Route>
+          <Route path="/blog">
+            <div data-page="blog">
+              <BlogPage />
             </div>
           </Route>
           <Route path="/cookie-policy">
