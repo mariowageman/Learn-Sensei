@@ -88,7 +88,7 @@ export default function LearningPath() {
   } as const;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background progress-page">
       <div className="container max-w-6xl mx-auto px-6 py-6 space-y-6">
         <div className="space-y-4">
           <div className="flex flex-col gap-2">

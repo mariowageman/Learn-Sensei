@@ -13,6 +13,13 @@
     color: #283951;
   }
 
+  .progress-page h1,
+  .progress-page h2,
+  .progress-page h3,
+  .progress-page h4 {
+    color: #111C2A;
+  }
+
   .dark body {
     background-color: #111C2A;
   }
