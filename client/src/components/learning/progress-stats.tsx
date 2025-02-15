@@ -139,7 +139,7 @@ export function ProgressStats({ subject }: ProgressStatsProps) {
                     }}
                   >
                     <div
-                      className="absolute bottom-0 w-full bg-[#3F3EED] rounded-sm"
+                      className="absolute bottom-0 w-full bg-gradient-to-r from-green-500 to-green-600 rounded-sm"
                       style={{
                         height: `${(day.correct / day.total) * 100}%`
                       }}

@@ -108,7 +108,7 @@ export function DashboardPage() {
               </div>
               <Progress 
                 value={subject.accuracy}
-                className="mt-4 bg-gray-100 [&>[role=progressbar]]:bg-[#3F3EED]"
+                className="mt-4 bg-gray-100 [&>[role=progressbar]]:bg-gradient-to-r [&>[role=progressbar]]:from-green-500 [&>[role=progressbar]]:to-green-600"
               />
             </Card>
           ))}
