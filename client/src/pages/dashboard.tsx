@@ -137,7 +137,7 @@ export function DashboardPage() {
 
         {/* Unified Learning History */}
         <div className="p-4">
-          <h2 className="text-2xl font-semibold text-[#111C2A]">Learning History</h2>
+          <h2 className="text-2xl font-semibold text-[#111C2A] mb-6">Learning History</h2>
           <ProgressStats subject="all" />
         </div>
       </div>
