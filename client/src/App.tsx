@@ -19,6 +19,7 @@ import { ThemeProvider } from "@/lib/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
+import BlogPost from "@/pages/blog-post";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -249,6 +250,11 @@ function Router() {
           <Route path="/blog">
             <div data-page="blog">
               <BlogPage />
+            </div>
+          </Route>
+          <Route path="/blog/:id">
+            <div data-page="blog-post">
+              <BlogPost />
             </div>
           </Route>
           <Route path="/cookie-policy">
