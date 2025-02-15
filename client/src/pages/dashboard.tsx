@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Brain, Target, Award, Book, TrendingUp } from "lucide-react";
+import { Brain, Target, Award, Book } from "lucide-react";
 import { ProgressStats } from "@/components/learning/progress-stats";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Footer } from "@/components/footer";
@@ -23,12 +23,6 @@ interface DashboardData {
     currentStreak: number;
   };
   subjectPerformance: SubjectPerformance[];
-  weeklyProgress: {
-    date: string;
-    correct: number;
-    total: number;
-  }[];
-  avgAccuracy: number;
 }
 
 export function DashboardPage() {
