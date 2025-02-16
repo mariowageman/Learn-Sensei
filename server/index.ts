@@ -3,43 +3,20 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { authHandler } from "./auth";
 import path from "path";
-import fs from "fs";
+
+console.log('Starting server initialization...');
 
 const app = express();
+console.log('Express app created');
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+console.log('Basic middleware configured');
 
 // Add auth middleware before other routes
+console.log('Setting up auth middleware...');
 app.use(authHandler);
-
-// Serve static files from public directory with proper MIME types
-app.use(express.static(path.join(process.cwd(), 'public'), {
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.png')) {
-      res.setHeader('Content-Type', 'image/png');
-    }
-  }
-}));
-
-// Also serve static files from client/public directory
-app.use('/public', express.static(path.join(process.cwd(), 'client', 'public'), {
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.png')) {
-      res.setHeader('Content-Type', 'image/png');
-    }
-  }
-}));
-
-// Debug endpoint to check if the file exists
-app.get('/debug/check-logo', (req, res) => {
-  const logoPath = path.join(process.cwd(), 'client', 'public', 'learn-sensei-logo-icon.png');
-  const exists = fs.existsSync(logoPath);
-  res.json({
-    exists,
-    path: logoPath,
-    size: exists ? fs.statSync(logoPath).size : null
-  });
-});
+console.log('Auth middleware configured');
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -70,26 +47,74 @@ app.use((req, res, next) => {
 
   next();
 });
+console.log('Request logging middleware configured');
 
 (async () => {
-  const server = registerRoutes(app);
+  try {
+    console.log('Registering routes...');
+    const server = registerRoutes(app);
+    console.log('Routes registered successfully');
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+      console.error('Error handler caught:', err);
+      res.status(status).json({ message });
+      throw err;
+    });
 
-    res.status(status).json({ message });
-    throw err;
-  });
+    // Serve static files after routes are registered
+    console.log('Setting up static file serving...');
+    app.use(express.static(path.join(process.cwd(), 'public'), {
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.png')) {
+          res.setHeader('Content-Type', 'image/png');
+        }
+      }
+    }));
 
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+    app.use('/public', express.static(path.join(process.cwd(), 'client', 'public'), {
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.png')) {
+          res.setHeader('Content-Type', 'image/png');
+        }
+      }
+    }));
+    console.log('Static file serving configured');
+
+    // Get port from environment or use fallback ports
+    const PORT = process.env.PORT || 3000;
+    console.log(`Attempting to start server on port ${PORT}...`);
+
+    try {
+      await new Promise((resolve, reject) => {
+        server.listen(PORT, "0.0.0.0", () => {
+          console.log(`Server successfully started and listening on port ${PORT}`);
+          resolve(true);
+        }).on('error', (err: any) => {
+          console.error('Server error:', err);
+          reject(err);
+        });
+      });
+
+      // Server started successfully, now set up Vite
+      if (app.get("env") === "development") {
+        console.log('Setting up Vite in development mode...');
+        await setupVite(app, server);
+        console.log('Vite setup complete');
+      } else {
+        console.log('Setting up static serving in production mode...');
+        serveStatic(app);
+        console.log('Static serving setup complete');
+      }
+
+      console.log('Server initialization complete - ready to handle requests');
+    } catch (error) {
+      console.error('Fatal error starting server:', error);
+      process.exit(1);
+    }
+  } catch (error) {
+    console.error('Fatal server error:', error);
+    process.exit(1);
   }
-
-  const PORT = 5000;
-  server.listen(PORT, "0.0.0.0", () => {
-    log(`serving on port ${PORT}`);
-  });
 })();
