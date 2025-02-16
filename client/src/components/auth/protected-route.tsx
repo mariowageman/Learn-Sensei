@@ -1,17 +1,30 @@
-
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/lib/auth-context';
+import { useAuth } from "@/lib/auth-context";
+import { Loader2 } from "lucide-react";
+import { Route, useLocation } from "wouter";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  path: string;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user } = useAuth();
+export function ProtectedRoute({ children, path }: ProtectedRouteProps) {
+  const { user, isLoading } = useAuth();
+  const [, setLocation] = useLocation();
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  if (isLoading) {
+    return (
+      <Route path={path}>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-border" />
+        </div>
+      </Route>
+    );
   }
 
-  return <>{children}</>;
+  if (!user) {
+    setLocation("/auth");
+    return null;
+  }
+
+  return <Route path={path}>{children}</Route>;
 }

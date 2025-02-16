@@ -21,6 +21,10 @@ import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
 import BlogPost from "@/pages/blog-post";
 import { useScrollTop } from "@/hooks/use-scroll-top";
+import { ProtectedRoute } from '@/components/auth/protected-route';
+import { UserMenu } from '@/components/auth/user-menu';
+import { AuthProvider } from '@/lib/auth-context';
+import AuthPage from "@/pages/auth";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -230,29 +234,34 @@ function Router() {
       <Navigation />
       <div className="flex flex-col min-h-screen">
         <Switch>
-          <Route path="/">
-            <div data-page="home">
-              <Home />
+          <Route path="/auth">
+            <div data-page="auth">
+              <AuthPage />
             </div>
           </Route>
-          <Route path="/dashboard">
+          <ProtectedRoute path="/dashboard">
             <div data-page="dashboard">
               <DashboardPage />
             </div>
-          </Route>
-          <Route path="/learning-paths">
+          </ProtectedRoute>
+          <ProtectedRoute path="/learning-paths">
             <div data-page="learning-paths">
               <LearningPaths />
             </div>
-          </Route>
-          <Route path="/learning-paths/:id">
+          </ProtectedRoute>
+          <ProtectedRoute path="/learning-paths/:id">
             <div data-page="learning-paths">
               <LearningPath />
             </div>
-          </Route>
-          <Route path="/sensei">
+          </ProtectedRoute>
+          <ProtectedRoute path="/sensei">
             <div data-page="sensei">
               <SenseiMode />
+            </div>
+          </ProtectedRoute>
+          <Route path="/">
+            <div data-page="home">
+              <Home />
             </div>
           </Route>
           <Route path="/blog">
@@ -292,8 +301,6 @@ function Router() {
   );
 }
 
-import { AuthProvider } from './lib/auth-context';
-
 function App() {
   return (
     <AuthProvider>
@@ -308,23 +315,3 @@ function App() {
 }
 
 export default App;
-
-// UserMenu Component (needs implementation)
-function UserMenu() {
-  // Implement login/register functionality here
-  return (
-    <div className="relative">
-      <button className="flex items-center">
-        {/* User icon here */}
-        <span className="ml-2">User</span>
-      </button>
-
-      {/* Dropdown menu (for logged-in users) */}
-      <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-lg">
-        <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
-        <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Settings</a>
-        <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
-      </div>
-    </div>
-  );
-}
