@@ -22,7 +22,7 @@ import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -35,7 +35,7 @@ export function LoginForm() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -74,7 +74,7 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle>Welcome back</CardTitle>
         <CardDescription>
-          Enter your email and password to login to your account
+          Enter your username and password to login to your account
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -82,14 +82,13 @@ export function LoginForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="email"
+              name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
                     <Input
-                      type="email"
-                      placeholder="Enter your email"
+                      placeholder="Enter your username"
                       {...field}
                       disabled={form.formState.isSubmitting}
                     />
