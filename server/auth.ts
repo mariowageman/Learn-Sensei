@@ -45,6 +45,7 @@ router.post("/api/auth/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
+    req.session.userId = user.id;
     res.json({ id: user.id, email: user.email });
   } catch (error) {
     res.status(401).json({ error: "Login failed" });
