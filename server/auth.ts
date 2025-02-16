@@ -1,10 +1,33 @@
 
-import { Router } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { db } from "@db";
 import { users } from "@db/schema";
 import bcrypt from "bcrypt";
 
 const router = Router();
+
+export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.session.userId;
+  
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  try {
+    const user = await db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.id, userId)
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(500).json({ error: "Authentication failed" });
+  }
+};
 
 router.post("/api/auth/register", async (req, res) => {
   const { email, password } = req.body;

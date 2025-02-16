@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { requireAuth } from "./auth";
 import { generateExplanation, generateQuestion, checkAnswer } from "./openai";
 import { db } from "@db";
 import { eq, and, desc, sql } from "drizzle-orm";
