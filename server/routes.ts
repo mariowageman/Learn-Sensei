@@ -2,8 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { generateExplanation, generateQuestion, checkAnswer } from "./openai";
 import { db } from "@db";
-import { eq, and, desc, sql } from "drizzle-orm";
-import { requireAuth, getOrCreateUser } from "./auth";
+import { eq, and, desc, sql, gt, lt } from "drizzle-orm";
 import {
   sessions,
   messages,
@@ -12,10 +11,9 @@ import {
   learningPaths,
   learningPathProgress,
   progressAnalytics,
-  subjectHistory,
-  users,
+  subjectHistory
 } from "@db/schema";
-import { fetchCourseraCourses } from "./coursera";
+import { fetchCourseraCourses, type CourseraCourse } from "./coursera";
 import { generateRSSFeed } from "../client/src/lib/rss";
 
 export function registerRoutes(app: Express): Server {
@@ -28,7 +26,7 @@ export function registerRoutes(app: Express): Server {
       const baseUrl = `${protocol}://${req.get('host')}`;
       const feed = generateRSSFeed(baseUrl);
       res.set('Content-Type', 'application/xml');
-      res.attachment('feed.xml');
+      res.attachment('feed.xml');  // This will force download
       res.send(feed);
     } catch (error) {
       console.error('Error generating RSS feed:', error);
@@ -36,129 +34,48 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Auth status endpoint
-  app.get("/api/auth/status", (req, res) => {
-    if (!req.user) {
-      return res.json({ authenticated: false, user: null });
-    }
-
-    return res.json({
-      authenticated: true,
-      user: {
-        id: req.user.id,
-        name: req.user.name,
-        profileImage: req.user.profileImage
-      }
+  app.get("/api/session", async (req, res) => {
+    const session = await db.query.sessions.findFirst({
+      orderBy: (sessions, { desc }) => [desc(sessions.createdAt)]
     });
+    res.json(session);
   });
 
-  // Protected routes
-  app.get("/api/session", requireAuth, async (req, res) => {
-    try {
-      const user = await getOrCreateUser(req);
-      if (!user) {
-        return res.status(401).json({ error: "User not found" });
-      }
-
-      const session = await db.query.sessions.findFirst({
-        where: eq(sessions.userId, user.id),
-        orderBy: [desc(sessions.createdAt)]
-      });
-
-      res.json(session);
-    } catch (error) {
-      console.error('Error fetching session:', error);
-      res.status(500).json({ error: "Failed to fetch session" });
-    }
+  app.get("/api/messages/:subject", async (req, res) => {
+    const { subject } = req.params;
+    const sessionMessages = await db.query.messages.findMany({
+      where: eq(messages.subject, subject),
+      orderBy: (messages, { asc }) => [asc(messages.createdAt)]
+    });
+    res.json(sessionMessages);
   });
 
-  app.post("/api/session", requireAuth, async (req, res) => {
-    try {
-      const user = await getOrCreateUser(req);
-      if (!user) {
-        return res.status(401).json({ error: "User not found" });
-      }
+  app.post("/api/messages", async (req, res) => {
+    const { subject, message } = req.body;
+    const response = await generateExplanation(subject);
 
-      const { subject } = req.body;
+    await db.insert(messages).values([
+      { role: "user", content: message, subject },
+      { role: "assistant", content: response.explanation, subject }
+    ]);
 
-      // Save to session
-      const [session] = await db.insert(sessions).values({
-        subject,
-        userId: user.id
-      }).returning();
-
-      // Save to history
-      await db.insert(subjectHistory).values({
-        subject,
-        userId: user.id
-      });
-
-      res.json(session);
-    } catch (error) {
-      console.error('Error creating session:', error);
-      res.status(500).json({ error: "Failed to create session" });
-    }
+    res.json({ success: true });
   });
 
-  app.get("/api/messages/:subject", requireAuth, async (req, res) => {
-    try {
-      const user = await getOrCreateUser(req);
-      if (!user) {
-        return res.status(401).json({ error: "User not found" });
-      }
-
-      const { subject } = req.params;
-      const sessionMessages = await db.query.messages.findMany({
-        where: and(
-          eq(messages.subject, subject),
-          eq(messages.userId, user.id)
-        ),
-        orderBy: (messages, { asc }) => [asc(messages.createdAt)]
-      });
-      res.json(sessionMessages);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-      res.status(500).json({ error: "Failed to fetch messages" });
-    }
-  });
-
-  app.post("/api/messages", requireAuth, async (req, res) => {
-    try {
-      const user = await getOrCreateUser(req);
-      if (!user) {
-        return res.status(401).json({ error: "User not found" });
-      }
-
-      const { subject, message } = req.body;
-      const response = await generateExplanation(subject);
-
-      await db.insert(messages).values([
-        { role: "user", content: message, subject, userId: user.id },
-        { role: "assistant", content: response.explanation, subject, userId: user.id }
-      ]);
-
-      res.json({ success: true });
-    } catch (error) {
-      console.error('Error creating message:', error);
-      res.status(500).json({ error: "Failed to create message" });
-    }
-  });
-
-  app.get("/api/quiz/:subject", requireAuth, async (req, res) => {
+  app.get("/api/quiz/:subject", async (req, res) => {
     const { subject } = req.params;
     const question = await generateQuestion(subject);
 
     const [savedQuestion] = await db.insert(quizQuestions).values({
       text: question.question,
       answer: question.answer,
-      subject,
-      userId: req.user!.dbId
+      subject
     }).returning();
 
     res.json(savedQuestion);
   });
 
-  app.post("/api/quiz/check", requireAuth, async (req, res) => {
+  app.post("/api/quiz/check", async (req, res) => {
     const { questionId, answer, timeSpent } = req.body;
 
     const question = await db.query.quizQuestions.findFirst({
@@ -196,7 +113,6 @@ export function registerRoutes(app: Express): Server {
       if (!pathProgress) {
         const [newProgress] = await db.insert(learningPathProgress).values({
           pathId: learningPath.id,
-          userId: req.user!.dbId,
           currentTopic: 0,
           completed: false,
           completedTopics: [],
@@ -237,7 +153,6 @@ export function registerRoutes(app: Express): Server {
       // Save quiz progress
       await db.insert(quizProgress).values({
         questionId,
-        userId: req.user!.dbId,
         subject: question.subject,
         isCorrect: result.correct,
         userAnswer: answer,
@@ -260,16 +175,14 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.get("/api/progress/:subject", requireAuth, async (req, res) => {
+  app.get("/api/progress/:subject", async (req, res) => {
     const { subject } = req.params;
     try {
       let progressQuery = db.query.quizProgress;
       let whereClause = undefined;
 
       if (subject !== 'all') {
-        whereClause = and(eq(quizProgress.subject, subject), eq(quizProgress.userId, req.user!.dbId));
-      } else {
-        whereClause = eq(quizProgress.userId, req.user!.dbId);
+        whereClause = eq(quizProgress.subject, subject);
       }
 
       const progress = await progressQuery.findMany({
@@ -302,11 +215,11 @@ export function registerRoutes(app: Express): Server {
       let streakDays = 0;
 
       learningPaths.forEach(path => {
-        const userProgress = path.progress?.find(p => p.userId === req.user!.dbId);
-        if (userProgress) {
-          const timeSpentObj = userProgress.timeSpentMinutes as Record<string, number>;
+        if (path.progress?.[0]) {
+          const pathProgress = path.progress[0];
+          const timeSpentObj = pathProgress.timeSpentMinutes as Record<string, number>;
           timeSpentMinutes += Object.values(timeSpentObj).reduce((sum, time) => sum + (time || 0), 0);
-          streakDays = Math.max(streakDays, userProgress.streakDays || 0);
+          streakDays = Math.max(streakDays, pathProgress.streakDays || 0);
         }
       });
 
@@ -362,7 +275,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Learning Paths routes
-  app.get("/api/learning-paths", requireAuth, async (req, res) => {
+  app.get("/api/learning-paths", async (req, res) => {
     try {
       const subject = req.query.subject as string | undefined;
       const recommended = req.query.recommended === 'true';
@@ -370,14 +283,12 @@ export function registerRoutes(app: Express): Server {
       if (recommended) {
         // Get user's recent subjects from history
         const recentSubjects = await db.query.subjectHistory.findMany({
-          where: eq(subjectHistory.userId, req.user!.dbId),
           orderBy: (history, { desc }) => [desc(history.createdAt)],
           limit: 5
         });
 
         // Get quiz performance data to identify areas for improvement
         const quizPerformance = await db.query.quizProgress.findMany({
-          where: eq(quizProgress.userId, req.user!.dbId),
           orderBy: (quiz, { desc }) => [desc(quiz.createdAt)]
         });
 
@@ -551,7 +462,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.get("/api/learning-paths/:id", requireAuth, async (req, res) => {
+  app.get("/api/learning-paths/:id", async (req, res) => {
     const { id } = req.params;
     try {
       const path = await db.query.learningPaths.findFirst({
@@ -572,14 +483,13 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.post("/api/learning-paths/:id/progress", requireAuth, async (req, res) => {
+  app.post("/api/learning-paths/:id/progress", async (req, res) => {
     const { id } = req.params;
     const { topicIndex } = req.body;
 
     try {
       const [progress] = await db.insert(learningPathProgress).values({
         pathId: parseInt(id),
-        userId: req.user!.dbId,
         currentTopic: topicIndex,
         completed: false,
         completedTopics: sql`'[]'::jsonb`,
@@ -596,14 +506,14 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.patch("/api/learning-paths/:id/progress", requireAuth, async (req, res) => {
+  app.patch("/api/learning-paths/:id/progress", async (req, res) => {
     const { id } = req.params;
     const { completedTopic, timeSpentMinutes } = req.body;
 
     try {
       // Get current progress
       const currentProgress = await db.query.learningPathProgress.findFirst({
-        where: and(eq(learningPathProgress.pathId, parseInt(id)), eq(learningPathProgress.userId, req.user!.dbId)),
+        where: eq(learningPathProgress.pathId, parseInt(id)),
         orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
       });
 
@@ -666,7 +576,6 @@ export function registerRoutes(app: Express): Server {
       // Update analytics
       await db.insert(progressAnalytics).values({
         pathId: parseInt(id),
-        userId: req.user!.dbId,
         date: today,
         topicsCompleted: updatedCompletedTopics.length,
         timeSpentMinutes: timeSpentMinutes || 0,
@@ -682,23 +591,20 @@ export function registerRoutes(app: Express): Server {
   });
 
 
-  app.get("/api/recommendations", requireAuth, async (req, res) => {
+  app.get("/api/recommendations", async (req, res) => {
     try {
       // Get user's progress across all learning paths
       const progress = await db.query.learningPathProgress.findMany({
-        where: eq(learningPathProgress.userId, req.user!.dbId),
         orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
       });
 
       // Get quiz performance data
       const quizPerformance = await db.query.quizProgress.findMany({
-        where: eq(quizProgress.userId, req.user!.dbId),
         orderBy: (quiz, { desc }) => [desc(quiz.createdAt)]
       });
 
       // Get subject history
       const subjectHistory = await db.query.subjectHistory.findMany({
-        where: eq(subjectHistory.userId, req.user!.dbId),
         orderBy: (history, { desc }) => [desc(history.createdAt)]
       });
 
@@ -759,10 +665,9 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.get("/api/recent-subjects", requireAuth, async (req, res) => {
+  app.get("/api/recent-subjects", async (req, res) => {
     try {
       const recentSubjects = await db.query.subjectHistory.findMany({
-        where: eq(subjectHistory.userId, req.user!.dbId),
         orderBy: (history, { desc }) => [desc(history.createdAt)],
         limit: 10
       });
@@ -773,12 +678,31 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.post("/api/session", async (req, res) => {
+    const { subject } = req.body;
 
-  app.get("/api/dashboard", requireAuth, async (req, res) => {
+    try {
+      // Save to session
+      const [session] = await db.insert(sessions).values({
+        subject
+      }).returning();
+
+      // Save to history
+      await db.insert(subjectHistory).values({
+        subject
+      });
+
+      res.json(session);
+    } catch (error) {
+      console.error('Error creating session:', error);
+      res.status(500).json({ error: "Failed to create session" });
+    }
+  });
+
+  app.get("/api/dashboard", async (req, res) => {
     try {
       // Get all quiz attempts
       const quizAttempts = await db.query.quizProgress.findMany({
-        where: eq(quizProgress.userId, req.user!.dbId),
         orderBy: (progress, { desc }) => [desc(progress.createdAt)]
       });
 
@@ -809,7 +733,6 @@ export function registerRoutes(app: Express): Server {
 
       // Get the current learning streak
       const pathProgress = await db.query.learningPathProgress.findMany({
-        where: eq(learningPathProgress.userId, req.user!.dbId),
         orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
       });
 
@@ -965,5 +888,3 @@ function generateRecommendationReason(
 
   return `This ${path.difficulty} level course in ${mainTopic} aligns well with your learning progress.`;
 }
-
-//Removed duplicate function

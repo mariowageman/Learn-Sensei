@@ -4,7 +4,6 @@
   "compilerOptions": {
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
-    "target": "es2015",
     "noEmit": true,
     "module": "ESNext",
     "strict": true,
@@ -14,9 +13,8 @@
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "moduleResolution": "bundler",
-    "downlevelIteration": true,
     "baseUrl": ".",
-    "types": ["node", "vite/client", "@replit/repl-auth"],
+    "types": ["node", "vite/client"],
     "paths": {
       "@db": ["./db/index.ts"],
       "@db/*": ["./db/*"],
