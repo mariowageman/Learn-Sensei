@@ -20,6 +20,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
 import BlogPost from "@/pages/blog-post";
+import { useScrollTop } from "@/hooks/use-scroll-top";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -217,6 +218,7 @@ function Navigation() {
 }
 
 function Router() {
+  useScrollTop();
   return (
     <>
       <Navigation />
