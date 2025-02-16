@@ -11,24 +11,29 @@ import {
   learningPaths,
   learningPathProgress,
   progressAnalytics,
-  subjectHistory
+  subjectHistory,
+  users
 } from "@db/schema";
-import { fetchCourseraCourses, type CourseraCourse } from "./coursera";
+import { fetchCourseraCourses } from "./coursera";
 import { generateRSSFeed } from "../client/src/lib/rss";
 import { authClass } from './auth';
-import { users } from '@db/schema';
-import { eq } from 'drizzle-orm';
 import session from 'express-session';
-import connectPgSimple from 'connect-pg-simple';
 import { pool } from '@db';
+import connectPgSimple from 'connect-pg-simple';
+
+// Extend express-session to include userId
+declare module 'express-session' {
+  interface SessionData {
+    userId: number;
+  }
+}
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
-  const PgSession = connectPgSimple(session);
 
   // Add session middleware
   app.use(session({
-    store: new PgSession({
+    store: new connectPgSimple(session)({
       pool,
       tableName: 'sessions'
     }),
@@ -916,7 +921,7 @@ function calculateConfidenceScore(
   // Quiz performance (up to 10%)
   score += quizAccuracy * 0.10;
 
-  // Time investment factor (upto 5%)
+  // Time investment factor (upto5%)
   const engagementScore = Math.min(timeSpent / (path.estimatedHours * 60), 1);
   score += engagementScore * 0.05;
 
@@ -968,36 +973,78 @@ function generateRecommendationReason(
   }
 
   const completedTopics = progress.completedTopics as number[];
-  const completedCount = completedTopics.length;
+  const totalTopics = topics.length;
+  const progressPercentage = (completedTopics.length / totalTopics) * 100;
 
-  // Tailor message based on user's progress and course difficulty
-  if (path.difficulty === 'beginner') {
-    if (completedCount === 0) {
-      return `Perfect first step! Start your journey with this beginner-friendly ${mainTopic} course.`;
-    }
-    return `Strengthen your basics with this foundational course in ${mainTopic}.`;
-  }
-
-  if (path.difficulty === 'intermediate') {
-    if (completedCount >= 2) {
-      return `Ready for the next level! Your strong performance in basic courses makes this intermediate ${mainTopic} course a perfect match.`;
-    }
-    return `Level up your skills with this intermediate course in ${mainTopic}.`;
-  }
-
-  if (path.difficulty === 'advanced') {
-    if (completedCount >= 4) {
-      return `Challenge yourself! Your mastery of intermediate topics makes you ready for this advanced ${mainTopic} course.`;
-    }
-    if (quizAccuracy > 0.8) {
-      return `Your exceptional quiz performance (${Math.round(quizAccuracy * 100)}% accuracy) shows you're ready for this advanced material.`;
-    }
-  }
-
-  // General recommendation based on learning streak
-  if (progress.streakDays >= 7) {
-    return `Keep your ${progress.streakDays}-day learning streak going! This ${path.difficulty} course in ${mainTopic} is perfect for your current level.`;
+  if (progressPercentage > 75) {
+    return `Ready for the next level! This ${mainTopic} course will build upon your strong foundation.`;
+  } else if (quizAccuracy < 0.6) {
+    return `This ${mainTopic} course will help strengthen your understanding of challenging concepts.`;
   }
 
   return `This ${path.difficulty} level course in ${mainTopic} aligns well with your learning progress.`;
+}
+
+function calculateRecommendationScore(
+  path: typeof learningPaths.$inferSelect,
+  quizAccuracy: number,
+  timeSpent: number,
+  progress?: typeof learningPathProgress.$inferSelect | null,
+  subjectHistory?: { subject: string }[] = []
+): number {
+  // Score calculation remains the same
+  let score = 0.70;
+
+  // Subject history bonus (up to 15%)
+  const topics = (path.topics as string[]) || [];
+  const mainTopic = topics[0]?.toLowerCase() || path.title.toLowerCase();
+  const hasSubjectHistory = subjectHistory?.some(
+    h => {
+      const historySubject = h.subject.toLowerCase();
+      const topicMatch = mainTopic.includes(historySubject) || historySubject.includes(mainTopic);
+      return topicMatch;
+    }
+  );
+  if (hasSubjectHistory) {
+    score += 0.15; // Higher match for subjects user has studied before
+  }
+
+  // Quiz performance (up to 10%)
+  score += quizAccuracy * 0.10;
+
+  // Time investment factor (upto 5%)
+  const engagementScore = Math.min(timeSpent / (path.estimatedHours * 60), 1);
+  score += engagementScore * 0.05;
+
+  // For new users or no progress
+  if (!progress) {
+    if (path.difficulty === 'beginner') {
+      score += 0.10; // Higher match for beginner courses
+    } else if (path.difficulty === 'intermediate') {
+      score += 0.05; // Medium match for intermediate courses
+    }
+    return Math.max(0.70, Math.min(1, score));
+  }
+
+  // Learning streak bonus (up to 5%)
+  const streakBonus = Math.min(progress.streakDays / 14, 1) * 0.05;
+  score += streakBonus;
+
+  // Topic mastery (up to 5%)
+  const completedTopics = progress.completedTopics as number[];
+  const topicMasteryScore = completedTopics.length / topics.length;
+  score += topicMasteryScore * 0.05;
+
+  // Difficulty progression (up to 5%)
+  if (path.difficulty === 'beginner' && completedTopics.length === 0) {
+    score += 0.05; // Perfect for beginners
+  } else if (path.difficulty === 'intermediate' && completedTopics.length >= 2) {
+    score += 0.05; // Ready for intermediate
+  } else if (path.difficulty === 'advanced' && completedTopics.length >= 4) {
+    score += 0.05; // Ready for advanced
+  }
+
+  // Ensure the score is between 70% and 100%
+  return Math.max(0.70, Math.min(1, score));
+}
 }

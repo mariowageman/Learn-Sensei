@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 interface User {
   id: number;
@@ -14,6 +14,7 @@ interface AuthContextType {
   error: Error | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  signup: (email: string, password: string, displayName: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -38,6 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (err) {
       setError(err as Error);
+      console.error('Auth check failed:', err);
     } finally {
       setLoading(false);
     }
@@ -72,6 +74,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: err instanceof Error ? err.message : "An error occurred",
       });
       setError(err as Error);
+      throw err;
+    }
+  };
+
+  const signup = async (email: string, password: string, displayName: string) => {
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, displayName }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to sign up');
+      }
+
+      const data = await response.json();
+      setUser(data.user);
+      setLocation('/dashboard');
+      toast({
+        title: "Welcome!",
+        description: "Your account has been created successfully.",
+      });
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Error signing up",
+        description: err instanceof Error ? err.message : "An error occurred",
+      });
+      setError(err as Error);
+      throw err;
     }
   };
 
@@ -86,11 +122,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (err) {
       setError(err as Error);
+      toast({
+        variant: "destructive",
+        title: "Error signing out",
+        description: "Failed to sign out. Please try again.",
+      });
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, login, logout, signup }}>
       {children}
     </AuthContext.Provider>
   );
