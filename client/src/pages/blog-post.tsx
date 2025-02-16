@@ -3,14 +3,21 @@ import { Footer } from "@/components/footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Clock, ArrowLeft } from "lucide-react";
+import { Clock, ArrowLeft, Edit } from "lucide-react";
 import { blogPosts, type BlogPost } from "./blog";
 import { calculateReadingTime } from "@/lib/utils";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ShareButtons } from "@/components/share-buttons";
+import { PostEditor } from "@/components/post-editor";
+import { useToast } from "@/hooks/use-toast";
+
+// Temporary admin check - replace with actual auth logic
+const isAdmin = true;
 
 export default function BlogPost() {
   const [, params] = useRoute("/blog/:id");
+  const [isEditing, setIsEditing] = useState(false);
+  const { toast } = useToast();
   const post = blogPosts.find((p: BlogPost) => p.id === params?.id);
 
   useEffect(() => {
@@ -37,6 +44,24 @@ export default function BlogPost() {
     );
   }
 
+  const handleSave = async (content: string) => {
+    try {
+      // TODO: Implement actual API call to save content
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      toast({
+        title: "Success",
+        description: "Blog post updated successfully",
+      });
+      setIsEditing(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update blog post",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Get related posts based on shared tags
   const relatedPosts = blogPosts
     .filter((p: BlogPost) => p.id !== post.id)
@@ -48,12 +73,23 @@ export default function BlogPost() {
       <article className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <Link href="/blog">
-              <Button variant="ghost" className="mb-4">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Blog
-              </Button>
-            </Link>
+            <div className="flex items-center justify-between mb-4">
+              <Link href="/blog">
+                <Button variant="ghost">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Blog
+                </Button>
+              </Link>
+              {isAdmin && !isEditing && (
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  variant="outline"
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit Post
+                </Button>
+              )}
+            </div>
             <div className="space-y-4">
               <div className="flex items-center gap-4 text-sm">
                 <Badge variant="secondary">{post.category}</Badge>
@@ -77,9 +113,17 @@ export default function BlogPost() {
             </AspectRatio>
           </div>
 
-          <div className="prose dark:prose-invert max-w-none mb-8">
-            {post.content}
-          </div>
+          {isEditing ? (
+            <PostEditor
+              initialContent={post.content}
+              onSave={handleSave}
+              onCancel={() => setIsEditing(false)}
+            />
+          ) : (
+            <div className="prose dark:prose-invert max-w-none mb-8">
+              {post.content}
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-2 mb-8">
             {post.tags.map((tag: string) => (
