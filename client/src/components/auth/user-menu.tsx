@@ -1,6 +1,7 @@
 
 import { useAuth } from "@/lib/auth-context";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { User as UserIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,12 +18,25 @@ export function UserMenu() {
 
   if (!user) {
     return (
-      <div className="flex gap-2">
-        <Button variant="ghost" onClick={() => navigate("/login")}>
-          Login
-        </Button>
-        <Button onClick={() => navigate("/register")}>Register</Button>
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="relative size-8">
+            <Avatar className="size-8">
+              <AvatarFallback>
+                <UserIcon className="size-4" />
+              </AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuItem onClick={() => navigate("/login")}>
+            Login
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/register")}>
+            Register
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
   }
 
