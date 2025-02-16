@@ -3,8 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BookOpen, ArrowRight, Timer, TrendingUp, Trophy } from "lucide-react";
+import { BookOpen, ArrowRight, Timer, Trophy } from "lucide-react";
 import { Link } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 
 interface Recommendation {
   pathId: number;
@@ -23,9 +24,18 @@ const difficultyColors = {
 } as const;
 
 export function LearningRecommendations() {
-  const { data: recommendations, isLoading } = useQuery<Recommendation[]>({
+  const { toast } = useToast();
+  const { data: recommendations, isLoading, error } = useQuery<Recommendation[]>({
     queryKey: ["/api/recommendations"],
     refetchInterval: 300000, // Refresh every 5 minutes
+    onError: (err) => {
+      toast({
+        variant: "destructive",
+        title: "Error loading recommendations",
+        description: "Please try again later",
+      });
+      console.error("Failed to load recommendations:", err);
+    },
   });
 
   if (isLoading) {
@@ -38,6 +48,16 @@ export function LearningRecommendations() {
           ))}
         </div>
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="p-6">
+        <p className="text-muted-foreground">
+          Unable to load recommendations. Please try again later.
+        </p>
+      </Card>
     );
   }
 
