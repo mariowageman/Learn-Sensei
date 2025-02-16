@@ -106,7 +106,8 @@ app.use((req, res, next) => {
   }
 
   const PORT = 3000;
-  server.listen(PORT, "0.0.0.0", () => {
-    log(`serving on port ${PORT}`);
+  const HOST = "0.0.0.0";
+  server.listen(PORT, HOST, () => {
+    log(`serving on ${HOST}:${PORT}`);
   });
 })();
