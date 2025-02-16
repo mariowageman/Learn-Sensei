@@ -1,7 +1,17 @@
-import { pgTable, text, serial, timestamp, boolean, integer, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, boolean, integer, jsonb, varchar } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
+
+// Users table without Google-specific fields
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  displayName: varchar("display_name", { length: 255 }).notNull(),
+  passwordHash: text("password_hash").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
 
 // Keep existing table definitions
 export const sessions = pgTable("sessions", {
@@ -40,9 +50,9 @@ export const learningPaths = pgTable("learning_paths", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  difficulty: text("difficulty").notNull(), 
-  topics: jsonb("topics").notNull(), 
-  prerequisites: jsonb("prerequisites").notNull(), 
+  difficulty: text("difficulty").notNull(),
+  topics: jsonb("topics").notNull(),
+  prerequisites: jsonb("prerequisites").notNull(),
   estimatedHours: integer("estimated_hours").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
@@ -50,6 +60,7 @@ export const learningPaths = pgTable("learning_paths", {
 export const learningPathProgress = pgTable("learning_path_progress", {
   id: serial("id").primaryKey(),
   pathId: integer("path_id").references(() => learningPaths.id),
+  userId: integer("user_id").references(() => users.id), 
   currentTopic: integer("current_topic").notNull(),
   completed: boolean("completed").notNull().default(false),
   completedTopics: jsonb("completed_topics").notNull(),
@@ -86,6 +97,10 @@ export const learningPathProgressRelations = relations(learningPathProgress, ({ 
   path: one(learningPaths, {
     fields: [learningPathProgress.pathId],
     references: [learningPaths.id],
+  }),
+  user: one(users, {
+    fields: [learningPathProgress.userId],
+    references: [users.id],
   })
 }));
 
@@ -107,6 +122,11 @@ export const quizProgressRelations = relations(quizProgress, ({ one }) => ({
   })
 }));
 
+export const usersRelations = relations(users, ({ many }) => ({
+  learningPaths: many(learningPathProgress)
+}));
+
+
 export const insertSessionSchema = createInsertSchema(sessions);
 export const selectSessionSchema = createSelectSchema(sessions);
 export const insertMessageSchema = createInsertSchema(messages);
@@ -123,6 +143,8 @@ export const insertProgressAnalyticsSchema = createInsertSchema(progressAnalytic
 export const selectProgressAnalyticsSchema = createSelectSchema(progressAnalytics);
 export const insertSubjectHistorySchema = createInsertSchema(subjectHistory);
 export const selectSubjectHistorySchema = createSelectSchema(subjectHistory);
+export const insertUserSchema = createInsertSchema(users);
+export const selectUserSchema = createSelectSchema(users);
 
 export type Session = typeof sessions.$inferSelect;
 export type Message = typeof messages.$inferSelect;
@@ -132,3 +154,4 @@ export type LearningPath = typeof learningPaths.$inferSelect;
 export type LearningPathProgress = typeof learningPathProgress.$inferSelect;
 export type ProgressAnalytics = typeof progressAnalytics.$inferSelect;
 export type SubjectHistory = typeof subjectHistory.$inferSelect;
+export type User = typeof users.$inferSelect;

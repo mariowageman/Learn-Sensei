@@ -15,9 +15,122 @@ import {
 } from "@db/schema";
 import { fetchCourseraCourses, type CourseraCourse } from "./coursera";
 import { generateRSSFeed } from "../client/src/lib/rss";
+import { authClass } from './auth';
+import { users } from '@db/schema';
+import { eq } from 'drizzle-orm';
+import session from 'express-session';
+import connectPgSimple from 'connect-pg-simple';
+import { pool } from '@db';
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
+  const PgSession = connectPgSimple(session);
+
+  // Add session middleware
+  app.use(session({
+    store: new PgSession({
+      pool,
+      tableName: 'sessions'
+    }),
+    secret: process.env.AUTH_SECRET!,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    }
+  }));
+
+  // Auth routes
+  app.post('/api/auth/signup', async (req, res) => {
+    const { email, password, displayName } = req.body;
+
+    try {
+      const existingUser = await db.query.users.findFirst({
+        where: eq(users.email, email)
+      });
+
+      if (existingUser) {
+        return res.status(400).json({ message: 'Email already registered' });
+      }
+
+      const [user] = await authClass.createUser(email, password, displayName);
+      req.session.userId = user.id;
+
+      res.json({
+        user: {
+          id: user.id,
+          email: user.email,
+          displayName: user.displayName
+        }
+      });
+    } catch (error) {
+      console.error('Signup error:', error);
+      res.status(500).json({ message: 'Error creating user' });
+    }
+  });
+
+  app.post('/api/auth/signin', async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+      const user = await authClass.validateUser(email, password);
+      if (!user) {
+        return res.status(401).json({ message: 'Invalid email or password' });
+      }
+
+      req.session.userId = user.id;
+      res.json({
+        user: {
+          id: user.id,
+          email: user.email,
+          displayName: user.displayName
+        }
+      });
+    } catch (error) {
+      console.error('Signin error:', error);
+      res.status(500).json({ message: 'Error signing in' });
+    }
+  });
+
+  app.post('/api/auth/signout', (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Signout error:', err);
+        return res.status(500).json({ message: 'Error signing out' });
+      }
+      res.json({ success: true });
+    });
+  });
+
+  app.get('/api/auth/session', async (req, res) => {
+    const userId = req.session.userId;
+    if (!userId) {
+      return res.json({ user: null });
+    }
+
+    try {
+      const user = await db.query.users.findFirst({
+        where: eq(users.id, userId)
+      });
+
+      if (!user) {
+        return res.json({ user: null });
+      }
+
+      res.json({
+        user: {
+          id: user.id,
+          email: user.email,
+          displayName: user.displayName
+        }
+      });
+    } catch (error) {
+      console.error('Session check error:', error);
+      res.status(500).json({ message: 'Error checking session' });
+    }
+  });
 
   // Add RSS feed endpoint
   app.get("/feed.xml", (req, res) => {
@@ -803,7 +916,7 @@ function calculateConfidenceScore(
   // Quiz performance (up to 10%)
   score += quizAccuracy * 0.10;
 
-  // Time investment factor (up to 5%)
+  // Time investment factor (upto 5%)
   const engagementScore = Math.min(timeSpent / (path.estimatedHours * 60), 1);
   score += engagementScore * 0.05;
 

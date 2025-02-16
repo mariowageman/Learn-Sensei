@@ -4,6 +4,12 @@ import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
 import fs from "fs";
 
+// Add startup logging
+console.log('Starting server initialization...');
+console.log('Environment variables check:');
+console.log('- DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'Not set');
+console.log('- AUTH_SECRET:', process.env.AUTH_SECRET ? 'Set' : 'Not set');
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -68,24 +74,30 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  console.log('Setting up routes and server...');
   const server = registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    console.error('Error in middleware:', err);
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
     res.status(status).json({ message });
-    throw err;
   });
 
   if (app.get("env") === "development") {
+    console.log('Setting up Vite in development mode...');
     await setupVite(app, server);
   } else {
+    console.log('Setting up static serving in production mode...');
     serveStatic(app);
   }
 
   const PORT = 5000;
   server.listen(PORT, "0.0.0.0", () => {
-    log(`serving on port ${PORT}`);
+    console.log(`Server started successfully on port ${PORT}`);
   });
-})();
+})().catch(err => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
+});

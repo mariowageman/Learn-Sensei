@@ -20,8 +20,12 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
 import BlogPost from "@/pages/blog-post";
+import { AuthProvider, useAuth } from "@/lib/auth";
+import { LoginPage } from "@/pages/LoginPage";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
+  const { user, logout } = useAuth();
+
   return (
     <>
       <Link href="/">
@@ -74,6 +78,18 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
           Blog
         </Button>
       </Link>
+      {user && (
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2"
+          onClick={() => {
+            logout();
+            onNavigate?.();
+          }}
+        >
+          Logout
+        </Button>
+      )}
     </>
   );
 }
@@ -82,6 +98,7 @@ function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
   const [logoError, setLogoError] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     // Check if logo file exists on component mount
@@ -208,7 +225,14 @@ function Navigation() {
           <NavigationLinks />
         </div>
 
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
+          {!user && (
+            <Link href="/login">
+              <Button variant="outline" size="sm">
+                Sign In
+              </Button>
+            </Link>
+          )}
           <ThemeToggle />
         </div>
       </div>
@@ -222,6 +246,11 @@ function Router() {
       <Navigation />
       <div className="flex flex-col min-h-screen">
         <Switch>
+          <Route path="/login">
+            <div data-page="login">
+              <LoginPage />
+            </div>
+          </Route>
           <Route path="/">
             <div data-page="home">
               <Home />
@@ -288,8 +317,10 @@ function App() {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <Router />
-        <Toaster />
+        <AuthProvider>
+          <Router />
+          <Toaster />
+        </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );
