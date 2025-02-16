@@ -286,14 +286,18 @@ function Router() {
   );
 }
 
+import { AuthProvider } from './lib/auth-context';
+
 function App() {
   return (
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <Router />
-        <Toaster />
-      </QueryClientProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <Router />
+          <Toaster />
+        </QueryClientProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 
