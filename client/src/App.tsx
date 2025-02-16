@@ -25,6 +25,7 @@ import { ProtectedRoute } from '@/components/auth/protected-route';
 import { UserMenu } from '@/components/auth/user-menu';
 import { AuthProvider } from '@/lib/auth-context';
 import AuthPage from "@/pages/auth";
+import SettingsPage from "@/pages/settings";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -89,7 +90,6 @@ function Navigation() {
   const [logoError, setLogoError] = useState(false);
 
   useEffect(() => {
-    // Check if logo file exists on component mount
     fetch('/debug/check-logo')
       .then(res => res.json())
       .then(data => {
@@ -150,7 +150,6 @@ function Navigation() {
   return (
     <nav className="border-b">
       <div className="container max-w-6xl mx-auto py-4 px-4 flex items-center justify-between">
-        {/* Mobile Menu and Logo */}
         <div className="flex items-center gap-4">
           <div className="sm:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -170,11 +169,9 @@ function Navigation() {
             </Sheet>
           </div>
 
-          {/* Logo - centered on mobile, left-aligned on desktop */}
           <div className="absolute left-1/2 -translate-x-1/2 sm:static sm:transform-none sm:left-0">
             <Link href="/" className="flex items-center">
               {logoError ? (
-                // Fallback SVG logo
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -207,11 +204,9 @@ function Navigation() {
             </Link>
           </div>
 
-          {/* Placeholder div to maintain mobile layout */}
           <div className="w-8 sm:hidden"></div>
         </div>
 
-        {/* Desktop Menu */}
         <div className="hidden sm:flex items-center justify-center flex-1">
           <NavigationLinks />
         </div>
@@ -239,6 +234,11 @@ function Router() {
               <AuthPage />
             </div>
           </Route>
+          <ProtectedRoute path="/settings">
+            <div data-page="settings">
+              <SettingsPage />
+            </div>
+          </ProtectedRoute>
           <ProtectedRoute path="/dashboard">
             <div data-page="dashboard">
               <DashboardPage />
