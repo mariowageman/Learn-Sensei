@@ -158,6 +158,9 @@ function Navigation() {
               <SheetContent side="left" className="w-64">
                 <div className="flex flex-col gap-2 mt-4">
                   <NavigationLinks onNavigate={() => setIsOpen(false)} />
+                  <div className="px-2 mt-2">
+                    <ThemeToggle />
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
@@ -210,8 +213,10 @@ function Navigation() {
         </div>
 
         <div className="flex items-center">
-          <ThemeToggle />
-          <UserMenu /> {/* Added UserMenu component here */}
+          <div className="hidden sm:block">
+            <ThemeToggle />
+          </div>
+          <UserMenu />
         </div>
       </div>
     </nav>

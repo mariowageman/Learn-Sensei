@@ -6,14 +6,14 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="flex items-center gap-2">
-      <Sun className="h-4 w-4 text-primary dark:text-white" />
+    <div className="flex items-center gap-2 py-2">
+      <Sun className="h-5 w-5 text-primary dark:text-white" />
       <Switch
         checked={theme === "dark"}
         onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
         className="dark:bg-white/20"
       />
-      <Moon className="h-4 w-4 text-primary dark:text-white" />
+      <Moon className="h-5 w-5 text-primary dark:text-white" />
     </div>
   );
 }
