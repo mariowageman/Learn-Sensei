@@ -1,12 +1,16 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { authHandler } from "./auth";
 import path from "path";
 import fs from "fs";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Add auth middleware before other routes
+app.use(authHandler);
 
 // Serve static files from public directory with proper MIME types
 app.use(express.static(path.join(process.cwd(), 'public'), {
