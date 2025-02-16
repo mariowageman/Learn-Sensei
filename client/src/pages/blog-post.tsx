@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { ShareButtons } from "@/components/share-buttons";
 import { PostEditor } from "@/components/post-editor";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Temporary admin check - replace with actual auth logic
 const isAdmin = true;
@@ -17,14 +18,22 @@ const isAdmin = true;
 export default function BlogPost() {
   const [, params] = useRoute("/blog/:id");
   const [isEditing, setIsEditing] = useState(false);
+  const [currentPost, setCurrentPost] = useState<BlogPost | null>(null);
   const { toast } = useToast();
-  const post = blogPosts.find((p: BlogPost) => p.id === params?.id);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const post = blogPosts.find((p: BlogPost) => p.id === params?.id);
+    if (post) {
+      setCurrentPost(post);
+    }
+  }, [params?.id]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [params?.id]);
 
-  if (!post) {
+  if (!currentPost) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
@@ -46,8 +55,21 @@ export default function BlogPost() {
 
   const handleSave = async (content: string) => {
     try {
-      // TODO: Implement actual API call to save content
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      const response = await fetch(`/api/blog/${currentPost.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update post');
+
+      // Update the local state with new content
+      setCurrentPost(prev => prev ? { ...prev, content } : null);
+
+      await queryClient.invalidateQueries({ queryKey: ['/api/blog'] });
+
       toast({
         title: "Success",
         description: "Blog post updated successfully",
@@ -64,8 +86,8 @@ export default function BlogPost() {
 
   // Get related posts based on shared tags
   const relatedPosts = blogPosts
-    .filter((p: BlogPost) => p.id !== post.id)
-    .filter((p: BlogPost) => p.tags.some((tag: string) => post.tags.includes(tag)))
+    .filter((p: BlogPost) => p.id !== currentPost.id)
+    .filter((p: BlogPost) => p.tags.some((tag: string) => currentPost.tags.includes(tag)))
     .slice(0, 2);
 
   return (
@@ -92,22 +114,22 @@ export default function BlogPost() {
             </div>
             <div className="space-y-4">
               <div className="flex items-center gap-4 text-sm">
-                <Badge variant="secondary">{post.category}</Badge>
-                <span className="text-muted-foreground">{post.date}</span>
+                <Badge variant="secondary">{currentPost.category}</Badge>
+                <span className="text-muted-foreground">{currentPost.date}</span>
                 <div className="flex items-center text-muted-foreground">
                   <Clock className="h-4 w-4 mr-1" />
-                  {calculateReadingTime(post.content)} min read
+                  {calculateReadingTime(currentPost.content)} min read
                 </div>
               </div>
-              <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
+              <h1 className="text-4xl font-bold tracking-tight">{currentPost.title}</h1>
             </div>
           </div>
 
           <div className="mb-8">
             <AspectRatio ratio={21/9} className="bg-muted rounded-lg overflow-hidden">
               <img 
-                src={post.image} 
-                alt={post.title}
+                src={currentPost.image} 
+                alt={currentPost.title}
                 className="object-cover w-full h-full"
               />
             </AspectRatio>
@@ -115,18 +137,19 @@ export default function BlogPost() {
 
           {isEditing ? (
             <PostEditor
-              initialContent={post.content}
+              initialContent={currentPost.content}
               onSave={handleSave}
               onCancel={() => setIsEditing(false)}
             />
           ) : (
-            <div className="prose dark:prose-invert max-w-none mb-8">
-              {post.content}
-            </div>
+            <div 
+              className="prose dark:prose-invert max-w-none mb-8"
+              dangerouslySetInnerHTML={{ __html: currentPost.content }}
+            />
           )}
 
           <div className="flex flex-wrap gap-2 mb-8">
-            {post.tags.map((tag: string) => (
+            {currentPost.tags.map((tag: string) => (
               <Link key={tag} href={`/blog?tag=${encodeURIComponent(tag)}`}>
                 <Badge
                   variant="outline"
@@ -141,8 +164,8 @@ export default function BlogPost() {
           <div className="flex justify-between items-center border-t pt-4">
             <ShareButtons
               url={window.location.href}
-              title={post.title}
-              description={post.description}
+              title={currentPost.title}
+              description={currentPost.description}
             />
           </div>
 

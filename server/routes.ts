@@ -16,6 +16,20 @@ import {
 import { fetchCourseraCourses, type CourseraCourse } from "./coursera";
 import { generateRSSFeed } from "../client/src/lib/rss";
 
+// Update the blog post types with proper interface
+interface BlogPost {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  description: string;
+  category: string;
+  image: string;
+  tags: string[];
+}
+
+let blogPosts: BlogPost[] = [];
+
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
 
@@ -591,6 +605,34 @@ export function registerRoutes(app: Express): Server {
   });
 
 
+  // Blog post update endpoint
+  app.patch("/api/blog/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { content } = req.body;
+
+      if (!content) {
+        return res.status(400).json({ error: "Content is required" });
+      }
+
+      const postIndex = blogPosts.findIndex(post => post.id === id);
+      if (postIndex === -1) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+
+      // Update the post content while preserving other fields
+      blogPosts[postIndex] = {
+        ...blogPosts[postIndex],
+        content,
+      };
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error updating blog post:', error);
+      res.status(500).json({ error: "Failed to update blog post" });
+    }
+  });
+
   app.get("/api/recommendations", async (req, res) => {
     try {
       // Get user's progress across all learning paths
@@ -885,6 +927,3 @@ function generateRecommendationReason(
   if (progress.streakDays >= 7) {
     return `Keep your ${progress.streakDays}-day learning streak going! This ${path.difficulty} course in ${mainTopic} is perfect for your current level.`;
   }
-
-  return `This ${path.difficulty} level course in ${mainTopic} aligns well with your learning progress.`;
-}
