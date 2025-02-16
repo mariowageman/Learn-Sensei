@@ -3,8 +3,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface User {
   id: number;
-  email: string;
-  avatarUrl?: string;
+  username: string;
 }
 
 interface AuthContextType {
@@ -25,7 +24,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/auth/user');
+        const response = await fetch('/api/auth/user', {
+          credentials: 'include' // Important for session cookie
+        });
         if (response.ok) {
           const userData = await response.json();
           setUser(userData);
@@ -42,12 +43,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = (userData: User) => {
     setUser(userData);
+    toast({
+      title: "Success!",
+      description: "You have successfully logged in.",
+    });
   };
 
   const logout = async () => {
     try {
       const response = await fetch('/api/auth/logout', {
-        method: 'POST'
+        method: 'POST',
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -57,14 +63,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           description: "You have been logged out.",
         });
       } else {
-        throw new Error('Logout failed');
+        const error = await response.json();
+        throw new Error(error.message || 'Logout failed');
       }
     } catch (error) {
       console.error('Logout error:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to logout. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to logout. Please try again.",
       });
     }
   };

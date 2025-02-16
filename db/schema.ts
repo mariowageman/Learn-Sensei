@@ -3,6 +3,15 @@ import { sql } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
+// Add users table
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
 // Keep existing table definitions
 export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
@@ -107,6 +116,11 @@ export const quizProgressRelations = relations(quizProgress, ({ one }) => ({
   })
 }));
 
+// Add user schema validation
+export const insertUserSchema = createInsertSchema(users);
+export const selectUserSchema = createSelectSchema(users);
+
+// Keep existing schema exports
 export const insertSessionSchema = createInsertSchema(sessions);
 export const selectSessionSchema = createSelectSchema(sessions);
 export const insertMessageSchema = createInsertSchema(messages);
@@ -124,6 +138,11 @@ export const selectProgressAnalyticsSchema = createSelectSchema(progressAnalytic
 export const insertSubjectHistorySchema = createInsertSchema(subjectHistory);
 export const selectSubjectHistorySchema = createSelectSchema(subjectHistory);
 
+// Add User type to existing type exports
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+
+// Keep existing type exports
 export type Session = typeof sessions.$inferSelect;
 export type Message = typeof messages.$inferSelect;
 export type QuizQuestion = typeof quizQuestions.$inferSelect;
