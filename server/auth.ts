@@ -82,6 +82,14 @@ router.post("/api/auth/register", async (req, res) => {
 
     console.log('Created user:', user);
 
+    // Fetch the complete user data with role
+    const userWithRole = await db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.id, user.id),
+      with: {
+        role: true
+      }
+    });
+
     // Start session
     req.session.userId = user.id;
     console.log('Session after registration:', req.session);
@@ -89,7 +97,7 @@ router.post("/api/auth/register", async (req, res) => {
     res.json({ 
       id: user.id, 
       username: user.username,
-      role: UserRole.USER
+      role: userWithRole?.role.name || UserRole.USER
     });
   } catch (error) {
     console.error('Registration error:', error);
