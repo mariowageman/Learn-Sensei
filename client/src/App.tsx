@@ -11,7 +11,7 @@ import CookiePolicy from "@/pages/cookie-policy";
 import { DashboardPage } from "@/pages/dashboard";
 import BlogPage from "@/pages/blog";
 import { CookieConsent } from "@/components/cookie-consent";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Home as HomeIcon, Brain, Menu, LayoutDashboard, BookText } from "lucide-react";
