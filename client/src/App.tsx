@@ -26,6 +26,9 @@ import { UserMenu } from '@/components/auth/user-menu';
 import { AuthProvider } from '@/lib/auth-context';
 import AuthPage from "@/pages/auth";
 import SettingsPage from "@/pages/settings";
+import { useScroll } from "@/hooks/use-scroll-top"; // Added import
+import cn from 'classnames'; // Added import, assuming classnames library
+
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -85,6 +88,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 function Navigation() {
+  const { isVisible } = useScroll();
   const [isOpen, setIsOpen] = useState(false);
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
   const [logoError, setLogoError] = useState(false);
@@ -149,7 +153,12 @@ function Navigation() {
   }, [touchStart, isOpen]);
 
   return (
-    <nav className="border-b">
+    <nav
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300",
+        isVisible ? "translate-y-0" : "-translate-y-full"
+      )}
+    >
       <div className="container max-w-6xl mx-auto py-4 px-4 flex items-center justify-between">
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
@@ -258,11 +267,14 @@ function Navigation() {
 }
 
 function Router() {
-  useScrollTop();
+  const { isVisible } = useScroll();
   return (
     <>
       <Navigation />
-      <div className="flex flex-col min-h-screen">
+      <div className={cn(
+        "flex flex-col min-h-screen transition-all duration-300",
+        isVisible ? "pt-[73px]" : "pt-0"
+      )}>
         <Switch>
           <Route path="/auth">
             <div data-page="auth">
