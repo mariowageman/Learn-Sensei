@@ -203,14 +203,51 @@ function Navigation() {
             </SheetTrigger>
             <SheetContent side="right" className="w-64">
               <div className="flex flex-col gap-4 pt-20">
-                <SheetClose asChild>
-                  <div className="flex flex-col gap-4">
-                    <NavigationLinks />
-                    <div className="px-2">
-                      <ThemeToggle />
-                    </div>
+                <div className="flex flex-col gap-4">
+                  <Link href="/">
+                    <SheetClose asChild>
+                      <Button variant="ghost" className="w-full justify-start gap-2">
+                        <HomeIcon className="h-4 w-4" />
+                        Home
+                      </Button>
+                    </SheetClose>
+                  </Link>
+                  <Link href="/sensei">
+                    <SheetClose asChild>
+                      <Button variant="ghost" className="w-full justify-start gap-2">
+                        <Brain className="h-4 w-4" />
+                        Sensei Mode
+                      </Button>
+                    </SheetClose>
+                  </Link>
+                  <Link href="/learning-paths">
+                    <SheetClose asChild>
+                      <Button variant="ghost" className="w-full justify-start gap-2">
+                        <BookOpen className="h-4 w-4" />
+                        Learning Paths
+                      </Button>
+                    </SheetClose>
+                  </Link>
+                  <Link href="/dashboard">
+                    <SheetClose asChild>
+                      <Button variant="ghost" className="w-full justify-start gap-2">
+                        <LayoutDashboard className="h-4 w-4" />
+                        Progress
+                      </Button>
+                    </SheetClose>
+                  </Link>
+                  <Link href="/blog">
+                    <SheetClose asChild>
+                      <Button variant="ghost" className="w-full justify-start gap-2">
+                        <BookText className="h-4 w-4" />
+                        Blog
+                      </Button>
+                    </SheetClose>
+                  </Link>
+                  <div className="px-2">
+                    <ThemeToggle />
                   </div>
-                </SheetClose>
+                </div>
               </div>
             </SheetContent>
           </Sheet>
