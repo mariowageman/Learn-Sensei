@@ -115,10 +115,8 @@ export function RegisterForm() {
                       />
                       <button
                         type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setShowPassword(!showPassword);
-                        }}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2"
                       >
                         {showPassword ? (
