@@ -19,10 +19,6 @@ export default function AuthPage() {
   return (
     <div className="container relative h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-[450px]">
-        <div className="flex items-center justify-center mb-8">
-          <img src="/learn-sensei-logo-icon.png" alt="Logo" className="h-12 w-12 mr-3" />
-          <h2 className="text-2xl font-medium">Learn Sensei</h2>
-        </div>
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
