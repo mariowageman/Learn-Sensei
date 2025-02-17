@@ -30,7 +30,7 @@ import SettingsPage from "@/pages/settings";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <>
+    <div className="flex flex-col gap-2 w-full">
       <Link href="/">
         <Button
           variant="ghost"
@@ -81,7 +81,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
           Blog
         </Button>
       </Link>
-    </>
+    </div>
   );
 }
 
@@ -175,10 +175,7 @@ function Navigation() {
                 src="/learn-sensei-logo-icon.png"
                 alt="Learn Sensei Logo"
                 className="h-12 w-12 -my-2"
-                onError={(e) => {
-                  console.error('Logo failed to load:', e);
-                  setLogoError(true);
-                }}
+                onError={() => setLogoError(true)}
               />
             )}
             <span className="sr-only">Learn Sensei</span>
@@ -204,10 +201,10 @@ function Navigation() {
               side="right" 
               className="p-0 w-[var(--sheet-width)] border-l"
             >
-              <div className="flex flex-col h-full">
-                <div className="flex flex-col gap-2 p-4">
+              <div className="flex flex-col h-full justify-center">
+                <div className="flex flex-col gap-6 px-4">
                   <NavigationLinks onNavigate={() => setIsOpen(false)} />
-                  <div className="mt-2">
+                  <div className="flex justify-center">
                     <ThemeToggle />
                   </div>
                 </div>
