@@ -12,7 +12,7 @@ import CookiePolicy from "@/pages/cookie-policy";
 import { DashboardPage } from "@/pages/dashboard";
 import BlogPage from "@/pages/blog";
 import { CookieConsent } from "@/components/cookie-consent";
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Home as HomeIcon, Brain, Menu, LayoutDashboard, BookText } from "lucide-react";
@@ -91,19 +91,12 @@ function Navigation() {
   const [logoError, setLogoError] = useState(false);
 
   useEffect(() => {
-    fetch('/debug/check-logo')
-      .then(res => res.json())
-      .then(data => {
-        console.log('Logo file check:', data);
-        if (!data.exists) {
-          setLogoError(true);
-        }
-      })
-      .catch(err => {
-        console.error('Error checking logo:', err);
-        setLogoError(true);
-      });
-  }, []);
+    if (isOpen) {
+      document.body.classList.add('fixed-body');
+    } else {
+      document.body.classList.remove('fixed-body');
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
@@ -207,11 +200,14 @@ function Navigation() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="p-0 w-[var(--sheet-width)] border-l">
-              <div className="flex flex-col gap-4 pt-20">
-                <div className="flex flex-col gap-4">
+            <SheetContent 
+              side="right" 
+              className="p-0 w-[var(--sheet-width)] border-l"
+            >
+              <div className="flex flex-col h-full">
+                <div className="flex flex-col gap-2 p-4">
                   <NavigationLinks onNavigate={() => setIsOpen(false)} />
-                  <div className="px-2">
+                  <div className="mt-2">
                     <ThemeToggle />
                   </div>
                 </div>
