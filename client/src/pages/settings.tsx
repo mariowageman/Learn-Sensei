@@ -13,7 +13,6 @@ import {
   Calendar,
   Clock
 } from "lucide-react";
-import { format } from "date-fns";
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -76,9 +75,6 @@ export default function ProfilePage() {
                     <Badge variant={getRoleBadgeVariant(user.role)} className="text-sm">
                       {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                     </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      Member since {format(new Date(user.createdAt), 'MMMM yyyy')}
-                    </span>
                   </div>
                 </div>
               </div>
