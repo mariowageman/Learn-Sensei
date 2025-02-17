@@ -201,13 +201,15 @@ function Navigation() {
             <ThemeToggle />
           </div>
           <UserMenu />
-          <Sheet>
+          <Sheet onOpenChange={(open) => {
+            document.body.classList.toggle('fixed-body', open);
+          }}>
             <SheetTrigger asChild className="lg:hidden">
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-64">
+            <SheetContent side="right" className="w-64 fixed">
               <div className="flex flex-col gap-4 pt-20">
                 <div className="flex flex-col gap-4">
                   <Link href="/">

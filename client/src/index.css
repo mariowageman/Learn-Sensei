@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  .fixed-body {
+    @apply overflow-hidden;
+  }
+
+  [data-state="open"] ~ main {
+    @apply fixed w-full;
+  }
   * {
     @apply border-border;
   }
