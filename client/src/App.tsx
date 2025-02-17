@@ -186,17 +186,17 @@ function Navigation() {
           </Link>
         </div>
 
-        <div className="hidden sm:flex items-center justify-center flex-1">
+        <div className="hidden md:flex items-center justify-center flex-1">
           <NavigationLinks />
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="hidden sm:block">
+          <div className="hidden md:block">
             <ThemeToggle />
           </div>
           <UserMenu />
           <Sheet>
-            <SheetTrigger asChild className="sm:hidden">
+            <SheetTrigger asChild className="md:hidden">
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
               </Button>
