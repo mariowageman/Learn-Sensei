@@ -19,8 +19,6 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   roleId: integer("role_id").references(() => roles.id).notNull(),
-  isActive: boolean("is_active").notNull().default(true),
-  metadata: jsonb("metadata").notNull().default(sql`'{}'::jsonb`),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull()
 });

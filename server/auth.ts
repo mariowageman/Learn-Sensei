@@ -18,7 +18,6 @@ const router = Router();
 
 export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.session.userId;
-  console.log('Session in requireAuth:', req.session);
 
   if (!userId) {
     return res.status(401).json({ message: "Please log in to continue" });
@@ -45,7 +44,6 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
 };
 
 router.post("/api/auth/register", async (req, res) => {
-  console.log('Register request body:', req.body);
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -53,6 +51,7 @@ router.post("/api/auth/register", async (req, res) => {
   }
 
   try {
+    // Check if user exists
     const existingUser = await db.query.users.findFirst({
       where: (users, { eq }) => eq(users.username, username)
     });
@@ -72,39 +71,32 @@ router.post("/api/auth/register", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create user with minimal required fields
     const [user] = await db.insert(users).values({
       username,
       password: hashedPassword,
-      roleId: defaultRole.id,
-      isActive: true,
-      metadata: {}
+      roleId: defaultRole.id
     }).returning();
 
-    // Fetch the complete user data with role
-    const userWithRole = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.id, user.id),
-      with: {
-        role: true
-      }
-    });
-
-    // Start session
+    // Set session
     req.session.userId = user.id;
-    console.log('Session after registration:', req.session);
 
+    // Return user data
     res.status(201).json({ 
       id: user.id, 
       username: user.username,
-      role: userWithRole?.role.name || UserRole.USER
+      role: UserRole.USER
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: "Registration failed", details: error instanceof Error ? error.message : String(error) });
+    res.status(500).json({ 
+      message: "Registration failed", 
+      details: error instanceof Error ? error.message : String(error) 
+    });
   }
 });
 
 router.post("/api/auth/login", async (req, res) => {
-  console.log('Login request body:', req.body);
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -129,7 +121,6 @@ router.post("/api/auth/login", async (req, res) => {
     }
 
     req.session.userId = user.id;
-    console.log('Session after login:', req.session);
 
     res.json({ 
       id: user.id, 
@@ -138,12 +129,11 @@ router.post("/api/auth/login", async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: "Login failed", details: error instanceof Error ? error.message : String(error) });
+    res.status(500).json({ message: "Login failed" });
   }
 });
 
 router.post("/api/auth/logout", (req, res) => {
-  console.log('Logout request - Current session:', req.session);
   req.session.destroy((err) => {
     if (err) {
       console.error('Logout error:', err);
@@ -154,9 +144,7 @@ router.post("/api/auth/logout", (req, res) => {
 });
 
 router.get("/api/auth/user", requireAuth, (req, res) => {
-  console.log('Get user request - Current session:', req.session);
   const user = req.user;
-
   res.json({ 
     id: user.id, 
     username: user.username,
