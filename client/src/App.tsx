@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { Switch, Route, Link } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
