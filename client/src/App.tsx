@@ -150,70 +150,38 @@ function Navigation() {
   return (
     <nav className="border-b">
       <div className="container max-w-6xl mx-auto py-4 px-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="sm:hidden">
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-64">
-                <div className="flex flex-col gap-2 mt-4">
-                  <NavigationLinks onNavigate={() => setIsOpen(false)} />
-                  <div className="px-2 mt-2">
-                    <ThemeToggle />
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-
-          <div className="absolute left-1/2 -translate-x-1/2 sm:static sm:transform-none sm:left-0">
-            <Link href="/" className="flex items-center">
-              {logoError ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  className="h-12 w-12 -my-2 text-primary dark:text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                  <path d="M6 8h4" />
-                  <path d="M14 8h4" />
-                  <path d="M6 12h4" />
-                  <path d="M14 12h4" />
-                </svg>
-              ) : (
-                <img
-                  src="/learn-sensei-logo-icon.png"
-                  alt="Learn Sensei Logo"
-                  className="h-12 w-12 -my-2"
-                  onError={(e) => {
-                    console.error('Logo failed to load:', e);
-                    setLogoError(true);
-                  }}
-                />
-              )}
-              <span className="sr-only">Learn Sensei</span>
-            </Link>
-          </div>
-
-          <div className="w-8 sm:hidden"></div>
-        </div>
-
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
-            <img
-              src="/learn-sensei-logo-icon.png"
-              alt="Learn Sensei"
-              className="h-8 w-8"
-            />
+            {logoError ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                className="h-12 w-12 -my-2 text-primary dark:text-white"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                <path d="M6 8h4" />
+                <path d="M14 8h4" />
+                <path d="M6 12h4" />
+                <path d="M14 12h4" />
+              </svg>
+            ) : (
+              <img
+                src="/learn-sensei-logo-icon.png"
+                alt="Learn Sensei Logo"
+                className="h-12 w-12 -my-2"
+                onError={(e) => {
+                  console.error('Logo failed to load:', e);
+                  setLogoError(true);
+                }}
+              />
+            )}
+            <span className="sr-only">Learn Sensei</span>
           </Link>
         </div>
 
@@ -222,9 +190,7 @@ function Navigation() {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="hidden sm:block">
-            <ThemeToggle />
-          </div>
+          <ThemeToggle />
           <UserMenu />
           <Sheet>
             <SheetTrigger asChild className="sm:hidden">
