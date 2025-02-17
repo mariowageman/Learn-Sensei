@@ -207,15 +207,37 @@ function Navigation() {
           <div className="w-8 sm:hidden"></div>
         </div>
 
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center">
+            <img
+              src="/learn-sensei-logo-icon.png"
+              alt="Learn Sensei"
+              className="h-8 w-8"
+            />
+          </Link>
+        </div>
+
         <div className="hidden sm:flex items-center justify-center flex-1">
           <NavigationLinks />
         </div>
 
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
           <div className="hidden sm:block">
             <ThemeToggle />
           </div>
           <UserMenu />
+          <Sheet>
+            <SheetTrigger asChild className="sm:hidden">
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-64">
+              <div className="flex flex-col gap-4">
+                <NavigationLinks onNavigate={() => document.querySelector('[role="dialog"]')?.remove()} />
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </nav>
