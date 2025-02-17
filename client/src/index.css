@@ -5,10 +5,21 @@
 @layer base {
   .fixed-body {
     @apply overflow-hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
   }
 
   [data-state="open"] ~ main {
-    @apply fixed w-full;
+    @apply w-full;
+  }
+
+  [data-state="open"] ~ * {
+    @apply pointer-events-none;
+  }
+
+  .SheetContent {
+    position: fixed !important;
   }
   * {
     @apply border-border;
