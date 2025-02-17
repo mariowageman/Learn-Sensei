@@ -72,15 +72,13 @@ router.post("/api/auth/register", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    console.log('Attempting to create user with username:', username);
     const [user] = await db.insert(users).values({
       username,
       password: hashedPassword,
       roleId: defaultRole.id,
-      isActive: true
+      isActive: true,
+      metadata: {}
     }).returning();
-
-    console.log('Created user:', user);
 
     // Fetch the complete user data with role
     const userWithRole = await db.query.users.findFirst({
@@ -94,7 +92,7 @@ router.post("/api/auth/register", async (req, res) => {
     req.session.userId = user.id;
     console.log('Session after registration:', req.session);
 
-    res.json({ 
+    res.status(201).json({ 
       id: user.id, 
       username: user.username,
       role: userWithRole?.role.name || UserRole.USER
