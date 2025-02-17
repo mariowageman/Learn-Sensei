@@ -7,19 +7,24 @@
     @apply overflow-hidden;
     position: fixed;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     left: 0;
     top: 0;
-    padding-right: 15px; /* Compensate for scrollbar disappearance */
   }
 
   [data-state="open"] ~ main {
     @apply w-full;
     position: fixed;
-    top: var(--header-offset, 0);
-    left: 0;
-    right: 0;
-    bottom: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .SheetContent {
+    position: fixed !important;
+    height: 100vh !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
   }
 
   [data-state="open"] ~ * {
