@@ -10,8 +10,11 @@
     height: 100%;
     left: 0;
     top: 0;
+    /* Add padding-right to compensate for the scrollbar disappearing */
+    padding-right: var(--removed-body-scroll-bar-size, 0px);
   }
 
+  /* Ensure Sheet content is properly positioned */
   .SheetContent {
     position: fixed !important;
     height: 100vh !important;
@@ -19,8 +22,16 @@
     right: 0 !important;
     bottom: 0 !important;
     z-index: 9999 !important;
+    width: var(--sheet-width) !important;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
   }
 
+  .SheetContent[data-state="open"] {
+    transform: translateX(0);
+  }
+
+  /* Handle overlay and focus management */
   [data-state="open"] {
     position: relative;
     z-index: 9999;
@@ -30,31 +41,26 @@
     @apply pointer-events-none;
   }
 
-  .SheetContent {
-    position: fixed !important;
-    z-index: 100;
-  }
   * {
     @apply border-border;
   }
 
+  .nav-scroll-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0);
+    will-change: transform;
+    z-index: 50;
+    backdrop-filter: blur(8px);
+    transform-origin: top;
+  }
 
-.nav-scroll-transition {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateY(0);
-  will-change: transform;
-  z-index: 50;
-  backdrop-filter: blur(8px);
-  transform-origin: top;
-}
-
-.nav-scroll-hidden {
-  transform: translateY(-100%);
-}
+  .nav-scroll-hidden {
+    transform: translateY(-100%);
+  }
 
   body {
     @apply font-sans antialiased pt-[73px];
