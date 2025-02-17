@@ -203,10 +203,14 @@ function Navigation() {
             </SheetTrigger>
             <SheetContent side="right" className="w-64">
               <div className="flex flex-col gap-4 pt-20">
-                <NavigationLinks onNavigate={() => document.querySelector('[role="dialog"]')?.remove()} />
-                <div className="px-2">
-                  <ThemeToggle />
-                </div>
+                <SheetClose asChild>
+                  <div className="flex flex-col gap-4">
+                    <NavigationLinks />
+                    <div className="px-2">
+                      <ThemeToggle />
+                    </div>
+                  </div>
+                </SheetClose>
               </div>
             </SheetContent>
           </Sheet>
