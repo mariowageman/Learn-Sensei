@@ -107,7 +107,8 @@ function Navigation() {
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       const touch = e.touches[0];
-      if (!isOpen && touch.clientX < 30) {
+      const windowWidth = window.innerWidth;
+      if (!isOpen && touch.clientX > windowWidth - 30) {
         setTouchStart({ x: touch.clientX, y: touch.clientY });
       } else if (isOpen) {
         setTouchStart({ x: touch.clientX, y: touch.clientY });
@@ -122,10 +123,10 @@ function Navigation() {
       const deltaY = Math.abs(touch.clientY - touchStart.y);
 
       if (Math.abs(deltaX) > deltaY) {
-        if (!isOpen && deltaX > 50) {
+        if (!isOpen && deltaX < -50) {
           setIsOpen(true);
           setTouchStart(null);
-        } else if (isOpen && deltaX < -50) {
+        } else if (isOpen && deltaX > 50) {
           setIsOpen(false);
           setTouchStart(null);
         }
