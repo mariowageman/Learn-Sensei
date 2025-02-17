@@ -18,7 +18,7 @@
 }
 
   body {
-    @apply font-sans antialiased;
+    @apply font-sans antialiased pt-[73px];
     background-color: #F5F7FA;
     color: #283951;
   }

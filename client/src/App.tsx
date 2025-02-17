@@ -148,8 +148,13 @@ function Navigation() {
     };
   }, [touchStart, isOpen]);
 
+  const isVisible = useScrollTop();
+  
   return (
-    <nav className="border-b">
+    <nav className={cn(
+      "border-b fixed top-0 left-0 right-0 bg-background z-50 nav-scroll-transition",
+      !isVisible && "nav-scroll-hidden"
+    )}>
       <div className="container max-w-6xl mx-auto py-4 px-4 flex items-center justify-between">
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
