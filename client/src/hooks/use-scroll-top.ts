@@ -10,13 +10,18 @@ export const useScrollTop = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
+      const scrollDelta = currentScrollY - lastScrollY;
       
-      if (currentScrollY < lastScrollY) {
-        // Scrolling up
+      if (currentScrollY < 10) {
         setIsVisible(true);
-      } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
-        // Scrolling down and not at the top
-        setIsVisible(false);
+      } else if (Math.abs(scrollDelta) > 10) {
+        if (scrollDelta < 0) {
+          // Scrolling up
+          setIsVisible(true);
+        } else {
+          // Scrolling down
+          setIsVisible(false);
+        }
       }
       
       setLastScrollY(currentScrollY);
