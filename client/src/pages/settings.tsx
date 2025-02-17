@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { LogOut, User, Shield } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { LogOut, User, Shield, Calendar } from "lucide-react";
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
@@ -11,6 +12,19 @@ export default function SettingsPage() {
   if (!user) {
     return null;
   }
+
+  const getRoleBadgeVariant = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'destructive';
+      case 'subscriber':
+        return 'default';
+      case 'moderator':
+        return 'secondary';
+      default:
+        return 'outline';
+    }
+  };
 
   return (
     <div className="container max-w-2xl mx-auto p-4 space-y-6">
@@ -29,7 +43,7 @@ export default function SettingsPage() {
               Profile
             </CardTitle>
             <CardDescription>
-              Your profile information and preferences
+              Your profile information and account details
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -41,7 +55,29 @@ export default function SettingsPage() {
               </Avatar>
               <div className="space-y-1">
                 <h3 className="text-lg font-semibold">{user.username}</h3>
-                <p className="text-sm text-muted-foreground">User ID: {user.id}</p>
+                <div className="flex items-center gap-2">
+                  <Badge variant={getRoleBadgeVariant(user.role)}>
+                    {user.role}
+                  </Badge>
+                  <p className="text-sm text-muted-foreground">Account ID: {user.id}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-4 pt-4">
+              <div className="flex items-center gap-4">
+                <Shield className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">Account Type</p>
+                  <p className="text-sm text-muted-foreground">
+                    You are currently a{' '}
+                    <span className="font-medium text-foreground">{user.role}</span> user
+                    {user.role === 'user' && ' (Basic access)'}
+                    {user.role === 'subscriber' && ' (Premium access)'}
+                    {user.role === 'admin' && ' (Full access)'}
+                    {user.role === 'moderator' && ' (Content management)'}
+                  </p>
+                </div>
               </div>
             </div>
           </CardContent>
