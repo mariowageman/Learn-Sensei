@@ -3,42 +3,59 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --sheet-width: 16rem;
+  }
+
   .fixed-body {
     @apply overflow-hidden;
     position: fixed;
     width: 100%;
-    height: 100%;
     left: 0;
     top: 0;
-    /* Add padding-right to compensate for the scrollbar disappearing */
-    padding-right: var(--removed-body-scroll-bar-size, 0px);
   }
 
-  /* Ensure Sheet content is properly positioned */
+  /* Sheet styles */
+  [data-overlay-portal] {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+  }
+
+  [data-overlay-portal] > * {
+    pointer-events: auto;
+  }
+
   .SheetContent {
     position: fixed !important;
     height: 100vh !important;
+    width: var(--sheet-width) !important;
     top: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
     z-index: 9999 !important;
-    width: var(--sheet-width) !important;
     transform: translateX(100%);
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: hsl(var(--background));
   }
 
   .SheetContent[data-state="open"] {
     transform: translateX(0);
   }
 
-  /* Handle overlay and focus management */
-  [data-state="open"] {
-    position: relative;
-    z-index: 9999;
+  .SheetOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  [data-state="open"] ~ * {
-    @apply pointer-events-none;
+  .SheetOverlay[data-state="open"] {
+    opacity: 1;
   }
 
   * {
@@ -83,7 +100,6 @@
     @apply bg-background;
   }
 
-  /* Ensure consistent page backgrounds */
   [data-page],
   [data-page] > div,
   [data-page] > main {
@@ -97,7 +113,6 @@
     background-color: #111C2A;
   }
 
-  /* Center content sections */
   .content-section {
     @apply mx-auto max-w-6xl px-4;
   }
@@ -125,7 +140,6 @@
     color: white;
   }
 
-  /* Active menu styles */
   [data-active="true"],
   [data-state="active"],
   .active {
@@ -147,18 +161,15 @@
     color: var(--primary) !important;
   }
 
-  /* Single, quick transition for all theme-related color changes */
   :root * {
     @apply transition-colors duration-100;
   }
 
-  /* Remove individual element transitions to prevent timing mismatches */
   body,
   :root {
     @apply transition-colors duration-100;
   }
 
-  /* Style elements without individual transitions */
   .card,
   .button,
   .nav-item,

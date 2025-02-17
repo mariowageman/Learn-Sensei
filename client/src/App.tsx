@@ -150,7 +150,7 @@ function Navigation() {
   }, [touchStart, isOpen]);
 
   const isVisible = useScrollTop();
-  
+
   return (
     <nav className={cn(
       "border-b fixed top-0 left-0 right-0 bg-background z-50 nav-scroll-transition",
@@ -201,57 +201,16 @@ function Navigation() {
             <ThemeToggle />
           </div>
           <UserMenu />
-          <Sheet onOpenChange={(open) => {
-            document.body.classList.toggle('fixed-body', open);
-          }}>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="lg:hidden">
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-64 fixed">
+            <SheetContent side="right" className="p-0 w-[var(--sheet-width)] border-l">
               <div className="flex flex-col gap-4 pt-20">
                 <div className="flex flex-col gap-4">
-                  <Link href="/">
-                    <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2">
-                        <HomeIcon className="h-4 w-4" />
-                        Home
-                      </Button>
-                    </SheetClose>
-                  </Link>
-                  <Link href="/sensei">
-                    <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2">
-                        <Brain className="h-4 w-4" />
-                        Sensei Mode
-                      </Button>
-                    </SheetClose>
-                  </Link>
-                  <Link href="/learning-paths">
-                    <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2">
-                        <BookOpen className="h-4 w-4" />
-                        Learning Paths
-                      </Button>
-                    </SheetClose>
-                  </Link>
-                  <Link href="/dashboard">
-                    <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2">
-                        <LayoutDashboard className="h-4 w-4" />
-                        Progress
-                      </Button>
-                    </SheetClose>
-                  </Link>
-                  <Link href="/blog">
-                    <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2">
-                        <BookText className="h-4 w-4" />
-                        Blog
-                      </Button>
-                    </SheetClose>
-                  </Link>
+                  <NavigationLinks onNavigate={() => setIsOpen(false)} />
                   <div className="px-2">
                     <ThemeToggle />
                   </div>
