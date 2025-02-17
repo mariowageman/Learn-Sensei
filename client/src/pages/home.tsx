@@ -14,7 +14,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-grid-white/10" />
         <div className="relative max-w-6xl mx-auto text-center space-y-8">
           <div className="space-y-4">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#111C2A] dark:bg-clip-text dark:text-transparent dark:bg-gradient-to-r dark:from-[#3F3EED] dark:to-[#3F3EED]/80">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#111C2A] dark:text-white">
               Learn Sensei for Smarter Learning
             </h1>
             <p className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto">
