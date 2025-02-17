@@ -8,6 +8,7 @@ interface AuthContextType {
   login: (user: RBACUser) => void;
   logout: () => void;
   hasPermission: (action: string, subject: string) => boolean;
+  updateUserRole?: (userId: number, roleId: number) => Promise<void>; // New function
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -77,13 +78,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return hasPermission(user.role, action, subject);
   };
 
+  const updateUserRole = async (userId: number, roleId: number) => {
+    try {
+      const response = await fetch(`/api/users/${userId}/role`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ roleId }),
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update user role');
+      }
+
+      const updatedUser = await response.json();
+      setUser(updatedUser);
+      toast({
+        title: "Success",
+        description: "User role updated successfully.",
+      });
+    } catch (error) {
+      console.error('Role update error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update user role",
+      });
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
       isLoading, 
       login, 
       logout,
-      hasPermission: checkPermission
+      hasPermission: checkPermission,
+      updateUserRole
     }}>
       {children}
     </AuthContext.Provider>

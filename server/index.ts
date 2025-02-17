@@ -7,6 +7,7 @@ import fs from "fs";
 import { authRouter } from "./auth";
 import connectPg from "connect-pg-simple";
 import { pool } from "@db";
+import { rolesRouter } from "./routes/roles";
 
 declare module 'express-session' {
   interface SessionData {
@@ -50,6 +51,8 @@ app.use((req, res, next) => {
 
 // Register auth routes
 app.use(authRouter);
+
+app.use(rolesRouter);
 
 // Serve static files from public directory with proper MIME types
 app.use(express.static(path.join(process.cwd(), 'public'), {
