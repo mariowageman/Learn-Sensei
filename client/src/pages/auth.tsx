@@ -12,7 +12,7 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (user) {
-      setLocation("/");
+      setLocation(-1); // Go back to previous page
     }
   }, [user, setLocation]);
 
