@@ -56,11 +56,10 @@ const SheetContent = React.forwardRef<
   SheetContentProps
 >(({ side = "right", className, children, ...props }, ref) => (
   <SheetPortal>
-    <SheetOverlay className="fixed inset-0 z-[9998]" />
+    <SheetOverlay />
     <SheetPrimitive.Content
       ref={ref}
-      className={cn(sheetVariants({ side }), "SheetContent fixed", className)}
-      style={{ position: 'fixed' }}
+      className={cn(sheetVariants({ side }), className)}
       {...props}
     >
       {children}

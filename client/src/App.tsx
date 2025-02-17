@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import { Switch, Route, Link } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -12,7 +11,7 @@ import CookiePolicy from "@/pages/cookie-policy";
 import { DashboardPage } from "@/pages/dashboard";
 import BlogPage from "@/pages/blog";
 import { CookieConsent } from "@/components/cookie-consent";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Home as HomeIcon, Brain, Menu, LayoutDashboard, BookText } from "lucide-react";
@@ -30,7 +29,7 @@ import SettingsPage from "@/pages/settings";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <div className="flex flex-col gap-2 w-full">
+    <>
       <Link href="/">
         <Button
           variant="ghost"
@@ -81,7 +80,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
           Blog
         </Button>
       </Link>
-    </div>
+    </>
   );
 }
 
@@ -91,12 +90,19 @@ function Navigation() {
   const [logoError, setLogoError] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add('fixed-body');
-    } else {
-      document.body.classList.remove('fixed-body');
-    }
-  }, [isOpen]);
+    fetch('/debug/check-logo')
+      .then(res => res.json())
+      .then(data => {
+        console.log('Logo file check:', data);
+        if (!data.exists) {
+          setLogoError(true);
+        }
+      })
+      .catch(err => {
+        console.error('Error checking logo:', err);
+        setLogoError(true);
+      });
+  }, []);
 
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
@@ -142,13 +148,8 @@ function Navigation() {
     };
   }, [touchStart, isOpen]);
 
-  const isVisible = useScrollTop();
-
   return (
-    <nav className={cn(
-      "border-b fixed top-0 left-0 right-0 bg-background z-50 nav-scroll-transition",
-      !isVisible && "nav-scroll-hidden"
-    )}>
+    <nav className="border-b">
       <div className="container max-w-6xl mx-auto py-4 px-4 flex items-center justify-between">
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
@@ -175,7 +176,10 @@ function Navigation() {
                 src="/learn-sensei-logo-icon.png"
                 alt="Learn Sensei Logo"
                 className="h-12 w-12 -my-2"
-                onError={() => setLogoError(true)}
+                onError={(e) => {
+                  console.error('Logo failed to load:', e);
+                  setLogoError(true);
+                }}
               />
             )}
             <span className="sr-only">Learn Sensei</span>
@@ -191,20 +195,56 @@ function Navigation() {
             <ThemeToggle />
           </div>
           <UserMenu />
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <Sheet>
             <SheetTrigger asChild className="lg:hidden">
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent 
-              side="right" 
-              className="p-0 w-[var(--sheet-width)] border-l"
-            >
-              <div className="flex flex-col h-full justify-center">
-                <div className="flex flex-col gap-6 px-4">
-                  <NavigationLinks onNavigate={() => setIsOpen(false)} />
-                  <div className="flex justify-center">
+            <SheetContent side="right" className="w-64">
+              <div className="flex flex-col gap-4 pt-20">
+                <div className="flex flex-col gap-4">
+                  <Link href="/">
+                    <SheetClose asChild>
+                      <Button variant="ghost" className="w-full justify-start gap-2">
+                        <HomeIcon className="h-4 w-4" />
+                        Home
+                      </Button>
+                    </SheetClose>
+                  </Link>
+                  <Link href="/sensei">
+                    <SheetClose asChild>
+                      <Button variant="ghost" className="w-full justify-start gap-2">
+                        <Brain className="h-4 w-4" />
+                        Sensei Mode
+                      </Button>
+                    </SheetClose>
+                  </Link>
+                  <Link href="/learning-paths">
+                    <SheetClose asChild>
+                      <Button variant="ghost" className="w-full justify-start gap-2">
+                        <BookOpen className="h-4 w-4" />
+                        Learning Paths
+                      </Button>
+                    </SheetClose>
+                  </Link>
+                  <Link href="/dashboard">
+                    <SheetClose asChild>
+                      <Button variant="ghost" className="w-full justify-start gap-2">
+                        <LayoutDashboard className="h-4 w-4" />
+                        Progress
+                      </Button>
+                    </SheetClose>
+                  </Link>
+                  <Link href="/blog">
+                    <SheetClose asChild>
+                      <Button variant="ghost" className="w-full justify-start gap-2">
+                        <BookText className="h-4 w-4" />
+                        Blog
+                      </Button>
+                    </SheetClose>
+                  </Link>
+                  <div className="px-2">
                     <ThemeToggle />
                   </div>
                 </div>

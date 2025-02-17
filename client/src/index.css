@@ -3,87 +3,12 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --sheet-width: 16rem;
-  }
-
-  .fixed-body {
-    @apply overflow-hidden;
-    position: fixed;
-    width: 100%;
-    left: 0;
-    top: 0;
-  }
-
-  /* Sheet styles */
-  [data-overlay-portal] {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    pointer-events: none;
-  }
-
-  [data-overlay-portal] > * {
-    pointer-events: auto;
-  }
-
-  .SheetContent {
-    position: fixed !important;
-    height: 100vh !important;
-    width: var(--sheet-width) !important;
-    top: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    z-index: 9999 !important;
-    transform: translateX(100%);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    background-color: hsl(var(--background));
-    display: flex;
-    flex-direction: column;
-    padding: 0 !important;
-  }
-
-  .SheetContent[data-state="open"] {
-    transform: translateX(0);
-  }
-
-  .SheetOverlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
-    z-index: 9998;
-    opacity: 0;
-    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .SheetOverlay[data-state="open"] {
-    opacity: 1;
-  }
-
   * {
     @apply border-border;
   }
 
-  .nav-scroll-transition {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateY(0);
-    will-change: transform;
-    z-index: 50;
-    backdrop-filter: blur(8px);
-    transform-origin: top;
-  }
-
-  .nav-scroll-hidden {
-    transform: translateY(-100%);
-  }
-
   body {
-    @apply font-sans antialiased pt-[73px];
+    @apply font-sans antialiased;
     background-color: #F5F7FA;
     color: #283951;
   }
@@ -103,6 +28,7 @@
     @apply bg-background;
   }
 
+  /* Ensure consistent page backgrounds */
   [data-page],
   [data-page] > div,
   [data-page] > main {
@@ -116,6 +42,7 @@
     background-color: #111C2A;
   }
 
+  /* Center content sections */
   .content-section {
     @apply mx-auto max-w-6xl px-4;
   }
@@ -143,6 +70,7 @@
     color: white;
   }
 
+  /* Active menu styles */
   [data-active="true"],
   [data-state="active"],
   .active {
@@ -164,15 +92,18 @@
     color: var(--primary) !important;
   }
 
+  /* Single, quick transition for all theme-related color changes */
   :root * {
     @apply transition-colors duration-100;
   }
 
+  /* Remove individual element transitions to prevent timing mismatches */
   body,
   :root {
     @apply transition-colors duration-100;
   }
 
+  /* Style elements without individual transitions */
   .card,
   .button,
   .nav-item,
