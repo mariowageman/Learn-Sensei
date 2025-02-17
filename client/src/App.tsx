@@ -190,7 +190,9 @@ function Navigation() {
         </div>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
+          <div className="hidden sm:block">
+            <ThemeToggle />
+          </div>
           <UserMenu />
           <Sheet>
             <SheetTrigger asChild className="sm:hidden">
@@ -201,6 +203,9 @@ function Navigation() {
             <SheetContent side="right" className="w-64">
               <div className="flex flex-col gap-4">
                 <NavigationLinks onNavigate={() => document.querySelector('[role="dialog"]')?.remove()} />
+                <div className="px-2">
+                  <ThemeToggle />
+                </div>
               </div>
             </SheetContent>
           </Sheet>
