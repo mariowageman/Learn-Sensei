@@ -12,7 +12,9 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (user) {
-      setLocation(-1); // Go back to previous page
+      const redirectPath = sessionStorage.getItem('redirectPath') || '/';
+      sessionStorage.removeItem('redirectPath');
+      setLocation(redirectPath);
     }
   }, [user, setLocation]);
 

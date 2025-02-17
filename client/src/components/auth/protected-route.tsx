@@ -22,6 +22,7 @@ export function ProtectedRoute({ children, path }: ProtectedRouteProps) {
   }
 
   if (!user) {
+    sessionStorage.setItem('redirectPath', path);
     setLocation("/auth");
     return null;
   }
