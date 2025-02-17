@@ -1,31 +1,27 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-
-interface User {
-  id: number;
-  username: string;
-}
+import { RBACUser, UserRole, hasPermission } from './rbac';
 
 interface AuthContextType {
-  user: User | null;
+  user: RBACUser | null;
   isLoading: boolean;
-  login: (user: User) => void;
+  login: (user: RBACUser) => void;
   logout: () => void;
+  hasPermission: (action: string, subject: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<RBACUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  // Check if user is already logged in on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const response = await fetch('/api/auth/user', {
-          credentials: 'include' // Important for session cookie
+          credentials: 'include'
         });
         if (response.ok) {
           const userData = await response.json();
@@ -41,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, []);
 
-  const login = (userData: User) => {
+  const login = (userData: RBACUser) => {
     setUser(userData);
     toast({
       title: "Success!",
@@ -76,8 +72,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const checkPermission = (action: string, subject: string): boolean => {
+    if (!user) return false;
+    return hasPermission(user.role, action, subject);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isLoading, 
+      login, 
+      logout,
+      hasPermission: checkPermission
+    }}>
       {children}
     </AuthContext.Provider>
   );

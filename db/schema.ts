@@ -3,14 +3,39 @@ import { sql } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
-// Add users table
+// Define user roles
+export const roles = pgTable("roles", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description").notNull(),
+  permissions: jsonb("permissions").notNull().default(sql`'{}'::jsonb`),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
+// Add users table with role
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  roleId: integer("role_id").references(() => roles.id).notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  metadata: jsonb("metadata").notNull().default(sql`'{}'::jsonb`),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull()
 });
+
+// Define relations
+export const usersRelations = relations(users, ({ one }) => ({
+  role: one(roles, {
+    fields: [users.roleId],
+    references: [roles.id],
+  }),
+}));
+
+export const rolesRelations = relations(roles, ({ many }) => ({
+  users: many(users),
+}));
 
 // Keep existing table definitions
 export const sessions = pgTable("sessions", {
@@ -116,11 +141,14 @@ export const quizProgressRelations = relations(quizProgress, ({ one }) => ({
   })
 }));
 
-// Add user schema validation
+// Add schemas for roles
+export const insertRoleSchema = createInsertSchema(roles);
+export const selectRoleSchema = createSelectSchema(roles);
+
+// Update user schemas
 export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 
-// Keep existing schema exports
 export const insertSessionSchema = createInsertSchema(sessions);
 export const selectSessionSchema = createSelectSchema(sessions);
 export const insertMessageSchema = createInsertSchema(messages);
@@ -138,11 +166,14 @@ export const selectProgressAnalyticsSchema = createSelectSchema(progressAnalytic
 export const insertSubjectHistorySchema = createInsertSchema(subjectHistory);
 export const selectSubjectHistorySchema = createSelectSchema(subjectHistory);
 
-// Add User type to existing type exports
+// Add Role type
+export type Role = typeof roles.$inferSelect;
+export type NewRole = typeof roles.$inferInsert;
+
+// Update User type
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
-// Keep existing type exports
 export type Session = typeof sessions.$inferSelect;
 export type Message = typeof messages.$inferSelect;
 export type QuizQuestion = typeof quizQuestions.$inferSelect;

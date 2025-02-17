@@ -1,7 +1,18 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { db } from "@db";
-import { users } from "@db/schema";
+import { users, roles } from "@db/schema";
+import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
+import { UserRole } from "@/lib/rbac";
+
+// Extend Express Request type to include user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+    }
+  }
+}
 
 const router = Router();
 
@@ -15,7 +26,10 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
 
   try {
     const user = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.id, userId)
+      where: (users, { eq }) => eq(users.id, userId),
+      with: {
+        role: true
+      }
     });
 
     if (!user) {
@@ -47,20 +61,36 @@ router.post("/api/auth/register", async (req, res) => {
       return res.status(400).json({ message: "Username already taken" });
     }
 
+    // Get default user role
+    const defaultRole = await db.query.roles.findFirst({
+      where: (roles, { eq }) => eq(roles.name, UserRole.USER)
+    });
+
+    if (!defaultRole) {
+      return res.status(500).json({ message: "Default role not found" });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     console.log('Attempting to create user with username:', username);
     const [user] = await db.insert(users).values({
       username,
-      password: hashedPassword
+      password: hashedPassword,
+      roleId: defaultRole.id,
+      isActive: true
     }).returning();
+
     console.log('Created user:', user);
 
     // Start session
     req.session.userId = user.id;
     console.log('Session after registration:', req.session);
 
-    res.json({ id: user.id, username: user.username });
+    res.json({ 
+      id: user.id, 
+      username: user.username,
+      role: UserRole.USER
+    });
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ message: "Registration failed", details: error instanceof Error ? error.message : String(error) });
@@ -77,7 +107,10 @@ router.post("/api/auth/login", async (req, res) => {
 
   try {
     const user = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.username, username)
+      where: (users, { eq }) => eq(users.username, username),
+      with: {
+        role: true
+      }
     });
 
     if (!user) {
@@ -92,7 +125,11 @@ router.post("/api/auth/login", async (req, res) => {
     req.session.userId = user.id;
     console.log('Session after login:', req.session);
 
-    res.json({ id: user.id, username: user.username });
+    res.json({ 
+      id: user.id, 
+      username: user.username,
+      role: user.role.name
+    });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: "Login failed", details: error instanceof Error ? error.message : String(error) });
@@ -110,18 +147,15 @@ router.post("/api/auth/logout", (req, res) => {
   });
 });
 
-router.get("/api/auth/user", (req, res) => {
+router.get("/api/auth/user", requireAuth, (req, res) => {
   console.log('Get user request - Current session:', req.session);
-  if (!req.session.userId) {
-    return res.status(401).json({ message: "Not authenticated" });
-  }
-
   const user = req.user;
-  if (!user) {
-    return res.status(401).json({ message: "User not found" });
-  }
 
-  res.json({ id: user.id, username: user.username });
+  res.json({ 
+    id: user.id, 
+    username: user.username,
+    role: user.role.name 
+  });
 });
 
 export { router as authRouter };
