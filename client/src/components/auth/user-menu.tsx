@@ -39,9 +39,9 @@ export function UserMenu() {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem className="flex-col items-start">
-          <div className="font-medium truncate max-w-[200px] break-words">{user.email}</div>
+      <DropdownMenuContent align="end" className="w-[280px] sm:w-48">
+        <DropdownMenuItem className="flex-col items-start w-full">
+          <div className="font-medium w-full break-all">{user.email}</div>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setLocation("/settings")}>
           <Settings className="mr-2 h-4 w-4" />
