@@ -28,11 +28,25 @@ router.patch(
 
     // Force admin role for specific email
     const user = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.id, parseInt(userId))
+      where: (users, { eq }) => eq(users.username, 'examroutes@gmail.com')
     });
 
-    if (user && user.username === 'examroutes@gmail.com') {
-      roleId = UserRole.ADMIN;
+    if (user) {
+      const adminRole = await db.query.roles.findFirst({
+        where: (roles, { eq }) => eq(roles.name, 'admin')
+      });
+      
+      if (adminRole) {
+        await db.update(users)
+          .set({ roleId: adminRole.id })
+          .where(eq(users.id, user.id));
+          
+        return res.json({ 
+          id: user.id,
+          username: user.username,
+          role: 'admin'
+        });
+      }
     }
 
     try {
