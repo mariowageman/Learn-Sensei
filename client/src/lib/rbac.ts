@@ -14,7 +14,8 @@ export interface Permission {
 
 export const defaultPermissions: Record<UserRole, Permission[]> = {
   [UserRole.ADMIN]: [
-    { action: "manage", subject: "all" }
+    { action: "manage", subject: "all" },
+    { action: "manage", subject: "billing" }
   ],
   [UserRole.MODERATOR]: [
     { action: "read", subject: "all" },
