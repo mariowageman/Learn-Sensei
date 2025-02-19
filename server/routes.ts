@@ -146,6 +146,11 @@ app.post("/api/blog", async (req, res) => {
   app.post("/api/upload", async (req, res) => {
     try {
       const storage = new Client();
+      const bucketId = process.env.BUCKET_ID;
+      if (!bucketId) {
+        return res.status(500).json({ error: "Bucket ID not configured" });
+      }
+      await storage.init({ bucketId });
       const file = req.files?.image;
       
       if (!file) {
@@ -155,8 +160,8 @@ app.post("/api/blog", async (req, res) => {
       const timestamp = Date.now();
       const filename = `image_${timestamp}${path.extname(file.name)}`;
       
-      await storage.upload_from_text(filename, file.data);
-      const url = await storage.get_signed_url(filename);
+      await storage.write(filename, file.data);
+      const url = await storage.getSignedUrl(filename);
 
       res.json({ url });
     } catch (error) {
