@@ -104,6 +104,21 @@ export const progressAnalytics = pgTable("progress_analytics", {
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
 
+export const blogPosts = pgTable("blog_posts", {
+  id: serial("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  date: timestamp("date").notNull().defaultNow(),
+  description: text("description").notNull(),
+  category: text("category").notNull(),
+  image: text("image").notNull(),
+  tags: jsonb("tags").notNull().default(sql`'[]'::jsonb`),
+  content: text("content").notNull(),
+  authorId: integer("author_id").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
 export const subjectHistory = pgTable("subject_history", {
   id: serial("id").primaryKey(),
   subject: text("subject").notNull(),
@@ -119,6 +134,13 @@ export const learningPathProgressRelations = relations(learningPathProgress, ({ 
     fields: [learningPathProgress.pathId],
     references: [learningPaths.id],
   })
+}));
+
+export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
+  author: one(users, {
+    fields: [blogPosts.authorId],
+    references: [users.id],
+  }),
 }));
 
 export const progressAnalyticsRelations = relations(progressAnalytics, ({ one }) => ({
@@ -163,6 +185,8 @@ export const insertProgressAnalyticsSchema = createInsertSchema(progressAnalytic
 export const selectProgressAnalyticsSchema = createSelectSchema(progressAnalytics);
 export const insertSubjectHistorySchema = createInsertSchema(subjectHistory);
 export const selectSubjectHistorySchema = createSelectSchema(subjectHistory);
+export const insertBlogPostSchema = createInsertSchema(blogPosts);
+export const selectBlogPostSchema = createSelectSchema(blogPosts);
 
 // Add Role type
 export type Role = typeof roles.$inferSelect;
