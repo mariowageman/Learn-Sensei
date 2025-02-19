@@ -167,7 +167,7 @@ export default function BlogPage() {
                     className="gap-2 whitespace-nowrap"
                     onClick={() => setLocation('/create-blog')}
                   >
-                    <Edit className="h-4 w-4" />
+                    <Edit className="h-4 w-4 dark:text-white" />
                     Create Post
                   </Button>
                 </ProtectedComponent>
