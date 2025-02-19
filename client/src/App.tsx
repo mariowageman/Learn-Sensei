@@ -20,6 +20,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
 import BlogPost from "@/pages/blog-post";
+import CreateBlog from "@/pages/create-blog";
 import { useScrollTop } from "@/hooks/use-scroll-top";
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { UserMenu } from '@/components/auth/user-menu';
@@ -319,6 +320,11 @@ function Router() {
           <Route path="/blog/:id">
             <div data-page="blog-post">
               <BlogPost />
+            </div>
+          </Route>
+          <Route path="/create-blog">
+            <div data-page="create-blog">
+              <CreateBlog />
             </div>
           </Route>
           <Route path="/cookie-policy">
