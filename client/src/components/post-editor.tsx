@@ -236,7 +236,7 @@ export function PostEditor({
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={cn(editor.isActive('bold') && 'bg-muted-foreground/20')}
         >
-          <Bold className="h-4 w-4" />
+          <Bold className="h-4 w-4 dark:text-white" />
         </Button>
         <Button
           variant="ghost"
@@ -244,7 +244,7 @@ export function PostEditor({
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={cn(editor.isActive('italic') && 'bg-muted-foreground/20')}
         >
-          <Italic className="h-4 w-4" />
+          <Italic className="h-4 w-4 dark:text-white" />
         </Button>
         <Button
           variant="ghost"
@@ -252,7 +252,7 @@ export function PostEditor({
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           className={cn(editor.isActive('heading', { level: 1 }) && 'bg-muted-foreground/20')}
         >
-          <Heading1 className="h-4 w-4" />
+          <Heading1 className="h-4 w-4 dark:text-white" />
         </Button>
         <Button
           variant="ghost"
@@ -260,7 +260,7 @@ export function PostEditor({
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={cn(editor.isActive('heading', { level: 2 }) && 'bg-muted-foreground/20')}
         >
-          <Heading2 className="h-4 w-4" />
+          <Heading2 className="h-4 w-4 dark:text-white" />
         </Button>
         <Button
           variant="ghost"
@@ -268,7 +268,7 @@ export function PostEditor({
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={cn(editor.isActive('bulletList') && 'bg-muted-foreground/20')}
         >
-          <List className="h-4 w-4" />
+          <List className="h-4 w-4 dark:text-white" />
         </Button>
         <Button
           variant="ghost"
@@ -276,7 +276,7 @@ export function PostEditor({
           onClick={handleLinkInsert}
           className={cn(editor.isActive('link') && 'bg-muted-foreground/20')}
         >
-          <LinkIcon className="h-4 w-4" />
+          <LinkIcon className="h-4 w-4 dark:text-white" />
         </Button>
         <div className="relative">
           <Button
@@ -285,7 +285,7 @@ export function PostEditor({
             className={cn(isUploading && 'opacity-50 cursor-not-allowed')}
             disabled={isUploading}
           >
-            <ImageIcon className="h-4 w-4" />
+            <ImageIcon className="h-4 w-4 dark:text-white" />
             <input
               type="file"
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
