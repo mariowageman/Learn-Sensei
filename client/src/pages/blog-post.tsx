@@ -155,8 +155,8 @@ export default function BlogPost() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <Link href="/blog">
-                <Button variant="ghost">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
+                <Button variant="ghost" className="dark:text-white">
+                  <ArrowLeft className="mr-2 h-4 w-4 dark:text-white" />
                   Back to Blog
                 </Button>
               </Link>
