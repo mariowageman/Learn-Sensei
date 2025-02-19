@@ -1,4 +1,3 @@
-
 import { useRoute, Link } from "wouter";
 import { Footer } from "@/components/footer";
 import { Badge } from "@/components/ui/badge";
@@ -145,7 +144,7 @@ export default function BlogPost() {
             <div className="space-y-4">
               <div className="flex items-center gap-4 text-sm">
                 <Badge variant="secondary">{currentPost.category}</Badge>
-                <span className="text-muted-foreground">{currentPost.date}</span>
+                <span className="text-muted-foreground">{new Date(currentPost.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                 <div className="flex items-center text-muted-foreground">
                   <Clock className="h-4 w-4 mr-1" />
                   {calculateReadingTime(currentPost.content)} min read
@@ -217,7 +216,7 @@ export default function BlogPost() {
                         {relatedPost.title}
                       </h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {relatedPost.date}
+                        {new Date(relatedPost.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                       </p>
                     </div>
                   </Link>
