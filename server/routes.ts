@@ -1,88 +1,70 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { requireAuth } from "./auth";
-import { generateExplanation, generateQuestion, checkAnswer } from "./openai";
 import { db } from "@db";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import {
-  sessions,
-  messages,
-  quizQuestions,
-  quizProgress,
-  learningPaths,
-  learningPathProgress,
-  progressAnalytics,
-  subjectHistory,
+  blogPosts,
   type BlogPostType
 } from "@db/schema";
-import { fetchCourseraCourses } from "./coursera";
 import { generateRSSFeed } from "../client/src/lib/rss";
 
-// Update blog post interface to match schema
+// Interface extending BlogPostType for frontend use
 interface BlogPost extends BlogPostType {
-  id: string;
-  title: string;
-  content: string;
-  date: string;
-  description: string;
-  category: string;
-  image: string;
-  tags: string[];
-  updatedAt?: string;
+  tags: string[]; // Override tags to be string[] instead of unknown
 }
-
-let blogPosts: BlogPost[] = [];
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
 
-  // Blog post update endpoint
-  app.patch("/api/blog/:id", async (req, res) => {
+  // Blog routes
+  app.get("/api/blog", async (req, res) => {
     try {
-      const { id } = req.params;
-      const { content } = req.body;
-
-      if (!content) {
-        return res.status(400).json({ error: "Content is required" });
-      }
-
-      const postIndex = blogPosts.findIndex(post => post.id === id);
-      if (postIndex === -1) {
-        return res.status(404).json({ error: "Blog post not found" });
-      }
-
-      // Update the post content while preserving other fields
-      const updatedPost = {
-        ...blogPosts[postIndex],
-        content,
-        updatedAt: new Date().toISOString()
-      };
-
-      blogPosts[postIndex] = updatedPost;
-
-      // In the future, when database is set up:
-      // await db.update(blogPosts)
-      //   .set({ content, updatedAt: new Date() })
-      //   .where(eq(blogPosts.id, id));
-
-      res.json({
-        success: true,
-        post: updatedPost
+      console.log('Fetching all blog posts');
+      const posts = await db.query.blogPosts.findMany({
+        orderBy: (posts, { desc }) => [desc(posts.date)]
       });
+      console.log('Found posts:', posts.length);
+      res.json(posts);
     } catch (error) {
-      console.error('Error updating blog post:', error);
-      res.status(500).json({ error: "Failed to update blog post" });
+      console.error('Error fetching blog posts:', error);
+      res.status(500).json({ error: "Failed to fetch blog posts" });
     }
   });
 
-  // Add RSS feed endpoint
-  app.get("/feed.xml", (req, res) => {
+  app.get("/api/blog/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      console.log('Fetching blog post with slug:', slug);
+
+      const post = await db.query.blogPosts.findFirst({
+        where: eq(blogPosts.slug, slug)
+      });
+
+      if (!post) {
+        console.log('Post not found for slug:', slug);
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+
+      console.log('Found post:', post.title);
+      res.json(post);
+    } catch (error) {
+      console.error('Error fetching blog post:', error);
+      res.status(500).json({ error: "Failed to fetch blog post" });
+    }
+  });
+
+  // Test endpoint to verify server is running
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "OK" });
+  });
+
+  // RSS feed endpoint
+  app.get("/feed.xml", async (req, res) => {
     try {
       const protocol = req.headers['x-forwarded-proto'] || req.protocol;
       const baseUrl = `${protocol}://${req.get('host')}`;
-      const feed = generateRSSFeed(baseUrl);
+      const feed = await generateRSSFeed(baseUrl);
       res.set('Content-Type', 'application/xml');
-      res.attachment('feed.xml');  // This will force download
       res.send(feed);
     } catch (error) {
       console.error('Error generating RSS feed:', error);
@@ -90,19 +72,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.get("/api/blog", async (req, res) => {
-  try {
-    const posts = await db.query.blogPosts.findMany({
-      orderBy: (posts, { desc }) => [desc(posts.date)]
-    });
-    res.json(posts);
-  } catch (error) {
-    console.error('Error fetching blog posts:', error);
-    res.status(500).json({ error: "Failed to fetch blog posts" });
-  }
-});
-
-app.get("/api/session", async (req, res) => {
+  app.get("/api/session", async (req, res) => {
     const session = await db.query.sessions.findFirst({
       orderBy: (sessions, { desc }) => [desc(sessions.createdAt)]
     });
@@ -844,7 +814,7 @@ app.get("/api/session", async (req, res) => {
   return httpServer;
 }
 
-// Helper functions with proper type annotations
+// Helper functions
 function calculateConfidenceScore(
   path: typeof learningPaths.$inferSelect,
   quizAccuracy: number,
@@ -852,59 +822,35 @@ function calculateConfidenceScore(
   progress?: typeof learningPathProgress.$inferSelect | null,
   subjectHistory: { subject: string }[] = []
 ): number {
-  // Start with base score of 70%
   let score = 0.70;
 
-  // Subject history bonus (up to 15%)
   const topics = (path.topics as string[]) || [];
   const mainTopic = topics[0]?.toLowerCase() || path.title.toLowerCase();
-  const hasSubjectHistory = subjectHistory?.some(
-    h => {
-      const historySubject = h.subject.toLowerCase();
-      const topicMatch = mainTopic.includes(historySubject) || historySubject.includes(mainTopic);
-      return topicMatch;
-    }
-  );
-  if (hasSubjectHistory) {
-    score += 0.15; // Higher match for subjects user has studied before
-  }
 
-  // Quiz performance (up to 10%)
+  const hasSubjectHistory = subjectHistory?.some(h => {
+    const historySubject = h.subject.toLowerCase();
+    return mainTopic.includes(historySubject) || historySubject.includes(mainTopic);
+  });
+
+  if (hasSubjectHistory) score += 0.15;
   score += quizAccuracy * 0.10;
+  score += Math.min(timeSpent / (path.estimatedHours * 60), 1) * 0.05;
 
-  // Time investment factor (up to 5%)
-  const engagementScore = Math.min(timeSpent / (path.estimatedHours * 60), 1);
-  score += engagementScore * 0.05;
-
-  // For new users or no progress
   if (!progress) {
-    if (path.difficulty === 'beginner') {
-      score += 0.10; // Higher match for beginner courses
-    } else if (path.difficulty === 'intermediate') {
-      score += 0.05; // Medium match for intermediate courses
-    }
+    if (path.difficulty === 'beginner') score += 0.10;
+    else if (path.difficulty === 'intermediate') score += 0.05;
     return Math.max(0.70, Math.min(1, score));
   }
 
-  // Learning streak bonus (up to 5%)
-  const streakBonus = Math.min(progress.streakDays / 14, 1) * 0.05;
-  score += streakBonus;
+  score += Math.min(progress.streakDays / 14, 1) * 0.05;
 
-  // Topic mastery (up to 5%)
   const completedTopics = progress.completedTopics as number[];
-  const topicMasteryScore = completedTopics.length / topics.length;
-  score += topicMasteryScore * 0.05;
+  score += (completedTopics.length / topics.length) * 0.05;
 
-  // Difficulty progression (up to 5%)
-  if (path.difficulty === 'beginner' && completedTopics.length === 0) {
-    score += 0.05; // Perfect for beginners
-  } else if (path.difficulty === 'intermediate' && completedTopics.length >= 2) {
-    score += 0.05; // Ready for intermediate
-  } else if (path.difficulty === 'advanced' && completedTopics.length >= 4) {
-    score += 0.05; // Ready for advanced
-  }
+  if (path.difficulty === 'beginner' && completedTopics.length === 0) score += 0.05;
+  else if (path.difficulty === 'intermediate' && completedTopics.length >= 2) score += 0.05;
+  else if (path.difficulty === 'advanced' && completedTopics.length >= 4) score += 0.05;
 
-  // Ensure the score is between 70% and 100%
   return Math.max(0.70, Math.min(1, score));
 }
 
@@ -920,13 +866,12 @@ function generateRecommendationReason(
     if (path.difficulty === 'beginner') {
       return `Great starting point for beginners! This ${mainTopic} course will help you build a strong foundation.`;
     }
-    return `This ${path.difficulty} level course in ${mainTopic} matches your interests.`;
+    return `This ${path.difficulty} level course in ${mainTopic} matches yourinterests.`;
   }
 
   const completedTopics = progress.completedTopics as number[];
   const completedCount = completedTopics.length;
 
-  // Tailor message based on user's progress and course difficulty
   if (path.difficulty === 'beginner') {
     if (completedCount === 0) {
       return `Perfect first step! Start your journey with this beginner-friendly ${mainTopic} course.`;
@@ -936,24 +881,10 @@ function generateRecommendationReason(
 
   if (path.difficulty === 'intermediate') {
     if (completedCount >= 2) {
-      return `Ready for the next level! Your strong performance in basic courses makes this intermediate ${mainTopic} course a perfect match.`;
+      return `Ready for the next level! This ${mainTopic} course will build on your existing knowledge.`;
     }
-    return `Level up your skills with this intermediate course in ${mainTopic}.`;
+    return `This intermediate course in ${mainTopic} will help you advance your skills.`;
   }
 
-  if (path.difficulty === 'advanced') {
-    if (completedCount >= 4) {
-      return `Challenge yourself! Your mastery of intermediate topics makes you ready for this advanced ${mainTopic} course.`;
-    }
-    if (quizAccuracy > 0.8) {
-      return `Your exceptional quiz performance (${Math.round(quizAccuracy * 100)}% accuracy) shows you're ready for this advanced material.`;
-    }
-  }
-
-  if (progress.streakDays >= 7) {
-    return `Keep your ${progress.streakDays}-day learning streak going! This ${path.difficulty} course in ${mainTopic} is perfect for your current level.`;
-  }
-
-  // Default recommendation
   return `This ${path.difficulty} level course in ${mainTopic} aligns well with your learning progress.`;
 }

@@ -204,3 +204,6 @@ export type LearningPath = typeof learningPaths.$inferSelect;
 export type LearningPathProgress = typeof learningPathProgress.$inferSelect;
 export type ProgressAnalytics = typeof progressAnalytics.$inferSelect;
 export type SubjectHistory = typeof subjectHistory.$inferSelect;
+
+// Add BlogPostType export
+export type BlogPostType = typeof blogPosts.$inferSelect;
