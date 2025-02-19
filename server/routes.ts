@@ -1,5 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { Client } from "replit.object-storage";
+import path from "path";
 import { db } from "@db";
 import { eq, desc } from "drizzle-orm";
 import {
@@ -138,6 +140,29 @@ app.post("/api/blog", async (req, res) => {
 
   app.get("/api/health", (req, res) => {
     res.json({ status: "OK" });
+  });
+
+  // File upload endpoint
+  app.post("/api/upload", async (req, res) => {
+    try {
+      const storage = new Client();
+      const file = req.files?.image;
+      
+      if (!file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const timestamp = Date.now();
+      const filename = `image_${timestamp}${path.extname(file.name)}`;
+      
+      await storage.upload_from_text(filename, file.data);
+      const url = await storage.get_signed_url(filename);
+
+      res.json({ url });
+    } catch (error) {
+      console.error('Upload error:', error);
+      res.status(500).json({ error: "Failed to upload file" });
+    }
   });
 
   // RSS feed endpoint

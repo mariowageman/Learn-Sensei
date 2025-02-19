@@ -8,6 +8,7 @@ import { authRouter } from "./auth";
 import connectPg from "connect-pg-simple";
 import { pool } from "@db";
 import { rolesRouter } from "./routes/roles";
+import fileUpload from 'express-fileupload'; // Added fileUpload middleware
 
 declare module 'express-session' {
   interface SessionData {
@@ -18,6 +19,7 @@ declare module 'express-session' {
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(fileUpload()); // Configure fileupload middleware
 
 // Configure session
 const PostgresStore = connectPg(session);
