@@ -268,7 +268,7 @@ export default function BlogPost() {
           <div className="mt-12">
             <Link href="/blog">
               <Button variant="blue" size="lg" className="gap-2 text-white">
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-4 w-4 text-white" />
                 Back to Blog
               </Button>
             </Link>
