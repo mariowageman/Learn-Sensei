@@ -16,7 +16,6 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { useToast } from '@/hooks/use-toast'
 
 interface PostEditorProps {
   initialContent: string;
@@ -26,25 +25,13 @@ interface PostEditorProps {
 
 export function PostEditor({ initialContent, onSave, onCancel }: PostEditorProps) {
   const [isUploading, setIsUploading] = useState(false);
-  const { toast } = useToast();
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2]
-        }
-      }),
-      Image.configure({
-        HTMLAttributes: {
-          class: 'max-w-full rounded-lg',
-        },
-      }),
+      StarterKit,
+      Image,
       Link.configure({
         openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-primary hover:underline cursor-pointer',
-        },
       }),
     ],
     content: initialContent,
@@ -69,43 +56,22 @@ export function PostEditor({ initialContent, onSave, onCancel }: PostEditorProps
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
+      if (!response.ok) throw new Error('Upload failed');
 
       const { url } = await response.json();
       editor?.chain().focus().setImage({ src: url }).run();
-
-      toast({
-        title: "Success",
-        description: "Image uploaded successfully",
-      });
     } catch (error) {
       console.error('Image upload failed:', error);
-      toast({
-        title: "Error",
-        description: "Failed to upload image",
-        variant: "destructive",
-      });
     } finally {
       setIsUploading(false);
     }
   }
 
   const handleLinkInsert = () => {
-    const previousUrl = editor?.getAttributes('link').href;
-    const url = window.prompt('Enter URL:', previousUrl);
-
-    if (url === null) {
-      return; // Cancelled
+    const url = window.prompt('Enter URL:');
+    if (url) {
+      editor?.chain().focus().setLink({ href: url }).run();
     }
-
-    if (url === '') {
-      editor?.chain().focus().unsetLink().run();
-      return;
-    }
-
-    editor?.chain().focus().setLink({ href: url }).run();
   }
 
   if (!editor) return null;
@@ -179,9 +145,9 @@ export function PostEditor({ initialContent, onSave, onCancel }: PostEditorProps
           </Button>
         </div>
       </div>
-
+      
       <EditorContent editor={editor} />
-
+      
       <div className="border-t bg-muted p-2 flex justify-end gap-2">
         <Button
           variant="ghost"
@@ -192,7 +158,6 @@ export function PostEditor({ initialContent, onSave, onCancel }: PostEditorProps
         </Button>
         <Button
           onClick={() => onSave(editor.getHTML())}
-          disabled={isUploading}
         >
           <Save className="h-4 w-4 mr-2" />
           Save Changes
