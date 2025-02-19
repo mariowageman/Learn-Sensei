@@ -38,9 +38,9 @@ export function registerRoutes(app: Express): Server {
     try {
       const { slug } = req.params;
       const { content, title, tags } = req.body;
-      
+
       await db.update(blogPosts)
-        .set({ 
+        .set({
           content,
           title: title || undefined,
           tags: tags || [],
@@ -58,7 +58,7 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/blog", async (req, res) => {
     try {
       const { slug, title, content, tags, description, category, image } = req.body;
-      
+
       const post = await db.insert(blogPosts)
         .values({
           slug,
@@ -123,14 +123,14 @@ export function registerRoutes(app: Express): Server {
       }
 
       const { identifier } = req.params;
-      
+
       // Check if identifier is a number (ID) or string (slug)
       if (!isNaN(Number(identifier))) {
         await db.delete(blogPosts).where(eq(blogPosts.id, parseInt(identifier)));
       } else {
         await db.delete(blogPosts).where(eq(blogPosts.slug, identifier));
       }
-      
+
       res.json({ message: "Post deleted successfully" });
     } catch (error) {
       console.error('Error deleting blog post:', error);
@@ -177,11 +177,16 @@ export function registerRoutes(app: Express): Server {
       console.log('Attempting to upload file:', filename);
 
       try {
-        await storage.put(filename, file.data);
+        // Create a Buffer from the file data if it's not already a Buffer
+        const fileBuffer = Buffer.isBuffer(file.data) ? file.data : Buffer.from(file.data);
+
+        // Use writeFile instead of put
+        await storage.writeFile(filename, fileBuffer);
         console.log('File uploaded to storage successfully');
 
-        const url = await storage.getSignedUrl(filename, { expires: 24 * 60 * 60 }); // 24 hours expiry
-        console.log('Generated signed URL:', url);
+        // Use url method instead of getSignedUrl
+        const url = await storage.url(filename);
+        console.log('Generated URL:', url);
 
         res.json({ url });
       } catch (storageError) {
