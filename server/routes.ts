@@ -180,15 +180,18 @@ export function registerRoutes(app: Express): Server {
         // Create a Buffer from the file data
         const fileBuffer = Buffer.isBuffer(file.data) ? file.data : Buffer.from(file.data);
 
-        // Upload file using the storage client
+        // Upload file using the storage client with metadata
         await storage.write(filename, fileBuffer, {
-          access: 'public-read',
-          contentType: file.mimetype
+          access: 'public',
+          contentType: file.mimetype,
+          metadata: {
+            originalName: file.name
+          }
         });
         console.log('File uploaded to storage successfully');
 
-        // Generate public URL
-        const url = `https://${bucketId}.replit.dev/${filename}`;
+        // Generate public URL using the correct bucket URL format
+        const url = `https://${bucketId}.replit.dev/${encodeURIComponent(filename)}`;
         console.log('Generated URL:', url);
 
         res.json({ url });
