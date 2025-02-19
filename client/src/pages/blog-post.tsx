@@ -163,7 +163,7 @@ export default function BlogPost() {
               <ProtectedComponent requiredRole={["admin", "moderator"]}>
                 <div className="flex gap-2">
                   <Button onClick={() => setIsEditing(true)} >
-                    <Edit className="h-4 w-4" />
+                    <Edit className="h-4 w-4 dark:text-white" />
                     Edit Post
                   </Button>
                   <Button 
