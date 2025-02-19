@@ -10,7 +10,6 @@ import {
   users,
   type BlogPostType
 } from "@db/schema";
-import { generateRSSFeed } from "../client/src/lib/rss";
 
 // Interface extending BlogPostType for frontend use
 interface BlogPost extends BlogPostType {
@@ -143,24 +142,30 @@ export function registerRoutes(app: Express): Server {
     res.json({ status: "OK" });
   });
 
-  // File upload endpoint
+  // File upload endpoint with improved error handling and logging
   app.post("/api/upload", async (req, res) => {
     try {
+      console.log('Starting file upload process');
+
       if (!req.files || !req.files.image) {
+        console.error('No file uploaded');
         return res.status(400).json({ error: "No image file uploaded" });
       }
 
       const bucketId = process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID;
       if (!bucketId) {
+        console.error('Storage bucket not configured');
         return res.status(500).json({ error: "Storage bucket not configured" });
       }
 
+      console.log('Initializing storage client with bucket:', bucketId);
       const storage = new Client({ bucketId });
       const file = req.files.image as UploadedFile;
 
       // Validate file type
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
       if (!allowedTypes.includes(file.mimetype)) {
+        console.error('Invalid file type:', file.mimetype);
         return res.status(400).json({ error: "Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed." });
       }
 
@@ -169,19 +174,23 @@ export function registerRoutes(app: Express): Server {
       const safeFilename = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
       const filename = `blog_images/${timestamp}_${safeFilename}`;
 
+      console.log('Attempting to upload file:', filename);
+
       try {
         await storage.put(filename, file.data);
-        const url = await storage.getSignedUrl(filename);
+        console.log('File uploaded to storage successfully');
 
-        console.log('File uploaded successfully:', filename);
+        const url = await storage.getSignedUrl(filename, { expires: 24 * 60 * 60 }); // 24 hours expiry
+        console.log('Generated signed URL:', url);
+
         res.json({ url });
       } catch (storageError) {
-        console.error('Storage error:', storageError);
-        res.status(500).json({ error: "Failed to store file" });
+        console.error('Storage operation failed:', storageError);
+        res.status(500).json({ error: "Failed to store file", details: (storageError as Error).message });
       }
     } catch (error) {
-      console.error('Upload error:', error);
-      res.status(500).json({ error: "Failed to process upload" });
+      console.error('Upload process error:', error);
+      res.status(500).json({ error: "Failed to process upload", details: (error as Error).message });
     }
   });
 
@@ -756,6 +765,7 @@ export function registerRoutes(app: Express): Server {
   });
 
 
+
   app.get("/api/recommendations", async (req, res) => {
     try {
       // Get user's progress across all learning paths
@@ -898,7 +908,8 @@ export function registerRoutes(app: Express): Server {
 
       // Get the current learning streak
       const pathProgress = await db.query.learningPathProgress.findMany({
-        orderBy: (progress, { desc }) => [desc(progress.updatedAt)]      });
+        orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
+      });
 
       const currentStreak = pathProgress[0]?.streakDays || 0;
 

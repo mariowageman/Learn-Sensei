@@ -189,13 +189,17 @@ export default function BlogPost() {
           </div>
 
           <div className="mb-8">
-            <AspectRatio ratio={21/9} className="bg-muted rounded-lg overflow-hidden">
-              <img 
-                src={currentPost.image} 
-                alt={currentPost.title}
-                className="object-cover w-full h-full"
-              />
-            </AspectRatio>
+            {currentPost.image && (
+              <div className="mb-8">
+                <AspectRatio ratio={21/9} className="bg-muted rounded-lg overflow-hidden">
+                  <img 
+                    src={currentPost.image} 
+                    alt={currentPost.title}
+                    className="object-cover w-full h-full"
+                  />
+                </AspectRatio>
+              </div>
+            )}
           </div>
 
           {isEditing ? (

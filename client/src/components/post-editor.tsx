@@ -16,8 +16,9 @@ import {
   Save,
   X
 } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { useToast } from '@/hooks/use-toast'
 
 interface PostEditorProps {
   initialContent: string;
@@ -26,15 +27,24 @@ interface PostEditorProps {
   initialImage?: string;
   onSave: (content: string, title: string, tags: string[], image: string) => void;
   onCancel: () => void;
-  existingTags: string[];
+  existingTags?: string[];
 }
 
-export function PostEditor({ initialContent, initialTitle, initialTags, initialImage, onSave, onCancel, existingTags }: PostEditorProps) {
+export function PostEditor({ 
+  initialContent, 
+  initialTitle, 
+  initialTags, 
+  initialImage, 
+  onSave, 
+  onCancel,
+  existingTags = []
+}: PostEditorProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [title, setTitle] = useState(initialTitle);
   const [tags, setTags] = useState<string[]>(initialTags);
   const [newTag, setNewTag] = useState("");
   const [mainImage, setMainImage] = useState(initialImage || "");
+  const { toast } = useToast();
 
   const editor = useEditor({
     extensions: [
@@ -52,7 +62,7 @@ export function PostEditor({ initialContent, initialTitle, initialTags, initialI
     },
   })
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, isMainImage: boolean = false) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -72,15 +82,29 @@ export function PostEditor({ initialContent, initialTitle, initialTags, initialI
       }
 
       const { url } = await response.json();
-      if (editor) {
+
+      if (isMainImage) {
+        setMainImage(url);
+        toast({
+          title: "Success",
+          description: "Cover image uploaded successfully",
+        });
+      } else if (editor) {
         editor.chain().focus().setImage({ src: url }).run();
+        toast({
+          title: "Success",
+          description: "Image inserted successfully",
+        });
       }
-      console.log('Image uploaded successfully:', url);
     } catch (error) {
       console.error('Image upload failed:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to upload image",
+        variant: "destructive"
+      });
     } finally {
       setIsUploading(false);
-      // Clear the file input
       e.target.value = '';
     }
   }
@@ -100,7 +124,11 @@ export function PostEditor({ initialContent, initialTitle, initialTags, initialI
         <div className="mb-4">
           {mainImage && (
             <div className="relative w-full h-48 mb-2">
-              <img src={mainImage} alt="Post cover" className="w-full h-full object-cover rounded-lg" />
+              <img 
+                src={mainImage} 
+                alt="Post cover" 
+                className="w-full h-full object-cover rounded-lg"
+              />
               <Button
                 variant="destructive"
                 size="sm"
@@ -121,41 +149,14 @@ export function PostEditor({ initialContent, initialTitle, initialTags, initialI
               <input
                 type="file"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-
-                  try {
-                    setIsUploading(true);
-                    const formData = new FormData();
-                    formData.append('image', file);
-
-                    const response = await fetch('/api/upload', {
-                      method: 'POST',
-                      body: formData,
-                    });
-
-                    if (!response.ok) {
-                      const errorData = await response.json();
-                      throw new Error(errorData.error || 'Upload failed');
-                    }
-
-                    const { url } = await response.json();
-                    setMainImage(url);
-                    console.log('Cover image uploaded successfully:', url);
-                  } catch (error) {
-                    console.error('Cover image upload failed:', error);
-                  } finally {
-                    setIsUploading(false);
-                    e.target.value = '';
-                  }
-                }}
+                onChange={(e) => handleImageUpload(e, true)}
                 accept="image/*"
                 disabled={isUploading}
               />
             </Button>
           </div>
         </div>
+
         <Input
           type="text"
           placeholder="Post title"
@@ -163,6 +164,7 @@ export function PostEditor({ initialContent, initialTitle, initialTags, initialI
           onChange={(e) => setTitle(e.target.value)}
           className="text-xl font-bold mb-2"
         />
+
         <div className="flex flex-wrap gap-2 items-center">
           {tags.map((tag, index) => (
             <Badge key={index} variant="secondary" className="group">
@@ -189,10 +191,13 @@ export function PostEditor({ initialContent, initialTitle, initialTags, initialI
                   }
                 }}
               />
-              {existingTags && newTag && (
+              {existingTags.length > 0 && newTag && (
                 <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-32 overflow-y-auto">
                   {existingTags
-                    .filter(tag => tag.toLowerCase().includes(newTag.toLowerCase()) && !tags.includes(tag))
+                    .filter(tag => 
+                      tag.toLowerCase().includes(newTag.toLowerCase()) && 
+                      !tags.includes(tag)
+                    )
                     .map(tag => (
                       <div
                         key={tag}
@@ -223,6 +228,7 @@ export function PostEditor({ initialContent, initialTitle, initialTags, initialI
           </div>
         </div>
       </div>
+
       <div className="border-b bg-muted p-2 flex flex-wrap gap-2">
         <Button
           variant="ghost"
@@ -283,7 +289,7 @@ export function PostEditor({ initialContent, initialTitle, initialTags, initialI
             <input
               type="file"
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              onChange={handleImageUpload}
+              onChange={(e) => handleImageUpload(e, false)}
               accept="image/*"
               disabled={isUploading}
             />
@@ -303,6 +309,7 @@ export function PostEditor({ initialContent, initialTitle, initialTags, initialI
         </Button>
         <Button
           onClick={() => onSave(editor.getHTML(), title, tags, mainImage)}
+          disabled={!mainImage || !title.trim()}
         >
           <Save className="h-4 w-4 mr-2" />
           Save Changes

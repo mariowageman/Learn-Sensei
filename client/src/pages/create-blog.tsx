@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
@@ -27,6 +26,15 @@ export default function CreateBlog() {
 
   const handleSave = async (content: string, title: string, tags: string[], image: string) => {
     try {
+      if (!image) {
+        toast({
+          title: 'Warning',
+          description: 'Please upload a cover image for the blog post',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       const slug = slugify(title);
       const response = await fetch('/api/blog', {
         method: 'POST',
@@ -40,7 +48,7 @@ export default function CreateBlog() {
           tags,
           description: content.slice(0, 150).replace(/<[^>]*>/g, ''),
           category: 'General',
-          image: image || '/assets/blog/learning-tips.jpg',
+          image, // Use the uploaded image URL
         }),
       });
 
