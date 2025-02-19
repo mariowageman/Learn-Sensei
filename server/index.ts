@@ -8,7 +8,7 @@ import { authRouter } from "./auth";
 import connectPg from "connect-pg-simple";
 import { pool } from "@db";
 import { rolesRouter } from "./routes/roles";
-import fileUpload from 'express-fileupload'; // Added fileUpload middleware
+import fileUpload from 'express-fileupload';
 
 declare module 'express-session' {
   interface SessionData {
@@ -19,7 +19,15 @@ declare module 'express-session' {
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(fileUpload()); // Configure fileupload middleware
+
+// Configure fileupload middleware with proper error handling and file size limits
+app.use(fileUpload({
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB file size limit
+  abortOnLimit: true,
+  responseOnLimit: "File size limit exceeded (5MB)",
+  useTempFiles: false,
+  debug: process.env.NODE_ENV === 'development',
+}));
 
 // Configure session
 const PostgresStore = connectPg(session);
