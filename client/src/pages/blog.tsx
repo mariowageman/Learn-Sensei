@@ -179,7 +179,7 @@ export default function BlogPage() {
                     window.location.href = '/feed.xml';
                   }}
                 >
-                  <Rss className="h-4 w-4" />
+                  <Rss className="h-4 w-4 dark:text-white" />
                   RSS Feed
                 </Button>
               </div>
