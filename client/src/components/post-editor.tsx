@@ -1,4 +1,3 @@
-
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
@@ -17,7 +16,7 @@ import {
   Save,
   X
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 
 interface PostEditorProps {
@@ -26,9 +25,10 @@ interface PostEditorProps {
   initialTags: string[];
   onSave: (content: string, title: string, tags: string[]) => void;
   onCancel: () => void;
+  existingTags: string[]; // Added prop for existing tags
 }
 
-export function PostEditor({ initialContent, initialTitle, initialTags, onSave, onCancel }: PostEditorProps) {
+export function PostEditor({ initialContent, initialTitle, initialTags, onSave, onCancel, existingTags }: PostEditorProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [title, setTitle] = useState(initialTitle);
   const [tags, setTags] = useState<string[]>(initialTags);
@@ -105,20 +105,40 @@ export function PostEditor({ initialContent, initialTitle, initialTags, onSave, 
             </Badge>
           ))}
           <div className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="Add tag"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              className="w-32"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && newTag.trim()) {
-                  e.preventDefault();
-                  setTags([...tags, newTag.trim()]);
-                  setNewTag("");
-                }
-              }}
-            />
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder="Add tag"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                className="w-32"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newTag.trim()) {
+                    e.preventDefault();
+                    setTags([...tags, newTag.trim()]);
+                    setNewTag("");
+                  }
+                }}
+              />
+              {existingTags && newTag && (
+                <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-32 overflow-y-auto">
+                  {existingTags
+                    .filter(tag => tag.toLowerCase().includes(newTag.toLowerCase()) && !tags.includes(tag))
+                    .map(tag => (
+                      <div
+                        key={tag}
+                        className="px-2 py-1 hover:bg-muted cursor-pointer"
+                        onClick={() => {
+                          setTags([...tags, tag]);
+                          setNewTag("");
+                        }}
+                      >
+                        {tag}
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
             <Button
               variant="outline"
               size="sm"
@@ -201,9 +221,9 @@ export function PostEditor({ initialContent, initialTitle, initialTags, onSave, 
           </Button>
         </div>
       </div>
-      
+
       <EditorContent editor={editor} />
-      
+
       <div className="border-t bg-muted p-2 flex justify-end gap-2">
         <Button
           variant="ghost"

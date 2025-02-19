@@ -10,6 +10,18 @@ import { slugify } from '@/lib/utils';
 export default function CreateBlog() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { data: blogPosts } = useQuery<BlogPost[]>({
+    queryKey: ['blogPosts'],
+    queryFn: async () => {
+      const response = await fetch('/api/blog');
+      if (!response.ok) throw new Error('Failed to fetch blog posts');
+      return response.json();
+    }
+  });
+
+  const existingTags = Array.from(
+    new Set(blogPosts?.flatMap(post => post.tags) || [])
+  ).sort();
 
   const handleSave = async (content: string, title: string, tags: string[]) => {
     try {
@@ -56,6 +68,7 @@ export default function CreateBlog() {
           initialContent=""
           initialTitle=""
           initialTags={[]}
+          existingTags={existingTags}
           onSave={handleSave}
           onCancel={() => setLocation('/blog')}
         />
