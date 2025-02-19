@@ -311,7 +311,7 @@ export function PostEditor({
           onClick={() => onSave(editor.getHTML(), title, tags, mainImage)}
           disabled={!mainImage || !title.trim()}
         >
-          <Save className="h-4 w-4 mr-2" />
+          <Save className="h-4 w-4 mr-2 dark:text-white" />
           Save Changes
         </Button>
       </div>
