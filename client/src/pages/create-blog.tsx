@@ -1,11 +1,13 @@
 
 import { useState } from 'react';
 import { useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
 import { PostEditor } from '@/components/post-editor';
 import { ProtectedComponent } from '@/components/rbac/protected-component';
 import { UserRole } from '@/lib/rbac';
 import { useToast } from '@/hooks/use-toast';
 import { slugify } from '@/lib/utils';
+import type { BlogPost } from '@/pages/blog';
 
 export default function CreateBlog() {
   const [, setLocation] = useLocation();
