@@ -122,23 +122,35 @@ export default function BlogPage() {
                       className="gap-2 whitespace-nowrap"
                       onClick={async () => {
                         try {
-                          await Promise.all(
+                          const results = await Promise.allSettled(
                             selectedPosts.map(async (id) => {
                               const response = await fetch(`/api/blog/${id}`, {
                                 method: 'DELETE',
                                 credentials: 'include',
                                 headers: {
-                                  'Content-Type': 'application/json'
+                                  'Content-Type': 'application/json',
+                                  'Authorization': 'Bearer ' + localStorage.getItem('token')
                                 }
                               });
-                              if (!response.ok) throw new Error('Failed to delete post');
+                              if (!response.ok) {
+                                const error = await response.json();
+                                throw new Error(error.error || 'Failed to delete post');
+                              }
+                              return id;
                             })
                           );
+
+                          const failures = results.filter(r => r.status === 'rejected');
+                          if (failures.length > 0) {
+                            throw new Error(`Failed to delete ${failures.length} posts`);
+                          }
+
                           window.location.reload();
                         } catch (error) {
+                          console.error('Delete error:', error);
                           toast({
                             title: "Error",
-                            description: "Failed to delete selected posts",
+                            description: error instanceof Error ? error.message : "Failed to delete selected posts",
                             variant: "destructive",
                           });
                         }
