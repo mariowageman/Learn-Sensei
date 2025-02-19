@@ -31,7 +31,23 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.get("/api/blog/:slug", async (req, res) => {
+  app.patch("/api/blog/:slug", async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { content } = req.body;
+    
+    await db.update(blogPosts)
+      .set({ content })
+      .where(eq(blogPosts.slug, slug));
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error updating blog post:', error);
+    res.status(500).json({ error: "Failed to update blog post" });
+  }
+});
+
+app.get("/api/blog/:slug", async (req, res) => {
     try {
       const { slug } = req.params;
       console.log('Fetching blog post with slug:', slug);
