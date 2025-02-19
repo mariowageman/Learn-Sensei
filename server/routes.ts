@@ -46,28 +46,24 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "Content is required" });
       }
 
+      // Import blogPosts from the blog page
+      const { blogPosts } = require("../client/src/pages/blog");
+
       const postIndex = blogPosts.findIndex(post => post.id === id);
       if (postIndex === -1) {
         return res.status(404).json({ error: "Blog post not found" });
       }
 
       // Update the post content while preserving other fields
-      const updatedPost = {
+      blogPosts[postIndex] = {
         ...blogPosts[postIndex],
         content,
         updatedAt: new Date().toISOString()
       };
 
-      blogPosts[postIndex] = updatedPost;
-
-      // In the future, when database is set up:
-      // await db.update(blogPosts)
-      //   .set({ content, updatedAt: new Date() })
-      //   .where(eq(blogPosts.id, id));
-
       res.json({
         success: true,
-        post: updatedPost
+        post: blogPosts[postIndex]
       });
     } catch (error) {
       console.error('Error updating blog post:', error);
