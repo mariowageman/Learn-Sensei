@@ -58,9 +58,11 @@ export function registerRoutes(app: Express): Server {
         updatedAt: new Date().toISOString()
       };
 
+      // Update the post in the array
       blogPosts[postIndex] = updatedPost;
 
-      // In the future, when database is set up:
+      // In a real application, this would be persisted to a database
+      // You would use something like:
       // await db.update(blogPosts)
       //   .set({ content, updatedAt: new Date() })
       //   .where(eq(blogPosts.id, id));
@@ -901,8 +903,7 @@ function generateRecommendationReason(
   quizAccuracy: number,
   progress?: typeof learningPathProgress.$inferSelect | null
 ): string {
-  const topics = (path.topics as string[]) || [];
-  const mainTopic = topics[0] || path.title;
+  const topics = (path.topics as string[]) || [];  const mainTopic = topics[0] || path.title;
 
   if (!progress) {
     if (path.difficulty === 'beginner') {
