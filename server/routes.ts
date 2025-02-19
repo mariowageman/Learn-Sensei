@@ -102,6 +102,25 @@ app.post("/api/blog", async (req, res) => {
   });
 
   // Test endpoint to verify server is running
+  app.delete("/api/blog/:slug", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      if (req.user.role.name !== 'admin' && req.user.role.name !== 'editor') {
+        return res.status(403).json({ error: "Insufficient permissions" });
+      }
+
+      const { slug } = req.params;
+      await db.delete(blogPosts).where(eq(blogPosts.slug, slug));
+      res.json({ message: "Post deleted successfully" });
+    } catch (error) {
+      console.error('Error deleting blog post:', error);
+      res.status(500).json({ error: "Failed to delete blog post" });
+    }
+  });
+
   app.get("/api/health", (req, res) => {
     res.json({ status: "OK" });
   });

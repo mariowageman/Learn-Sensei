@@ -76,6 +76,13 @@ export default function BlogPost() {
     }
   };
 
+  const handleDelete = async () => {
+    // Placeholder for delete functionality.  Replace with actual delete logic.
+    console.log("Delete post called for:", currentPost?.slug);
+    //  Add your actual delete fetch request here.
+    toast({title: "Delete in progress", description: "This is a placeholder delete function"});
+  };
+
   if (isLoading) return <div>Loading...</div>;
   if (error) {
     console.error('Blog post error:', error);
@@ -130,15 +137,18 @@ export default function BlogPost() {
                 </Button>
               </Link>
               <ProtectedComponent requiredRole={["admin", "moderator"]}>
-                {!isEditing && (
-                  <Button
-                    onClick={() => setIsEditing(true)}
-                    variant="outline"
-                  >
-                    <Edit className="mr-2 h-4 w-4" />
+                <div className="flex gap-2">
+                  <Button onClick={() => setIsEditing(true)} >
+                    <Edit className="h-4 w-4" />
                     Edit Post
                   </Button>
-                )}
+                  <Button 
+                    variant="destructive" 
+                    onClick={handleDelete} 
+                  >
+                    Delete Post
+                  </Button>
+                </div>
               </ProtectedComponent>
             </div>
             <div className="space-y-4">
