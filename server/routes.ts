@@ -146,7 +146,7 @@ app.post("/api/blog", async (req, res) => {
   app.post("/api/upload", async (req, res) => {
     try {
       const storage = new Client();
-      const bucketId = process.env.BUCKET_ID;
+      const bucketId = process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID;
       if (!bucketId) {
         return res.status(500).json({ error: "Bucket ID not configured" });
       }
