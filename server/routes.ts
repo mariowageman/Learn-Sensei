@@ -46,8 +46,7 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "Content is required" });
       }
 
-      // Import blogPosts from the blog page
-      const { blogPosts } = require("../client/src/pages/blog");
+      import { blogPosts } from "../client/src/pages/blog";
 
       const postIndex = blogPosts.findIndex(post => post.id === id);
       if (postIndex === -1) {
