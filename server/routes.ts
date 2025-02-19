@@ -31,7 +31,7 @@ interface BlogPost extends BlogPostType {
   updatedAt?: string;
 }
 
-import { blogPosts } from "../client/src/pages/blog";
+let blogPosts: BlogPost[] = [];
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
@@ -57,16 +57,17 @@ export function registerRoutes(app: Express): Server {
         content,
         updatedAt: new Date().toISOString()
       };
-      
-      // Update the post in the array
+
       blogPosts[postIndex] = updatedPost;
 
-      // Update original array to ensure changes persist
-      Object.assign(blogPosts, [...blogPosts]);
+      // In the future, when database is set up:
+      // await db.update(blogPosts)
+      //   .set({ content, updatedAt: new Date() })
+      //   .where(eq(blogPosts.id, id));
 
       res.json({
         success: true,
-        post: blogPosts[postIndex]
+        post: updatedPost
       });
     } catch (error) {
       console.error('Error updating blog post:', error);
