@@ -324,10 +324,12 @@ export default function BlogPage() {
                         </Badge>
                       ))}
                     </div>
-                    <div className="flex items-center">
-                      <input type="checkbox" id={`post-${post.id}`} checked={selectedPosts.includes(post.id)} onChange={() => handlePostSelect(post.id)} />
-                      <label htmlFor={`post-${post.id}`} className="ml-2">Select</label>
-                    </div>
+                    <ProtectedComponent allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR]}>
+                      <div className="flex items-center">
+                        <input type="checkbox" id={`post-${post.id}`} checked={selectedPosts.includes(post.id)} onChange={() => handlePostSelect(post.id)} />
+                        <label htmlFor={`post-${post.id}`} className="ml-2">Select</label>
+                      </div>
+                    </ProtectedComponent>
                     <Link href={`/blog/${post.slug}`}>
                       <Button className="w-full group mt-8">
                         Read More
