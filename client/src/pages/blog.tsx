@@ -37,6 +37,9 @@ const useBlogPosts = () => {
     }
   });
 };
+
+const blogPosts = [
+  {
     title: "5 Tips for Effective Online Learning",
     date: "February 14, 2025",
     description: "Master the art of online learning with these proven strategies for success. Learn how to stay motivated, manage your time effectively, and achieve your learning goals.",
