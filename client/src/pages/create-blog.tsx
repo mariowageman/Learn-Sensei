@@ -25,7 +25,7 @@ export default function CreateBlog() {
     new Set(blogPosts?.flatMap(post => post.tags) || [])
   ).sort();
 
-  const handleSave = async (content: string, title: string, tags: string[]) => {
+  const handleSave = async (content: string, title: string, tags: string[], image: string) => {
     try {
       const slug = slugify(title);
       const response = await fetch('/api/blog', {
@@ -40,7 +40,7 @@ export default function CreateBlog() {
           tags,
           description: content.slice(0, 150).replace(/<[^>]*>/g, ''),
           category: 'General',
-          image: '/assets/blog/learning-tips.jpg',
+          image: image || '/assets/blog/learning-tips.jpg',
         }),
       });
 

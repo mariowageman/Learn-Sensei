@@ -23,16 +23,18 @@ interface PostEditorProps {
   initialContent: string;
   initialTitle: string;
   initialTags: string[];
-  onSave: (content: string, title: string, tags: string[]) => void;
+  initialImage?: string;
+  onSave: (content: string, title: string, tags: string[], image: string) => void;
   onCancel: () => void;
-  existingTags: string[]; // Added prop for existing tags
+  existingTags: string[];
 }
 
-export function PostEditor({ initialContent, initialTitle, initialTags, onSave, onCancel, existingTags }: PostEditorProps) {
+export function PostEditor({ initialContent, initialTitle, initialTags, initialImage, onSave, onCancel, existingTags }: PostEditorProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [title, setTitle] = useState(initialTitle);
   const [tags, setTags] = useState<string[]>(initialTags);
   const [newTag, setNewTag] = useState("");
+  const [mainImage, setMainImage] = useState(initialImage || "");
 
   const editor = useEditor({
     extensions: [
@@ -87,6 +89,60 @@ export function PostEditor({ initialContent, initialTitle, initialTags, onSave, 
   return (
     <div className="border rounded-lg overflow-hidden">
       <div className="p-4 border-b">
+        <div className="mb-4">
+          {mainImage && (
+            <div className="relative w-full h-48 mb-2">
+              <img src={mainImage} alt="Post cover" className="w-full h-full object-cover rounded-lg" />
+              <Button
+                variant="destructive"
+                size="sm"
+                className="absolute top-2 right-2"
+                onClick={() => setMainImage("")}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              disabled={isUploading}
+              className="relative"
+            >
+              {isUploading ? "Uploading..." : "Upload Cover Image"}
+              <input
+                type="file"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+
+                  try {
+                    setIsUploading(true);
+                    const formData = new FormData();
+                    formData.append('image', file);
+
+                    const response = await fetch('/api/upload', {
+                      method: 'POST',
+                      body: formData,
+                    });
+
+                    if (!response.ok) throw new Error('Upload failed');
+
+                    const { url } = await response.json();
+                    setMainImage(url);
+                  } catch (error) {
+                    console.error('Image upload failed:', error);
+                  } finally {
+                    setIsUploading(false);
+                  }
+                }}
+                accept="image/*"
+                disabled={isUploading}
+              />
+            </Button>
+          </div>
+        </div>
         <Input
           type="text"
           placeholder="Post title"
@@ -233,7 +289,7 @@ export function PostEditor({ initialContent, initialTitle, initialTags, onSave, 
           Cancel
         </Button>
         <Button
-          onClick={() => onSave(editor.getHTML(), title, tags)}
+          onClick={() => onSave(editor.getHTML(), title, tags, mainImage)}
         >
           <Save className="h-4 w-4 mr-2" />
           Save Changes
