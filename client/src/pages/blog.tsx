@@ -115,12 +115,13 @@ export default function BlogPage() {
               <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
               <div className="flex gap-2">
                 <ProtectedComponent allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR]}>
-                  {selectedPosts.length > 0 && (
-                    <Button 
-                      variant="destructive"
-                      size="sm"
-                      className="gap-2 whitespace-nowrap"
-                      onClick={async () => {
+                  <ProtectedComponent requiredRole={[UserRole.ADMIN, UserRole.MODERATOR]}>
+                    {selectedPosts.length > 0 && (
+                      <Button 
+                        variant="destructive"
+                        size="sm"
+                        className="gap-2 whitespace-nowrap"
+                        onClick={async () => {
                         try {
                           const results = await Promise.allSettled(
                             selectedPosts.map(async (id) => {
@@ -157,8 +158,9 @@ export default function BlogPage() {
                       }}
                     >
                       Delete Selected ({selectedPosts.length})
-                    </Button>
-                  )}
+                      </Button>
+                    )}
+                  </ProtectedComponent>
                   <Button 
                     variant="default"
                     size="sm"
