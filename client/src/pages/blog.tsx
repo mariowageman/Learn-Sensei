@@ -129,6 +129,37 @@ export default function BlogPage() {
               Explore the latest insights in AI-powered learning and educational technology
             </p>
           </div>
+          <ProtectedComponent allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR]}>
+            {blogPosts.filter(post => !post.title).length > 0 && (
+              <div className="bg-destructive/10 p-4 rounded-lg mt-4">
+                <h2 className="font-semibold text-destructive mb-2">Invalid Posts Detected</h2>
+                <div className="space-y-2">
+                  {blogPosts.filter(post => !post.title).map(post => (
+                    <div key={post.id} className="flex items-center justify-between bg-background p-2 rounded">
+                      <span>Post ID: {post.id}</span>
+                      <Button 
+                        variant="destructive"
+                        size="sm"
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(`/api/blog/${post.id}`, {
+                              method: 'DELETE'
+                            });
+                            if (!response.ok) throw new Error('Failed to delete post');
+                            window.location.reload();
+                          } catch (error) {
+                            console.error('Error deleting post:', error);
+                          }
+                        }}
+                      >
+                        Delete Invalid Post
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </ProtectedComponent>
 
           <div className="flex flex-wrap gap-2 py-4">
             {allTags.map((tag: string) => (

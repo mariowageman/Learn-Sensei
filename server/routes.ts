@@ -102,7 +102,7 @@ app.post("/api/blog", async (req, res) => {
   });
 
   // Test endpoint to verify server is running
-  app.delete("/api/blog/:slug", async (req, res) => {
+  app.delete("/api/blog/:identifier", async (req, res) => {
     try {
       if (!req.user) {
         return res.status(401).json({ error: "Authentication required" });
@@ -112,8 +112,15 @@ app.post("/api/blog", async (req, res) => {
         return res.status(403).json({ error: "Insufficient permissions" });
       }
 
-      const { slug } = req.params;
-      await db.delete(blogPosts).where(eq(blogPosts.slug, slug));
+      const { identifier } = req.params;
+      
+      // Check if identifier is a number (ID) or string (slug)
+      if (!isNaN(Number(identifier))) {
+        await db.delete(blogPosts).where(eq(blogPosts.id, parseInt(identifier)));
+      } else {
+        await db.delete(blogPosts).where(eq(blogPosts.slug, identifier));
+      }
+      
       res.json({ message: "Post deleted successfully" });
     } catch (error) {
       console.error('Error deleting blog post:', error);
