@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { Client } from "@replit/object-storage";
+import type { UploadedFile } from "express-fileupload";
 import path from "path";
 import { db } from "@db";
 import { eq, desc } from "drizzle-orm";
@@ -35,27 +36,27 @@ export function registerRoutes(app: Express): Server {
   });
 
   app.patch("/api/blog/:slug", async (req, res) => {
-  try {
-    const { slug } = req.params;
-    const { content, title, tags } = req.body;
-    
-    await db.update(blogPosts)
-      .set({ 
-        content,
-        title: title || undefined,
-        tags: tags || [],
-        updatedAt: new Date()
-      })
-      .where(eq(blogPosts.slug, slug));
+    try {
+      const { slug } = req.params;
+      const { content, title, tags } = req.body;
+      
+      await db.update(blogPosts)
+        .set({ 
+          content,
+          title: title || undefined,
+          tags: tags || [],
+          updatedAt: new Date()
+        })
+        .where(eq(blogPosts.slug, slug));
 
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error updating blog post:', error);
-    res.status(500).json({ error: "Failed to update blog post" });
-  }
-});
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error updating blog post:', error);
+      res.status(500).json({ error: "Failed to update blog post" });
+    }
+  });
 
-app.post("/api/blog", async (req, res) => {
+  app.post("/api/blog", async (req, res) => {
     try {
       const { slug, title, content, tags, description, category, image } = req.body;
       
@@ -145,27 +146,42 @@ app.post("/api/blog", async (req, res) => {
   // File upload endpoint
   app.post("/api/upload", async (req, res) => {
     try {
+      if (!req.files || !req.files.image) {
+        return res.status(400).json({ error: "No image file uploaded" });
+      }
+
       const bucketId = process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID;
       if (!bucketId) {
-        return res.status(500).json({ error: "Bucket ID not configured" });
+        return res.status(500).json({ error: "Storage bucket not configured" });
       }
+
       const storage = new Client({ bucketId });
-      const file = req.files?.image;
-      
-      if (!file) {
-        return res.status(400).json({ error: "No file uploaded" });
+      const file = req.files.image as UploadedFile;
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.mimetype)) {
+        return res.status(400).json({ error: "Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed." });
       }
 
+      // Generate unique filename
       const timestamp = Date.now();
-      const filename = `image_${timestamp}${path.extname(file.name)}`;
-      
-      await storage.write(filename, file.data);
-      const url = await storage.getSignedUrl(filename);
+      const safeFilename = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+      const filename = `blog_images/${timestamp}_${safeFilename}`;
 
-      res.json({ url });
+      try {
+        await storage.write(filename, file.data);
+        const url = await storage.getSignedUrl(filename);
+
+        console.log('File uploaded successfully:', filename);
+        res.json({ url });
+      } catch (storageError) {
+        console.error('Storage error:', storageError);
+        res.status(500).json({ error: "Failed to store file" });
+      }
     } catch (error) {
       console.error('Upload error:', error);
-      res.status(500).json({ error: "Failed to upload file" });
+      res.status(500).json({ error: "Failed to process upload" });
     }
   });
 
@@ -811,6 +827,114 @@ app.post("/api/blog", async (req, res) => {
     } catch (error) {
       console.error('Error generating recommendations:', error);
       res.status(500).json({ error: "Failed to generate recommendations" });
+    }
+  });
+
+  app.get("/api/recent-subjects", async (req, res) => {
+    try {
+      const recentSubjects = await db.query.subjectHistory.findMany({
+        orderBy: (history, { desc }) => [desc(history.createdAt)],
+        limit: 10
+      });
+      res.json(recentSubjects);
+    } catch (error) {
+      console.error('Error fetching recent subjects:', error);
+      res.status(500).json({ error: "Failed to fetch recent subjects" });
+    }
+  });
+
+  app.post("/api/session", async (req, res) => {
+    const { subject } = req.body;
+
+    try {
+      // Save to session
+      const [session] = await db.insert(sessions).values({
+        subject
+      }).returning();
+
+      // Save to history
+      await db.insert(subjectHistory).values({
+        subject
+      });
+
+      res.json(session);
+    } catch (error) {
+      console.error('Error creating session:', error);
+      res.status(500).json({ error: "Failed to create session" });
+    }
+  });
+
+  app.get("/api/dashboard", async (req, res) => {
+    try {
+      // Get all quiz attempts
+      const quizAttempts = await db.query.quizProgress.findMany({
+        orderBy: (progress, { desc }) => [desc(progress.createdAt)]
+      });
+
+      // Get unique subjects
+      const subjects = [...new Set(quizAttempts.map(attempt => attempt.subject))];
+
+      // Calculate overall stats
+      const totalSubjects = subjects.length;
+      let totalCorrect = 0;
+      let totalAttempts = 0;
+
+      // Calculate subject-specific performance
+      const subjectPerformance = subjects.map(subject => {
+        const subjectAttempts = quizAttempts.filter(attempt => attempt.subject === subject);
+        const correct = subjectAttempts.filter(attempt => attempt.isCorrect).length;
+        const total = subjectAttempts.length;
+
+        totalCorrect += correct;
+        totalAttempts += total;
+
+        return {
+          subject,
+          totalAttempts: total,
+          correctAnswers: correct,
+          accuracy: Math.round((correct / total) * 100)
+        };
+      });
+
+      // Get the current learning streak
+      const pathProgress = await db.query.learningPathProgress.findMany({
+        orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
+      });
+
+      const currentStreak = pathProgress[0]?.streakDays || 0;
+
+      // Calculate total time spent
+      const totalTimeSpent = pathProgress.reduce((total, progress) => {
+        const timeSpent = progress.timeSpentMinutes as Record<string, number>;
+        return total + Object.values(timeSpent).reduce((sum, time) => sum + (time || 0), 0);
+      }, 0);
+
+      // Get recent activity
+      const recentActivity = await Promise.all(
+        quizAttempts.slice(0, 5).map(async attempt => {
+          return {
+            subject: attempt.subject,
+            type: 'Quiz Question',
+            result: attempt.isCorrect ? 'Correct' : 'Incorrect',
+            timestamp: attempt.createdAt
+          };
+        })
+      );
+
+      res.json({
+        overallProgress: {
+          totalSubjects,
+          completedSubjects: subjects.length,
+          averageAccuracy: totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0,
+          totalTimeSpent,
+          currentStreak
+        },
+        subjectPerformance,
+        recentActivity
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      res.status(500).json({ error: "Failed to fetch dashboard data" });
     }
   });
 
