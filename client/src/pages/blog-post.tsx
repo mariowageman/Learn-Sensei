@@ -12,8 +12,7 @@ import { PostEditor } from "@/components/post-editor";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 
-// Temporary admin check - replace with actual auth logic
-const isAdmin = true;
+import { ProtectedComponent } from "@/components/rbac/protected-component";
 
 export default function BlogPost() {
   const [, params] = useRoute("/blog/:id");
@@ -102,15 +101,17 @@ export default function BlogPost() {
                   Back to Blog
                 </Button>
               </Link>
-              {isAdmin && !isEditing && (
-                <Button
-                  onClick={() => setIsEditing(true)}
-                  variant="outline"
-                >
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit Post
-                </Button>
-              )}
+              <ProtectedComponent requiredRole={["admin", "moderator"]}>
+                {!isEditing && (
+                  <Button
+                    onClick={() => setIsEditing(true)}
+                    variant="outline"
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit Post
+                  </Button>
+                )}
+              </ProtectedComponent>
             </div>
             <div className="space-y-4">
               <div className="flex items-center gap-4 text-sm">
