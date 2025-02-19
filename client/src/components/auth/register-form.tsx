@@ -133,7 +133,7 @@ export function RegisterForm() {
             />
             <Button 
               type="submit" 
-              className="w-full" 
+              className="w-full bg-[#3F3EED] hover:bg-[#3F3EED]/90 text-white" 
               disabled={form.formState.isSubmitting}
             >
               {form.formState.isSubmitting ? (
