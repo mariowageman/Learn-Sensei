@@ -132,9 +132,9 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  const PORT = 3000;
+  const PORT = process.env.PORT || 3000;
   const HOST = "0.0.0.0";
   server.listen(PORT, HOST, () => {
-    log(`serving on ${HOST}:${PORT}`);
+    log(`Server running at http://${HOST}:${PORT}`);
   });
 })();
