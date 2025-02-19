@@ -128,13 +128,13 @@ export default function BlogPage() {
                                 method: 'DELETE',
                                 credentials: 'include',
                                 headers: {
-                                  'Content-Type': 'application/json',
-                                  'Authorization': 'Bearer ' + localStorage.getItem('token')
+                                  'Content-Type': 'application/json'
                                 }
                               });
+                              
                               if (!response.ok) {
-                                const error = await response.json();
-                                throw new Error(error.error || 'Failed to delete post');
+                                const errorData = await response.json();
+                                throw new Error(errorData.error || 'Failed to delete post');
                               }
                               return id;
                             })
