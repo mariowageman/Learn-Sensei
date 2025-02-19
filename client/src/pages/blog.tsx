@@ -39,9 +39,6 @@ const useBlogPosts = () => {
 };
 
 // Original static posts array moved to server-side
-      Online learning has transformed education, offering flexibility and accessibility. However, staying focused and retaining knowledge requires the right approach. Whether you're self-studying or using an AI-powered platform like LearnSensei, these five tips will help you make the most of your learning experience.
-
-      1. Set Clear Learning Goals
 
       Define specific and achievable objectives before starting any course. Ask yourself what you want to accomplish, what skills you aim to develop, and how you will measure your progress. LearnSensei personalizes learning paths based on your current skills, helping you set and reach meaningful milestones.
 
