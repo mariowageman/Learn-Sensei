@@ -101,7 +101,7 @@ async function seed() {
   <li>Microlearning modules</li>
   <li>Social learning communities</li>
 </ul>`,
-        date: new Date("2024-02-13")
+        date: new Date("2024-02-13").toISOString().split('T')[0]
       }
     ]);
     console.log("Seed data inserted successfully");
