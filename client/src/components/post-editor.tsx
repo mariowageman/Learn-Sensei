@@ -22,13 +22,16 @@ import { cn } from '@/lib/utils'
 interface PostEditorProps {
   initialContent: string;
   initialTitle: string;
-  onSave: (content: string, title: string) => void;
+  initialTags: string[];
+  onSave: (content: string, title: string, tags: string[]) => void;
   onCancel: () => void;
 }
 
-export function PostEditor({ initialContent, initialTitle, onSave, onCancel }: PostEditorProps) {
+export function PostEditor({ initialContent, initialTitle, initialTags, onSave, onCancel }: PostEditorProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [title, setTitle] = useState(initialTitle);
+  const [tags, setTags] = useState<string[]>(initialTags);
+  const [newTag, setNewTag] = useState("");
 
   const editor = useEditor({
     extensions: [
@@ -88,8 +91,47 @@ export function PostEditor({ initialContent, initialTitle, onSave, onCancel }: P
           placeholder="Post title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="text-xl font-bold"
+          className="text-xl font-bold mb-2"
         />
+        <div className="flex flex-wrap gap-2 items-center">
+          {tags.map((tag, index) => (
+            <Badge key={index} variant="secondary" className="group">
+              {tag}
+              <X 
+                className="h-3 w-3 ml-1 cursor-pointer" 
+                onClick={() => setTags(tags.filter((_, i) => i !== index))}
+              />
+            </Badge>
+          ))}
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Add tag"
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+              className="w-32"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newTag.trim()) {
+                  e.preventDefault();
+                  setTags([...tags, newTag.trim()]);
+                  setNewTag("");
+                }
+              }}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (newTag.trim()) {
+                  setTags([...tags, newTag.trim()]);
+                  setNewTag("");
+                }
+              }}
+            >
+              Add
+            </Button>
+          </div>
+        </div>
       </div>
       <div className="border-b bg-muted p-2 flex flex-wrap gap-2">
         <Button
@@ -170,7 +212,7 @@ export function PostEditor({ initialContent, initialTitle, onSave, onCancel }: P
           Cancel
         </Button>
         <Button
-          onClick={() => onSave(editor.getHTML(), title)}
+          onClick={() => onSave(editor.getHTML(), title, tags)}
         >
           <Save className="h-4 w-4 mr-2" />
           Save Changes

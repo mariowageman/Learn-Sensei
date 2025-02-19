@@ -46,7 +46,7 @@ export default function BlogPost() {
         .slice(0, 2)
     : [];
 
-  const handleSave = async (content: string, title: string) => {
+  const handleSave = async (content: string, title: string, tags: string[]) => {
     if (!currentPost) return;
     try {
       const response = await fetch(`/api/blog/${currentPost.slug}`, {
@@ -54,7 +54,7 @@ export default function BlogPost() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content, title }),
+        body: JSON.stringify({ content, title, tags }),
       });
 
       if (!response.ok) throw new Error('Failed to update post');

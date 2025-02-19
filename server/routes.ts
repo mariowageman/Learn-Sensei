@@ -34,12 +34,13 @@ export function registerRoutes(app: Express): Server {
   app.patch("/api/blog/:slug", async (req, res) => {
   try {
     const { slug } = req.params;
-    const { content, title } = req.body;
+    const { content, title, tags } = req.body;
     
     await db.update(blogPosts)
       .set({ 
         content,
         title: title || undefined,
+        tags: tags || [],
         updatedAt: new Date()
       })
       .where(eq(blogPosts.slug, slug));
