@@ -5,6 +5,7 @@ import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
+import { Badge } from './ui/badge'
 import { 
   Bold, 
   Italic, 
