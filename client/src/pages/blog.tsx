@@ -40,10 +40,6 @@ const useBlogPosts = () => {
 
 // Original static posts array moved to server-side
 
-      Define specific and achievable objectives before starting any course. Ask yourself what you want to accomplish, what skills you aim to develop, and how you will measure your progress. LearnSensei personalizes learning paths based on your current skills, helping you set and reach meaningful milestones.
-
-      2. Create a Distraction-Free Learning Space
-
       A focused environment is essential for online learning. Choose a quiet space, use noise-canceling headphones if necessary, and turn off notifications to avoid interruptions. LearnSensei optimizes your study sessions with AI-curated recommendations, ensuring you stay on track.
 
       3. Engage with Interactive and Multi-Format Content
