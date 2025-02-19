@@ -181,7 +181,7 @@ export function registerRoutes(app: Express): Server {
         const fileBuffer = Buffer.isBuffer(file.data) ? file.data : Buffer.from(file.data);
 
         // Upload file using the storage client
-        await storage.put(filename, fileBuffer, {
+        await storage.write(filename, fileBuffer, {
           access: 'public-read',
           contentType: file.mimetype
         });
