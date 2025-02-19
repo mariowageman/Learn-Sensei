@@ -145,7 +145,7 @@ export function PostEditor({
               disabled={isUploading}
               className="relative"
             >
-              {isUploading ? "Uploading..." : "Upload Cover Image"}
+              <span className="dark:text-white">{isUploading ? "Uploading..." : "Upload Cover Image"}</span>
               <input
                 type="file"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
