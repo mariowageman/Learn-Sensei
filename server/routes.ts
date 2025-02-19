@@ -181,13 +181,18 @@ export function registerRoutes(app: Express): Server {
         const fileBuffer = Buffer.isBuffer(file.data) ? file.data : Buffer.from(file.data);
 
         // Upload file using the storage client with metadata
-        await storage.write(filename, fileBuffer, {
-          public: true,
-          contentType: file.mimetype,
-          metadata: {
-            originalName: file.name
-          }
-        });
+        try {
+          await storage.write(filename, fileBuffer, {
+            public: true,
+            contentType: file.mimetype,
+            metadata: {
+              originalName: file.name
+            }
+          });
+        } catch (err) {
+          console.error('Storage write error:', err);
+          throw new Error('Failed to upload file to storage');
+        }
         console.log('File uploaded to storage successfully');
 
         // Generate public URL using the correct bucket URL format
