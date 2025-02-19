@@ -1,15 +1,20 @@
-import { blogPosts } from "../pages/blog";
+import type { BlogPost } from "../pages/blog";
 
-export function generateRSSFeed(baseUrl: string): string {
-  const latestPosts = [...blogPosts].sort((a, b) => 
+export async function generateRSSFeed(baseUrl: string): Promise<string> {
+  // Fetch blog posts from API
+  const response = await fetch(`${baseUrl}/api/blog`);
+  if (!response.ok) throw new Error('Failed to fetch blog posts for RSS feed');
+  const posts: BlogPost[] = await response.json();
+
+  const latestPosts = [...posts].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
   const rssItems = latestPosts.map(post => `
     <item>
       <title><![CDATA[${post.title}]]></title>
-      <link>${baseUrl}/blog/${post.id}</link>
-      <guid>${baseUrl}/blog/${post.id}</guid>
+      <link>${baseUrl}/blog/${post.slug}</link>
+      <guid>${baseUrl}/blog/${post.slug}</guid>
       <description><![CDATA[${post.description}]]></description>
       <category>${post.category}</category>
       <pubDate>${new Date(post.date).toUTCString()}</pubDate>

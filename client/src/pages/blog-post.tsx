@@ -4,35 +4,34 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Clock, ArrowLeft, Edit } from "lucide-react";
-import { blogPosts, type BlogPost } from "./blog";
+import { type BlogPost } from "./blog";
 import { calculateReadingTime } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ShareButtons } from "@/components/share-buttons";
 import { PostEditor } from "@/components/post-editor";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
-
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProtectedComponent } from "@/components/rbac/protected-component";
 
 export default function BlogPost() {
-  const [, params] = useRoute("/blog/:id");
+  const [, params] = useRoute("/blog/:slug");
   const [isEditing, setIsEditing] = useState(false);
-  const [currentPost, setCurrentPost] = useState<BlogPost | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const post = blogPosts.find((p: BlogPost) => p.id === params?.id);
-    if (post) {
-      setCurrentPost(post);
-    }
-  }, [params?.id]);
+  const { data: currentPost, isLoading, error } = useQuery<BlogPost>({
+    queryKey: ['blogPost', params?.slug],
+    queryFn: async () => {
+      if (!params?.slug) throw new Error('No slug provided');
+      const response = await fetch(`/api/blog/${params.slug}`);
+      if (!response.ok) throw new Error('Failed to fetch blog post');
+      return response.json();
+    },
+    enabled: !!params?.slug
+  });
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [params?.id]);
-
-  if (!currentPost) {
+  if (isLoading) return <div>Loading...</div>;
+  if (error || !currentPost) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
@@ -54,7 +53,7 @@ export default function BlogPost() {
 
   const handleSave = async (content: string) => {
     try {
-      const response = await fetch(`/api/blog/${currentPost.id}`, {
+      const response = await fetch(`/api/blog/${currentPost.slug}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -64,10 +63,8 @@ export default function BlogPost() {
 
       if (!response.ok) throw new Error('Failed to update post');
 
-      // Update the local state with new content
-      setCurrentPost(prev => prev ? { ...prev, content } : null);
-
-      await queryClient.invalidateQueries({ queryKey: ['/api/blog'] });
+      await queryClient.invalidateQueries({ queryKey: ['blogPost', currentPost.slug] });
+      await queryClient.invalidateQueries({ queryKey: ['blogPosts'] });
 
       toast({
         title: "Success",
@@ -84,10 +81,14 @@ export default function BlogPost() {
   };
 
   // Get related posts based on shared tags
-  const relatedPosts = blogPosts
-    .filter((p: BlogPost) => p.id !== currentPost.id)
-    .filter((p: BlogPost) => p.tags.some((tag: string) => currentPost.tags.includes(tag)))
-    .slice(0, 2);
+  const { data: relatedPosts = [] } = useQuery<BlogPost[]>({
+    queryKey: ['blogPosts'],
+    select: (posts) => 
+      posts
+        .filter(p => p.slug !== currentPost.slug)
+        .filter(p => p.tags.some(tag => currentPost.tags.includes(tag)))
+        .slice(0, 2)
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -175,7 +176,7 @@ export default function BlogPost() {
               <h2 className="text-2xl font-bold mb-6">Related Posts</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {relatedPosts.map((relatedPost: BlogPost) => (
-                  <Link key={relatedPost.id} href={`/blog/${relatedPost.id}`}>
+                  <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`}>
                     <div className="group cursor-pointer">
                       <AspectRatio ratio={16/9} className="bg-muted rounded-lg overflow-hidden mb-4">
                         <img 
