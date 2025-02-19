@@ -38,7 +38,7 @@ const useBlogPosts = () => {
   });
 };
 
-const blogPosts = [
+export const blogPosts = [
   {
     title: "5 Tips for Effective Online Learning",
     date: "February 14, 2025",

@@ -1,4 +1,4 @@
-import { blogPosts } from "@/pages/blog";
+import { blogPosts } from "../pages/blog";
 
 export function generateRSSFeed(baseUrl: string): string {
   const latestPosts = [...blogPosts].sort((a, b) => 
