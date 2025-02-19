@@ -104,11 +104,18 @@ app.post("/api/blog", async (req, res) => {
   // Test endpoint to verify server is running
   app.delete("/api/blog/:identifier", async (req, res) => {
     try {
-      if (!req.user) {
+      if (!req.session?.userId) {
         return res.status(401).json({ error: "Authentication required" });
       }
 
-      if (req.user.role.name !== 'admin' && req.user.role.name !== 'editor') {
+      const user = await db.query.users.findFirst({
+        where: eq(users.id, req.session.userId),
+        with: {
+          role: true
+        }
+      });
+
+      if (!user || (user.role.name !== 'admin' && user.role.name !== 'moderator')) {
         return res.status(403).json({ error: "Insufficient permissions" });
       }
 
