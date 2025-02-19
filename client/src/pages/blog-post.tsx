@@ -207,6 +207,7 @@ export default function BlogPost() {
               initialContent={currentPost.content}
               initialTitle={currentPost.title}
               initialTags={currentPost.tags || []}
+              initialImage={currentPost.image}
               onSave={handleSave}
               onCancel={() => setIsEditing(false)}
             />
