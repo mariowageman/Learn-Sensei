@@ -24,38 +24,12 @@ export const users = pgTable("users", {
 });
 
 // Define relations
-export const usersRelations = relations(users, ({ one, many }) => ({
+export const usersRelations = relations(users, ({ one }) => ({
   role: one(roles, {
     fields: [users.roleId],
     references: [roles.id],
   }),
-  posts: many(blogPosts),
 }));
-
-// Add blog posts table
-export const blogPosts = pgTable("blog_posts", {
-  id: serial("id").primaryKey(),
-  slug: text("slug").notNull().unique(),
-  title: text("title").notNull(),
-  content: text("content").notNull(),
-  description: text("description").notNull(),
-  date: timestamp("date").notNull(),
-  category: text("category").notNull(),
-  image: text("image").notNull(),
-  tags: jsonb("tags").notNull().default(sql`'[]'::jsonb`),
-  authorId: integer("author_id").references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull()
-});
-
-// Add blog posts relations
-export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
-  author: one(users, {
-    fields: [blogPosts.authorId],
-    references: [users.id],
-  }),
-}));
-
 
 export const rolesRelations = relations(roles, ({ many }) => ({
   users: many(users),
@@ -98,9 +72,9 @@ export const learningPaths = pgTable("learning_paths", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  difficulty: text("difficulty").notNull(),
-  topics: jsonb("topics").notNull(),
-  prerequisites: jsonb("prerequisites").notNull(),
+  difficulty: text("difficulty").notNull(), 
+  topics: jsonb("topics").notNull(), 
+  prerequisites: jsonb("prerequisites").notNull(), 
   estimatedHours: integer("estimated_hours").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
@@ -190,10 +164,6 @@ export const selectProgressAnalyticsSchema = createSelectSchema(progressAnalytic
 export const insertSubjectHistorySchema = createInsertSchema(subjectHistory);
 export const selectSubjectHistorySchema = createSelectSchema(subjectHistory);
 
-// Add blog post schemas
-export const insertBlogPostSchema = createInsertSchema(blogPosts);
-export const selectBlogPostSchema = createSelectSchema(blogPosts);
-
 // Add Role type
 export type Role = typeof roles.$inferSelect;
 export type NewRole = typeof roles.$inferInsert;
@@ -210,7 +180,3 @@ export type LearningPath = typeof learningPaths.$inferSelect;
 export type LearningPathProgress = typeof learningPathProgress.$inferSelect;
 export type ProgressAnalytics = typeof progressAnalytics.$inferSelect;
 export type SubjectHistory = typeof subjectHistory.$inferSelect;
-
-// Add blog post types
-export type BlogPost = typeof blogPosts.$inferSelect;
-export type NewBlogPost = typeof blogPosts.$inferInsert;
