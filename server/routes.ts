@@ -152,8 +152,14 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "No image file uploaded" });
       }
 
-      const bucketId = process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID;
+      const bucketId = process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID || "replit-objstore-86412e8a-40c3-4bc7-9aa4-a3c42add1445";
       const token = process.env.REPLIT_TOKEN;
+
+      console.log('Storage configuration:', {
+        bucketId,
+        hasToken: !!token,
+        envBucketId: process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID
+      });
 
       if (!bucketId || !token) {
         console.error('Storage configuration missing:', { bucketId: !!bucketId, token: !!token });
