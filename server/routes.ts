@@ -52,7 +52,34 @@ export function registerRoutes(app: Express): Server {
   }
 });
 
-app.get("/api/blog/:slug", async (req, res) => {
+app.post("/api/blog", async (req, res) => {
+    try {
+      const { slug, title, content, tags, description, category, image } = req.body;
+      
+      const post = await db.insert(blogPosts)
+        .values({
+          slug,
+          title,
+          content,
+          tags,
+          description,
+          category,
+          image,
+          date: new Date(),
+          authorId: req.user?.id,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+
+      res.json(post[0]);
+    } catch (error) {
+      console.error('Error creating blog post:', error);
+      res.status(500).json({ error: "Failed to create blog post" });
+    }
+  });
+
+  app.get("/api/blog/:slug", async (req, res) => {
     try {
       const { slug } = req.params;
       console.log('Fetching blog post with slug:', slug);

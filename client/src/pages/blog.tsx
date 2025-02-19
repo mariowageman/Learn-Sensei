@@ -96,17 +96,30 @@ export default function BlogPage() {
           <div className="flex flex-col space-y-4">
             <div className="flex items-center justify-between">
               <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="gap-2 whitespace-nowrap"
-                onClick={() => {
-                  window.location.href = '/feed.xml';
-                }}
-              >
-                <Rss className="h-4 w-4" />
-                RSS Feed
-              </Button>
+              <div className="flex gap-2">
+                <ProtectedComponent allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR]}>
+                  <Button 
+                    variant="default"
+                    size="sm"
+                    className="gap-2 whitespace-nowrap"
+                    onClick={() => setLocation('/blog/new')}
+                  >
+                    <Edit className="h-4 w-4" />
+                    Create Post
+                  </Button>
+                </ProtectedComponent>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="gap-2 whitespace-nowrap"
+                  onClick={() => {
+                    window.location.href = '/feed.xml';
+                  }}
+                >
+                  <Rss className="h-4 w-4" />
+                  RSS Feed
+                </Button>
+              </div>
             </div>
             <p className="text-lg text-muted-foreground">
               Explore the latest insights in AI-powered learning and educational technology

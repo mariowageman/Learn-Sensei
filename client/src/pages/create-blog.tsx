@@ -1,0 +1,65 @@
+
+import { useState } from 'react';
+import { useLocation } from 'wouter';
+import { PostEditor } from '@/components/post-editor';
+import { ProtectedComponent } from '@/components/rbac/protected-component';
+import { UserRole } from '@/lib/rbac';
+import { useToast } from '@/hooks/use-toast';
+import { slugify } from '@/lib/utils';
+
+export default function CreateBlog() {
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+
+  const handleSave = async (content: string, title: string, tags: string[]) => {
+    try {
+      const slug = slugify(title);
+      const response = await fetch('/api/blog', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          slug,
+          title,
+          content,
+          tags,
+          description: content.slice(0, 150).replace(/<[^>]*>/g, ''),
+          category: 'General',
+          image: '/assets/blog/learning-tips.jpg',
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to create post');
+
+      toast({
+        title: 'Success',
+        description: 'Blog post created successfully',
+      });
+
+      setLocation(`/blog/${slug}`);
+    } catch (error) {
+      console.error('Error creating blog post:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create blog post',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  return (
+    <ProtectedComponent allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR]}>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold mb-8">Create New Blog Post</h1>
+        <PostEditor
+          initialContent=""
+          initialTitle=""
+          initialTags={[]}
+          onSave={handleSave}
+          onCancel={() => setLocation('/blog')}
+        />
+      </div>
+    </ProtectedComponent>
+  );
+}
