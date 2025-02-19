@@ -1,3 +1,4 @@
+
 import { useRoute, Link } from "wouter";
 import { Footer } from "@/components/footer";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +20,13 @@ export default function BlogPost() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: currentPost, isLoading, error } = useQuery<BlogPost>({
+  // Combine both queries into one component-level query
+  const { data: posts = [], isLoading: isLoadingPosts } = useQuery<BlogPost[]>({
+    queryKey: ['blogPosts'],
+    enabled: !!params?.slug
+  });
+
+  const { data: currentPost, isLoading: isLoadingPost, error } = useQuery<BlogPost>({
     queryKey: ['blogPost', params?.slug],
     queryFn: async () => {
       if (!params?.slug) throw new Error('No slug provided');
@@ -29,6 +36,46 @@ export default function BlogPost() {
     },
     enabled: !!params?.slug
   });
+
+  const isLoading = isLoadingPosts || isLoadingPost;
+
+  // Calculate related posts outside of render
+  const relatedPosts = currentPost
+    ? posts
+        .filter(p => p.slug !== currentPost.slug)
+        .filter(p => currentPost.tags.some(tag => p.tags.includes(tag)))
+        .slice(0, 2)
+    : [];
+
+  const handleSave = async (content: string) => {
+    if (!currentPost) return;
+    try {
+      const response = await fetch(`/api/blog/${currentPost.slug}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update post');
+
+      await queryClient.invalidateQueries({ queryKey: ['blogPost', currentPost.slug] });
+      await queryClient.invalidateQueries({ queryKey: ['blogPosts'] });
+
+      toast({
+        title: "Success",
+        description: "Blog post updated successfully",
+      });
+      setIsEditing(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update blog post",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (isLoading) return <div>Loading...</div>;
   if (error) {
@@ -70,46 +117,6 @@ export default function BlogPost() {
       </div>
     );
   }
-
-  const handleSave = async (content: string) => {
-    try {
-      const response = await fetch(`/api/blog/${currentPost.slug}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ content }),
-      });
-
-      if (!response.ok) throw new Error('Failed to update post');
-
-      await queryClient.invalidateQueries({ queryKey: ['blogPost', currentPost.slug] });
-      await queryClient.invalidateQueries({ queryKey: ['blogPosts'] });
-
-      toast({
-        title: "Success",
-        description: "Blog post updated successfully",
-      });
-      setIsEditing(false);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update blog post",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Get related posts based on shared tags
-  const { data: allPosts = [] } = useQuery<BlogPost[]>({
-    queryKey: ['blogPosts'],
-    enabled: !!currentPost // Only fetch when we have the current post
-  });
-
-  const relatedPosts = allPosts
-    .filter(p => p.slug !== currentPost?.slug)
-    .filter(p => currentPost?.tags.some(tag => p.tags.includes(tag)) ?? false)
-    .slice(0, 2);
 
   return (
     <div className="min-h-screen bg-background">
