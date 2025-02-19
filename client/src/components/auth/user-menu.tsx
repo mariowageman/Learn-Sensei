@@ -19,7 +19,7 @@ export function UserMenu() {
       <Button 
         variant="ghost" 
         onClick={() => setLocation("/auth")}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 dark:text-white"
       >
         <UserIcon className="h-4 w-4" />
         Sign In
