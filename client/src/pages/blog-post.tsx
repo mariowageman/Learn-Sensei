@@ -167,6 +167,8 @@ export default function BlogPost() {
           {isEditing ? (
             <PostEditor
               initialContent={currentPost.content}
+              initialTitle={currentPost.title}
+              initialTags={currentPost.tags || []}
               onSave={handleSave}
               onCancel={() => setIsEditing(false)}
             />
