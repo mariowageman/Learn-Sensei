@@ -60,9 +60,9 @@ export function registerRoutes(app: Express): Server {
       
       // Update the post in the array
       blogPosts[postIndex] = updatedPost;
-      
-      // Import and re-export to ensure updates are visible
-      module.exports = { ...module.exports, blogPosts };
+
+      // Update original array to ensure changes persist
+      Object.assign(blogPosts, [...blogPosts]);
 
       res.json({
         success: true,
