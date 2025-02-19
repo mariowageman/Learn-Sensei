@@ -153,19 +153,22 @@ export function registerRoutes(app: Express): Server {
       }
 
       const bucketId = process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID;
-      if (!bucketId) {
-        console.error('Storage bucket not configured');
-        return res.status(500).json({ error: "Storage bucket not configured" });
+      const token = process.env.REPLIT_TOKEN;
+
+      if (!bucketId || !token) {
+        console.error('Storage configuration missing:', { bucketId: !!bucketId, token: !!token });
+        return res.status(500).json({ error: "Storage configuration incomplete" });
       }
 
       console.log('Initializing storage client with bucket:', bucketId);
-      const storage = new Client({
-        bucketId: bucketId,
-        token: process.env.REPLIT_TOKEN,
-        maxRetries: 3,
-        retryDelay: 1000,
-        timeout: 30000
-      });
+      try {
+        const storage = new Client({
+          bucketId: bucketId,
+          token: token,
+          maxRetries: 3,
+          retryDelay: 1000,
+          timeout: 30000
+        });
       const file = req.files.image as UploadedFile;
 
       // Validate file type
@@ -183,11 +186,13 @@ export function registerRoutes(app: Express): Server {
       console.log('Attempting to upload file:', filename);
 
       try {
-        // Create a Buffer from the file data
+        console.log('Processing file:', file.name, 'Size:', file.size, 'Type:', file.mimetype);
         const fileBuffer = Buffer.isBuffer(file.data) ? file.data : Buffer.from(file.data);
-
-        // Upload file using the storage client with metadata
-        try {
+        
+        if (!fileBuffer || fileBuffer.length === 0) {
+          console.error('Empty file buffer');
+          return res.status(400).json({ error: "Invalid file data" });
+        }
           await storage.write(filename, fileBuffer, {
             public: true,
             contentType: file.mimetype,
