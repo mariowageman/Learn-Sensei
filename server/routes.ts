@@ -31,7 +31,7 @@ interface BlogPost extends BlogPostType {
   updatedAt?: string;
 }
 
-let blogPosts: BlogPost[] = [];
+import { blogPosts } from "../client/src/pages/blog";
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
@@ -44,11 +44,6 @@ export function registerRoutes(app: Express): Server {
 
       if (!content) {
         return res.status(400).json({ error: "Content is required" });
-      }
-
-      // Initialize blogPosts array if not already defined
-      if (!blogPosts.length) {
-        blogPosts = [];
       }
 
       const postIndex = blogPosts.findIndex(post => post.id === id);
