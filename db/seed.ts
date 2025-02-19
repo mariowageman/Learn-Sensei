@@ -9,7 +9,7 @@ async function seed() {
         title: "The Evolution of AI in Learning: Beyond Personalization",
         description: "Discover how AI is transforming education beyond simple personalization.",
         category: "AI in Education",
-        image: "/assets/blog/The-Evolution-of-AI-in-Learning-Beyond-Personalization.jpeg",
+        image: "/assets/blog/The-Evolution-of-AI-in-Learning-Beyond-Personalization.jpeg?v=2",
         tags: ['AI', 'Education', 'Technology', 'Personalization'],
         content: `
 <h1>The Evolution of AI in Learning: Beyond Personalization</h1>
