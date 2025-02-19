@@ -177,15 +177,18 @@ export function registerRoutes(app: Express): Server {
       console.log('Attempting to upload file:', filename);
 
       try {
-        // Create a Buffer from the file data if it's not already a Buffer
+        // Create a Buffer from the file data
         const fileBuffer = Buffer.isBuffer(file.data) ? file.data : Buffer.from(file.data);
 
-        // Use writeFile instead of put
-        await storage.writeFile(filename, fileBuffer);
+        // Upload file using the storage client
+        await storage.put(filename, fileBuffer, {
+          access: 'public-read',
+          contentType: file.mimetype
+        });
         console.log('File uploaded to storage successfully');
 
-        // Use url method instead of getSignedUrl
-        const url = await storage.url(filename);
+        // Generate public URL
+        const url = `https://${bucketId}.replit.dev/${filename}`;
         console.log('Generated URL:', url);
 
         res.json({ url });
