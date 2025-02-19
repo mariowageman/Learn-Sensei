@@ -150,7 +150,7 @@ app.post("/api/blog", async (req, res) => {
       if (!bucketId) {
         return res.status(500).json({ error: "Bucket ID not configured" });
       }
-      await storage.init({ bucketId });
+      await storage.init();
       const file = req.files?.image;
       
       if (!file) {
