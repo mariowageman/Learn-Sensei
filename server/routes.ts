@@ -159,7 +159,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       console.log('Initializing storage client with bucket:', bucketId);
-      const storage = new Client({ bucketId });
+      const storage = new Client();
       const file = req.files.image as UploadedFile;
 
       // Validate file type
@@ -182,7 +182,7 @@ export function registerRoutes(app: Express): Server {
 
         // Upload file using the storage client with metadata
         await storage.write(filename, fileBuffer, {
-          access: 'public',
+          public: true,
           contentType: file.mimetype,
           metadata: {
             originalName: file.name
