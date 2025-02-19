@@ -31,7 +31,27 @@ export default function BlogPost() {
   });
 
   if (isLoading) return <div>Loading...</div>;
-  if (error || !currentPost) {
+  if (error) {
+    console.error('Blog post error:', error);
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold">Error Loading Post</h1>
+            <p className="text-muted-foreground">There was an error loading the blog post. Please try again later.</p>
+            <Link href="/blog">
+              <Button>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Blog
+              </Button>
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+  if (!currentPost) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">

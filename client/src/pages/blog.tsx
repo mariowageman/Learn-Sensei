@@ -51,8 +51,24 @@ export default function BlogPage() {
 
   const { data: blogPosts, isLoading, error } = useBlogPosts();
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading blog posts</div>;
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (error) {
+    console.error('Blog listing error:', error);
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold">Error Loading Posts</h1>
+            <p className="text-muted-foreground">There was an error loading the blog posts. Please try again later.</p>
+            <Button onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
   if (!blogPosts) return null;
 
   const filteredPosts = selectedTag
