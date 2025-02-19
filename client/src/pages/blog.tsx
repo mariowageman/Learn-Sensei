@@ -172,7 +172,7 @@ export default function BlogPage() {
                   </Button>
                 </ProtectedComponent>
                 <Button 
-                  variant="outline" 
+                  variant="default" 
                   size="sm"
                   className="gap-2 whitespace-nowrap"
                   onClick={() => {
