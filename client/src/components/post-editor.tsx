@@ -1,8 +1,10 @@
+
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import { Button } from './ui/button'
+import { Input } from './ui/input'
 import { 
   Bold, 
   Italic, 
@@ -19,12 +21,14 @@ import { cn } from '@/lib/utils'
 
 interface PostEditorProps {
   initialContent: string;
-  onSave: (content: string) => void;
+  initialTitle: string;
+  onSave: (content: string, title: string) => void;
   onCancel: () => void;
 }
 
-export function PostEditor({ initialContent, onSave, onCancel }: PostEditorProps) {
+export function PostEditor({ initialContent, initialTitle, onSave, onCancel }: PostEditorProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const [title, setTitle] = useState(initialTitle);
 
   const editor = useEditor({
     extensions: [
@@ -78,6 +82,15 @@ export function PostEditor({ initialContent, onSave, onCancel }: PostEditorProps
 
   return (
     <div className="border rounded-lg overflow-hidden">
+      <div className="p-4 border-b">
+        <Input
+          type="text"
+          placeholder="Post title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="text-xl font-bold"
+        />
+      </div>
       <div className="border-b bg-muted p-2 flex flex-wrap gap-2">
         <Button
           variant="ghost"
@@ -157,7 +170,7 @@ export function PostEditor({ initialContent, onSave, onCancel }: PostEditorProps
           Cancel
         </Button>
         <Button
-          onClick={() => onSave(editor.getHTML())}
+          onClick={() => onSave(editor.getHTML(), title)}
         >
           <Save className="h-4 w-4 mr-2" />
           Save Changes
