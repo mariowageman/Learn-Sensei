@@ -180,7 +180,7 @@ export default function BlogPage() {
                       {calculateReadingTime(post.content)} min read
                     </div>
                   </div>
-                  <CardTitle className="line-clamp-2 hover:text-primary transition-colors">
+                  <CardTitle className="line-clamp-2 hover:text-primary transition-colors min-h-[3.5rem]">
                     <Link href={`/blog/${post.slug}`}>
                       {post.title}
                     </Link>
