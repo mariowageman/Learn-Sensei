@@ -10,6 +10,10 @@ import { Footer } from "@/components/footer";
 import { calculateReadingTime } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { ProtectedComponent } from '@/components/rbac/protected-component';
+import { UserRole } from '@/lib/rbac';
+import { Edit } from "lucide-react";
+
 
 export interface BlogPost {
   id: string;
