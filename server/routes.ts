@@ -145,12 +145,11 @@ app.post("/api/blog", async (req, res) => {
   // File upload endpoint
   app.post("/api/upload", async (req, res) => {
     try {
-      const storage = new Client();
       const bucketId = process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID;
       if (!bucketId) {
         return res.status(500).json({ error: "Bucket ID not configured" });
       }
-      await storage.init();
+      const storage = new Client({ bucketId });
       const file = req.files?.image;
       
       if (!file) {
