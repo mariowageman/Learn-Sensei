@@ -77,10 +77,34 @@ export default function BlogPost() {
   };
 
   const handleDelete = async () => {
-    // Placeholder for delete functionality.  Replace with actual delete logic.
-    console.log("Delete post called for:", currentPost?.slug);
-    //  Add your actual delete fetch request here.
-    toast({title: "Delete in progress", description: "This is a placeholder delete function"});
+    try {
+      const response = await fetch(`/api/blog/${currentPost?.slug}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete post');
+      }
+
+      toast({
+        title: "Success",
+        description: "Post deleted successfully"
+      });
+      
+      window.location.href = '/blog';
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to delete post",
+        variant: "destructive"
+      });
+    }
   };
 
   if (isLoading) return <div>Loading...</div>;
