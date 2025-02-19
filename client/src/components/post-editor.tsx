@@ -304,8 +304,8 @@ export function PostEditor({
           variant="ghost"
           onClick={onCancel}
         >
-          <X className="h-4 w-4 mr-2" />
-          Cancel
+          <X className="h-4 w-4 mr-2 dark:text-white" />
+          <span className="dark:text-white">Cancel</span>
         </Button>
         <Button
           onClick={() => onSave(editor.getHTML(), title, tags, mainImage)}
