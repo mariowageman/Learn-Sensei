@@ -159,7 +159,10 @@ export function registerRoutes(app: Express): Server {
       }
 
       console.log('Initializing storage client with bucket:', bucketId);
-      const storage = new Client();
+      const storage = new Client({
+        bucketId: bucketId,
+        token: process.env.REPLIT_TOKEN
+      });
       const file = req.files.image as UploadedFile;
 
       // Validate file type
