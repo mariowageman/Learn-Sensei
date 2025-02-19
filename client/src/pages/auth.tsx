@@ -19,7 +19,7 @@ export default function AuthPage() {
   }, [user, setLocation]);
 
   return (
-    <div className="container relative min-h-[calc(100vh-65px)] mt-[65px] flex items-center justify-center px-4">
+    <div className="container relative min-h-[calc(100vh-65px)] mt-[30px] sm:mt-[65px] flex items-center justify-center px-4">
       <div className="w-full max-w-[450px]">
         <div className="mx-auto flex w-full flex-col justify-center space-y-4 sm:space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
