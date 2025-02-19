@@ -46,6 +46,7 @@ export default function BlogPage() {
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -95,6 +96,16 @@ export default function BlogPage() {
     }
   };
 
+  const handlePostSelect = (postId: string) => {
+    setSelectedPosts(prevSelected => {
+      if (prevSelected.includes(postId)) {
+        return prevSelected.filter(id => id !== postId);
+      } else {
+        return [...prevSelected, postId];
+      }
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -104,6 +115,38 @@ export default function BlogPage() {
               <h1 className="text-4xl font-bold tracking-tight">Blog</h1>
               <div className="flex gap-2">
                 <ProtectedComponent allowedRoles={[UserRole.ADMIN, UserRole.MODERATOR]}>
+                  {selectedPosts.length > 0 && (
+                    <Button 
+                      variant="destructive"
+                      size="sm"
+                      className="gap-2 whitespace-nowrap"
+                      onClick={async () => {
+                        try {
+                          await Promise.all(
+                            selectedPosts.map(async (id) => {
+                              const response = await fetch(`/api/blog/${id}`, {
+                                method: 'DELETE',
+                                credentials: 'include',
+                                headers: {
+                                  'Content-Type': 'application/json'
+                                }
+                              });
+                              if (!response.ok) throw new Error('Failed to delete post');
+                            })
+                          );
+                          window.location.reload();
+                        } catch (error) {
+                          toast({
+                            title: "Error",
+                            description: "Failed to delete selected posts",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                    >
+                      Delete Selected ({selectedPosts.length})
+                    </Button>
+                  )}
                   <Button 
                     variant="default"
                     size="sm"
@@ -266,6 +309,10 @@ export default function BlogPage() {
                           {tag}
                         </Badge>
                       ))}
+                    </div>
+                    <div className="flex items-center">
+                      <input type="checkbox" id={`post-${post.id}`} checked={selectedPosts.includes(post.id)} onChange={() => handlePostSelect(post.id)} />
+                      <label htmlFor={`post-${post.id}`} className="ml-2">Select</label>
                     </div>
                     <Link href={`/blog/${post.slug}`}>
                       <Button className="w-full group mt-8">
