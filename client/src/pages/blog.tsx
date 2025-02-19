@@ -143,12 +143,24 @@ export default function BlogPage() {
                         onClick={async () => {
                           try {
                             const response = await fetch(`/api/blog/${post.id}`, {
-                              method: 'DELETE'
+                              method: 'DELETE',
+                              credentials: 'include',
+                              headers: {
+                                'Content-Type': 'application/json'
+                              }
                             });
-                            if (!response.ok) throw new Error('Failed to delete post');
+                            if (!response.ok) {
+                              const error = await response.json();
+                              throw new Error(error.error || 'Failed to delete post');
+                            }
                             window.location.reload();
                           } catch (error) {
                             console.error('Error deleting post:', error);
+                            toast({
+                              title: "Error",
+                              description: error.message || "Failed to delete post",
+                              variant: "destructive",
+                            });
                           }
                         }}
                       >
