@@ -52,11 +52,17 @@ export function registerRoutes(app: Express): Server {
       }
 
       // Update the post content while preserving other fields
-      blogPosts[postIndex] = {
+      const updatedPost = {
         ...blogPosts[postIndex],
         content,
         updatedAt: new Date().toISOString()
       };
+      
+      // Update the post in the array
+      blogPosts[postIndex] = updatedPost;
+      
+      // Import and re-export to ensure updates are visible
+      module.exports = { ...module.exports, blogPosts };
 
       res.json({
         success: true,
