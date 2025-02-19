@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { Client } from "replit.object-storage";
+import { Client } from "@replit/object-storage";
 import path from "path";
 import { db } from "@db";
 import { eq, desc } from "drizzle-orm";
