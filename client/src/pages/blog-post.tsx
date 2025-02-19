@@ -102,15 +102,14 @@ export default function BlogPost() {
 
   // Get related posts based on shared tags
   const { data: allPosts = [] } = useQuery<BlogPost[]>({
-    queryKey: ['blogPosts']
+    queryKey: ['blogPosts'],
+    enabled: !!currentPost // Only fetch when we have the current post
   });
 
-  const relatedPosts = currentPost 
-    ? allPosts
-        .filter(p => p.slug !== currentPost.slug)
-        .filter(p => p.tags.some(tag => currentPost.tags.includes(tag)))
-        .slice(0, 2)
-    : [];
+  const relatedPosts = allPosts
+    .filter(p => p.slug !== currentPost?.slug)
+    .filter(p => currentPost?.tags.some(tag => p.tags.includes(tag)) ?? false)
+    .slice(0, 2);
 
   return (
     <div className="min-h-screen bg-background">
