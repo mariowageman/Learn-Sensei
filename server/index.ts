@@ -142,9 +142,26 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  const PORT = process.env.PORT || 3000;
-  const HOST = "0.0.0.0";
-  server.listen(PORT, HOST, () => {
-    log(`Server running at http://${HOST}:${PORT}`);
+  const tryPort = async (port: number): Promise<number> => {
+    try {
+      await new Promise((resolve, reject) => {
+        server.listen(port, "0.0.0.0")
+          .once('listening', () => {
+            server.close(() => resolve(port));
+          })
+          .once('error', reject);
+      });
+      return port;
+    } catch (err) {
+      if (port < 3010) {
+        return tryPort(port + 1);
+      }
+      throw err;
+    }
+  };
+
+  const PORT = process.env.PORT || await tryPort(3000);
+  server.listen(PORT, "0.0.0.0", () => {
+    log(`Server running at http://0.0.0.0:${PORT}`);
   });
 })();
