@@ -22,16 +22,23 @@ export interface BlogPost {
   content: string;
 }
 
-export const blogPosts: BlogPost[] = [
-  {
-    id: "effective-online-learning-tips",
-    title: "5 Tips for Effective Online Learning",
-    date: "February 15, 2025",
-    description: "Master online learning with these essential tips and strategies. Learn how to stay focused, retain knowledge, and make the most of your educational journey.",
-    category: "Education",
-    image: "/assets/blog/ai-education.jpg",
-    tags: ["Education", "Learning", "Study Tips", "Online Learning"],
-    content: `
+import { useQuery } from "@tanstack/react-query";
+
+// Fetch blog posts from API
+const useBlogPosts = () => {
+  return useQuery({
+    queryKey: ['blogPosts'],
+    queryFn: async () => {
+      const response = await fetch('/api/blog');
+      if (!response.ok) {
+        throw new Error('Failed to fetch blog posts');
+      }
+      return response.json();
+    }
+  });
+};
+
+// Original static posts array moved to server-side
       Online learning has transformed education, offering flexibility and accessibility. However, staying focused and retaining knowledge requires the right approach. Whether you're self-studying or using an AI-powered platform like LearnSensei, these five tips will help you make the most of your learning experience.
 
       1. Set Clear Learning Goals
@@ -280,6 +287,11 @@ export default function BlogPage() {
       setSelectedTag(tag);
     }
   }, []);
+
+  const { data: blogPosts, isLoading, error } = useBlogPosts();
+  
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading blog posts</div>;
 
   const filteredPosts = selectedTag
     ? blogPosts.filter(post => post.tags.includes(selectedTag))

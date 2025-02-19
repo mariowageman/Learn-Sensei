@@ -90,7 +90,19 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.get("/api/session", async (req, res) => {
+  app.get("/api/blog", async (req, res) => {
+  try {
+    const posts = await db.query.blogPosts.findMany({
+      orderBy: (posts, { desc }) => [desc(posts.date)]
+    });
+    res.json(posts);
+  } catch (error) {
+    console.error('Error fetching blog posts:', error);
+    res.status(500).json({ error: "Failed to fetch blog posts" });
+  }
+});
+
+app.get("/api/session", async (req, res) => {
     const session = await db.query.sessions.findFirst({
       orderBy: (sessions, { desc }) => [desc(sessions.createdAt)]
     });
