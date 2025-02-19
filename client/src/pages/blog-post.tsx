@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { ShareButtons } from "@/components/share-buttons";
 import { PostEditor } from "@/components/post-editor";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 
 import { ProtectedComponent } from "@/components/rbac/protected-component";
 
@@ -21,16 +21,79 @@ export default function BlogPost() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Use react-query to fetch the blog post
+  const { data: post, isLoading } = useQuery({
+    queryKey: ['/api/blog', params?.id],
+    queryFn: async () => {
+      const response = await fetch(`/api/blog/${params?.id}`);
+      if (!response.ok) throw new Error('Failed to fetch blog post');
+      return response.json();
+    },
+    enabled: !!params?.id
+  });
+
   useEffect(() => {
-    const post = blogPosts.find((p: BlogPost) => p.id === params?.id);
     if (post) {
       setCurrentPost(post);
     }
-  }, [params?.id]);
+  }, [post]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [params?.id]);
+
+  const handleSave = async (content: string) => {
+    try {
+      const response = await fetch(`/api/blog/${currentPost?.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update post');
+      }
+
+      const { post: updatedPost } = await response.json();
+      setCurrentPost(prev => prev ? { ...prev, ...updatedPost } : null);
+      await queryClient.invalidateQueries({ queryKey: ['/api/blog'] });
+
+      toast({
+        title: "Success",
+        description: "Blog post updated successfully",
+      });
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating blog post:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update blog post",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto animate-pulse">
+            <div className="h-8 bg-muted rounded w-3/4 mb-4" />
+            <div className="h-4 bg-muted rounded w-1/4 mb-8" />
+            <div className="h-64 bg-muted rounded mb-8" />
+            <div className="space-y-4">
+              <div className="h-4 bg-muted rounded w-full" />
+              <div className="h-4 bg-muted rounded w-5/6" />
+              <div className="h-4 bg-muted rounded w-4/6" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!currentPost) {
     return (
@@ -52,38 +115,6 @@ export default function BlogPost() {
     );
   }
 
-  const handleSave = async (content: string) => {
-    try {
-      const response = await fetch(`/api/blog/${currentPost.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ content }),
-      });
-
-      if (!response.ok) throw new Error('Failed to update post');
-
-      // Update the local state with new content
-      setCurrentPost(prev => prev ? { ...prev, content } : null);
-
-      await queryClient.invalidateQueries({ queryKey: ['/api/blog'] });
-
-      toast({
-        title: "Success",
-        description: "Blog post updated successfully",
-      });
-      setIsEditing(false);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update blog post",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Get related posts based on shared tags
   const relatedPosts = blogPosts
     .filter((p: BlogPost) => p.id !== currentPost.id)
     .filter((p: BlogPost) => p.tags.some((tag: string) => currentPost.tags.includes(tag)))

@@ -13,31 +13,17 @@ import {
   learningPathProgress,
   progressAnalytics,
   subjectHistory,
-  type BlogPostType
+  blogPosts,
+  type BlogPost
 } from "@db/schema";
 import { fetchCourseraCourses } from "./coursera";
 import { generateRSSFeed } from "../client/src/lib/rss";
-
-// Update blog post interface to match schema
-interface BlogPost extends BlogPostType {
-  id: string;
-  title: string;
-  content: string;
-  date: string;
-  description: string;
-  category: string;
-  image: string;
-  tags: string[];
-  updatedAt?: string;
-}
-
-let blogPosts: BlogPost[] = [];
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
 
   // Blog post update endpoint
-  app.patch("/api/blog/:id", async (req, res) => {
+  app.patch("/api/blog/:id", requireAuth, async (req, res) => {
     try {
       const { id } = req.params;
       const { content } = req.body;
@@ -46,24 +32,18 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "Content is required" });
       }
 
-      const postIndex = blogPosts.findIndex(post => post.id === id);
-      if (postIndex === -1) {
+      const [updatedPost] = await db
+        .update(blogPosts)
+        .set({
+          content,
+          updatedAt: new Date()
+        })
+        .where(eq(blogPosts.id, parseInt(id)))
+        .returning();
+
+      if (!updatedPost) {
         return res.status(404).json({ error: "Blog post not found" });
       }
-
-      // Update the post content while preserving other fields
-      const updatedPost = {
-        ...blogPosts[postIndex],
-        content,
-        updatedAt: new Date().toISOString()
-      };
-
-      blogPosts[postIndex] = updatedPost;
-
-      // In the future, when database is set up:
-      // await db.update(blogPosts)
-      //   .set({ content, updatedAt: new Date() })
-      //   .where(eq(blogPosts.id, id));
 
       res.json({
         success: true,
@@ -908,7 +888,7 @@ function generateRecommendationReason(
     if (path.difficulty === 'beginner') {
       return `Great starting point for beginners! This ${mainTopic} course will help you build a strong foundation.`;
     }
-    return `This ${path.difficulty} level course in ${mainTopic} matches your interests.`;
+    return `This ${path.difficulty} level course in ${mainTopic} matches your interests`;
   }
 
   const completedTopics = progress.completedTopics as number[];
@@ -944,4 +924,6 @@ function generateRecommendationReason(
 
   // Default recommendation
   return `This ${path.difficulty} level course in ${mainTopic} aligns well with your learning progress.`;
+}
+
 }
