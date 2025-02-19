@@ -13,13 +13,14 @@ import {
   learningPathProgress,
   progressAnalytics,
   subjectHistory,
-  type BlogPostType
 } from "@db/schema";
 import { fetchCourseraCourses } from "./coursera";
 import { generateRSSFeed } from "../client/src/lib/rss";
+import fs from 'fs/promises';
+import path from 'path';
 
-// Update blog post interface to match schema
-interface BlogPost extends BlogPostType {
+// Define BlogPost type directly since it's not in schema
+interface BlogPost {
   id: string;
   title: string;
   content: string;
@@ -31,39 +32,108 @@ interface BlogPost extends BlogPostType {
   updatedAt?: string;
 }
 
-let blogPosts: BlogPost[] = [];
+const BLOG_POSTS_DIR = path.join(process.cwd(), 'content', 'blog');
+
+// Ensure blog posts directory exists
+async function ensureBlogDirectory() {
+  try {
+    await fs.access(BLOG_POSTS_DIR);
+  } catch {
+    await fs.mkdir(BLOG_POSTS_DIR, { recursive: true });
+  }
+}
+
+// Load blog post from file
+async function loadBlogPost(id: string): Promise<BlogPost | null> {
+  try {
+    const filePath = path.join(BLOG_POSTS_DIR, `${id}.json`);
+    const content = await fs.readFile(filePath, 'utf-8');
+    return JSON.parse(content);
+  } catch (error) {
+    console.error(`Error loading blog post ${id}:`, error);
+    return null;
+  }
+}
+
+// Load all blog posts
+async function loadAllBlogPosts(): Promise<BlogPost[]> {
+  try {
+    await ensureBlogDirectory();
+    const files = await fs.readdir(BLOG_POSTS_DIR);
+    const posts = await Promise.all(
+      files
+        .filter(file => file.endsWith('.json'))
+        .map(async file => {
+          const content = await fs.readFile(path.join(BLOG_POSTS_DIR, file), 'utf-8');
+          return JSON.parse(content);
+        })
+    );
+    return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  } catch (error) {
+    console.error('Error loading blog posts:', error);
+    return [];
+  }
+}
+
+// Save blog post to file
+async function saveBlogPost(post: BlogPost): Promise<void> {
+  await ensureBlogDirectory();
+  const filePath = path.join(BLOG_POSTS_DIR, `${post.id}.json`);
+  await fs.writeFile(filePath, JSON.stringify(post, null, 2));
+}
 
 export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
+
+  // Get all blog posts
+  app.get("/api/blog", async (req, res) => {
+    try {
+      const posts = await loadAllBlogPosts();
+      res.json(posts);
+    } catch (error) {
+      console.error('Error fetching blog posts:', error);
+      res.status(500).json({ error: "Failed to fetch blog posts" });
+    }
+  });
+
+  // Get single blog post
+  app.get("/api/blog/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const post = await loadBlogPost(id);
+      if (!post) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+      res.json(post);
+    } catch (error) {
+      console.error('Error fetching blog post:', error);
+      res.status(500).json({ error: "Failed to fetch blog post" });
+    }
+  });
 
   // Blog post update endpoint
   app.patch("/api/blog/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const { content } = req.body;
+      const { content, title, description, category, tags } = req.body;
 
-      if (!content) {
-        return res.status(400).json({ error: "Content is required" });
-      }
-
-      const postIndex = blogPosts.findIndex(post => post.id === id);
-      if (postIndex === -1) {
+      const post = await loadBlogPost(id);
+      if (!post) {
         return res.status(404).json({ error: "Blog post not found" });
       }
 
-      // Update the post content while preserving other fields
+      // Update the post with new content while preserving other fields
       const updatedPost = {
-        ...blogPosts[postIndex],
+        ...post,
         content,
+        title: title || post.title,
+        description: description || post.description,
+        category: category || post.category,
+        tags: tags || post.tags,
         updatedAt: new Date().toISOString()
       };
 
-      blogPosts[postIndex] = updatedPost;
-
-      // In the future, when database is set up:
-      // await db.update(blogPosts)
-      //   .set({ content, updatedAt: new Date() })
-      //   .where(eq(blogPosts.id, id));
+      await saveBlogPost(updatedPost);
 
       res.json({
         success: true,
@@ -647,6 +717,7 @@ export function registerRoutes(app: Express): Server {
   });
 
 
+
   app.get("/api/recommendations", async (req, res) => {
     try {
       // Get user's progress across all learning paths
@@ -944,4 +1015,5 @@ function generateRecommendationReason(
 
   // Default recommendation
   return `This ${path.difficulty} level course in ${mainTopic} aligns well with your learning progress.`;
+}
 }
