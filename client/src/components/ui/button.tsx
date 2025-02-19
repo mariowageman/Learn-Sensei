@@ -9,17 +9,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-blue-500 dark:hover:bg-blue-600",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-[#3A3D98] dark:hover:bg-[#3A3D98]/80",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90 dark:bg-red-500 dark:hover:bg-red-600",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground dark:border-gray-400 dark:text-gray-100 dark:hover:bg-gray-600 dark:hover:text-white",
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground dark:border-[#3A3D98] dark:text-[#3A3D98] dark:hover:bg-[#3A3D98] dark:hover:text-white",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 dark:bg-gray-300 dark:text-gray-800 dark:hover:bg-gray-400",
-        ghost: "hover:bg-accent hover:text-accent-foreground dark:text-gray-100 dark:hover:bg-gray-600",
-        link: "text-primary underline-offset-4 hover:underline dark:text-blue-300",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 dark:bg-[#3A3D98]/20 dark:text-[#3A3D98] dark:hover:bg-[#3A3D98]/30",
+        ghost: "hover:bg-accent hover:text-accent-foreground dark:text-[#3A3D98] dark:hover:bg-[#3A3D98]/20",
+        link: "text-primary underline-offset-4 hover:underline dark:text-[#3A3D98]",
         success: "bg-green-500 text-white hover:bg-green-600 dark:bg-green-500 dark:hover:bg-green-600",
-        blue: "bg-[#3A3D98] text-white hover:bg-[#3A3D98]/90 dark:bg-blue-500 dark:hover:bg-blue-600"
+        blue: "bg-[#3A3D98] text-white hover:bg-[#3A3D98]/90 dark:bg-[#3A3D98] dark:hover:bg-[#3A3D98]/80"
       },
       size: {
         default: "h-10 px-4 py-2",
