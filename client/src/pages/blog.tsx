@@ -106,7 +106,7 @@ export default function BlogPage() {
                     variant="default"
                     size="sm"
                     className="gap-2 whitespace-nowrap"
-                    onClick={() => setLocation('/blog/new')}
+                    onClick={() => setLocation('/create-blog')}
                   >
                     <Edit className="h-4 w-4" />
                     Create Post
