@@ -170,7 +170,7 @@ export function registerRoutes(app: Express): Server {
       const filename = `blog_images/${timestamp}_${safeFilename}`;
 
       try {
-        await storage.write(filename, file.data);
+        await storage.put(filename, file.data);
         const url = await storage.getSignedUrl(filename);
 
         console.log('File uploaded successfully:', filename);
@@ -898,8 +898,7 @@ export function registerRoutes(app: Express): Server {
 
       // Get the current learning streak
       const pathProgress = await db.query.learningPathProgress.findMany({
-        orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
-      });
+        orderBy: (progress, { desc }) => [desc(progress.updatedAt)]      });
 
       const currentStreak = pathProgress[0]?.streakDays || 0;
 

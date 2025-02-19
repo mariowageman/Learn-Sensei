@@ -5,12 +5,12 @@ import Link from '@tiptap/extension-link'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Badge } from './ui/badge'
-import { 
-  Bold, 
-  Italic, 
-  List, 
-  Heading1, 
-  Heading2, 
+import {
+  Bold,
+  Italic,
+  List,
+  Heading1,
+  Heading2,
   Link as LinkIcon,
   Image as ImageIcon,
   Save,
@@ -66,14 +66,22 @@ export function PostEditor({ initialContent, initialTitle, initialTags, initialI
         body: formData,
       });
 
-      if (!response.ok) throw new Error('Upload failed');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Upload failed');
+      }
 
       const { url } = await response.json();
-      editor?.chain().focus().setImage({ src: url }).run();
+      if (editor) {
+        editor.chain().focus().setImage({ src: url }).run();
+      }
+      console.log('Image uploaded successfully:', url);
     } catch (error) {
       console.error('Image upload failed:', error);
     } finally {
       setIsUploading(false);
+      // Clear the file input
+      e.target.value = '';
     }
   }
 
@@ -127,14 +135,19 @@ export function PostEditor({ initialContent, initialTitle, initialTags, initialI
                       body: formData,
                     });
 
-                    if (!response.ok) throw new Error('Upload failed');
+                    if (!response.ok) {
+                      const errorData = await response.json();
+                      throw new Error(errorData.error || 'Upload failed');
+                    }
 
                     const { url } = await response.json();
                     setMainImage(url);
+                    console.log('Cover image uploaded successfully:', url);
                   } catch (error) {
-                    console.error('Image upload failed:', error);
+                    console.error('Cover image upload failed:', error);
                   } finally {
                     setIsUploading(false);
+                    e.target.value = '';
                   }
                 }}
                 accept="image/*"
@@ -154,8 +167,8 @@ export function PostEditor({ initialContent, initialTitle, initialTags, initialI
           {tags.map((tag, index) => (
             <Badge key={index} variant="secondary" className="group">
               {tag}
-              <X 
-                className="h-3 w-3 ml-1 cursor-pointer" 
+              <X
+                className="h-3 w-3 ml-1 cursor-pointer"
                 onClick={() => setTags(tags.filter((_, i) => i !== index))}
               />
             </Badge>
