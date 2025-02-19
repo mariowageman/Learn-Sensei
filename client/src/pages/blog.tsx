@@ -13,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ProtectedComponent } from '@/components/rbac/protected-component';
 import { UserRole } from '@/lib/rbac';
 import { Edit } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 
 export interface BlogPost {
@@ -42,6 +43,7 @@ const useBlogPosts = () => {
 };
 
 export default function BlogPage() {
+  const { toast } = useToast();
   const [location, setLocation] = useLocation();
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
