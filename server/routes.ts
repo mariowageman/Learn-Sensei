@@ -161,7 +161,10 @@ export function registerRoutes(app: Express): Server {
       console.log('Initializing storage client with bucket:', bucketId);
       const storage = new Client({
         bucketId: bucketId,
-        token: process.env.REPLIT_TOKEN
+        token: process.env.REPLIT_TOKEN,
+        maxRetries: 3,
+        retryDelay: 1000,
+        timeout: 30000
       });
       const file = req.files.image as UploadedFile;
 
