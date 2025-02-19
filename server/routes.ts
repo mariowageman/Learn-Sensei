@@ -4,6 +4,7 @@ import { db } from "@db";
 import { eq, desc } from "drizzle-orm";
 import {
   blogPosts,
+  users,
   type BlogPostType
 } from "@db/schema";
 import { generateRSSFeed } from "../client/src/lib/rss";
