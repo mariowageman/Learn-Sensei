@@ -185,7 +185,7 @@ export default function BlogPage() {
                       {post.title}
                     </Link>
                   </CardTitle>
-                  <CardDescription>{post.date}</CardDescription>
+                  <CardDescription>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <p className="text-muted-foreground mb-4 line-clamp-3">{post.description}</p>
