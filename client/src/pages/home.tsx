@@ -13,7 +13,7 @@ export default function Home() {
       <section className="relative h-screen md:h-[800px] overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat h-full"
-          style={{ backgroundImage: 'url(/src/assets/hero-bg.jpg)' }}
+          style={{ backgroundImage: 'url(/assets/hero-bg.jpg)' }}
         />
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative h-full max-w-6xl mx-auto flex flex-col justify-end sm:pb-20 pb-[100px] px-4">
