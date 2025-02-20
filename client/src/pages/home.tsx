@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { AnimatedText } from "@/components/ui/animated-text";
 import { Button } from "@/components/ui/button";
 import { LearningRecommendations } from "@/components/learning/recommendations";
 import { GraduationCap, Brain, Target, Sparkles } from "lucide-react";
@@ -19,7 +20,7 @@ export default function Home() {
         <div className="relative h-full max-w-6xl mx-auto flex flex-col justify-end sm:pb-20 pb-[100px] px-4">
           <div className="text-center space-y-6">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white">
-              Learn Sensei for Smarter Learning
+              Learn Sensei for <AnimatedText words={["Smarter", "Effortless", "Adaptive"]} /> Learning
             </h1>
             <p className="text-xl sm:text-2xl text-white/90 max-w-2xl mx-auto">
               Get the right content instantly with AI-powered questions and video explanations
