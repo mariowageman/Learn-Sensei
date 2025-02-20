@@ -27,8 +27,8 @@ import { UserMenu } from '@/components/auth/user-menu';
 import { AuthProvider } from '@/lib/auth-context';
 import AuthPage from "@/pages/auth";
 import SettingsPage from "@/pages/settings";
-import { useScroll } from "@/hooks/use-scroll-top"; // Added import
-import cn from 'classnames'; // Added import, assuming classnames library
+import { useScroll } from "@/hooks/use-scroll-top";
+import cn from 'classnames';
 
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
@@ -37,7 +37,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
       <Link href="/">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2"
+          className="w-full justify-start gap-2 dark:text-white"
           onClick={onNavigate}
         >
           <HomeIcon className="h-4 w-4" />
@@ -47,7 +47,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
       <Link href="/sensei">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2"
+          className="w-full justify-start gap-2 dark:text-white"
           onClick={onNavigate}
         >
           <Brain className="h-4 w-4" />
@@ -57,7 +57,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
       <Link href="/learning-paths">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2"
+          className="w-full justify-start gap-2 dark:text-white"
           onClick={onNavigate}
         >
           <BookOpen className="h-4 w-4" />
@@ -67,7 +67,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
       <Link href="/dashboard">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2"
+          className="w-full justify-start gap-2 dark:text-white"
           onClick={onNavigate}
         >
           <LayoutDashboard className="h-4 w-4" />
@@ -77,7 +77,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
       <Link href="/blog">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2"
+          className="w-full justify-start gap-2 dark:text-white"
           onClick={onNavigate}
         >
           <BookText className="h-4 w-4" />
@@ -216,7 +216,7 @@ function Navigation() {
                 <div className="flex flex-col gap-4">
                   <Link href="/">
                     <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2">
+                      <Button variant="ghost" className="w-full justify-start gap-2 dark:text-white">
                         <HomeIcon className="h-4 w-4" />
                         Home
                       </Button>
@@ -224,7 +224,7 @@ function Navigation() {
                   </Link>
                   <Link href="/sensei">
                     <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2">
+                      <Button variant="ghost" className="w-full justify-start gap-2 dark:text-white">
                         <Brain className="h-4 w-4" />
                         Sensei Mode
                       </Button>
@@ -232,7 +232,7 @@ function Navigation() {
                   </Link>
                   <Link href="/learning-paths">
                     <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2">
+                      <Button variant="ghost" className="w-full justify-start gap-2 dark:text-white">
                         <BookOpen className="h-4 w-4" />
                         Learning Paths
                       </Button>
@@ -240,7 +240,7 @@ function Navigation() {
                   </Link>
                   <Link href="/dashboard">
                     <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2">
+                      <Button variant="ghost" className="w-full justify-start gap-2 dark:text-white">
                         <LayoutDashboard className="h-4 w-4" />
                         Progress
                       </Button>
@@ -248,7 +248,7 @@ function Navigation() {
                   </Link>
                   <Link href="/blog">
                     <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2">
+                      <Button variant="ghost" className="w-full justify-start gap-2 dark:text-white">
                         <BookText className="h-4 w-4" />
                         Blog
                       </Button>
