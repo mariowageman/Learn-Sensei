@@ -13,9 +13,9 @@ export default function Home() {
       <section className="relative py-32 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ 
           backgroundImage: 'url(/src/assets/hero-bg.jpg)',
-          height: '1200px',
+          height: '1500px',
           '@media (max-width: 768px)': {
-            height: '800px'
+            height: '1000px'
           }
         }} />
         <div className="absolute inset-0 bg-black/50" />
