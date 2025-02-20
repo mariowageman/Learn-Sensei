@@ -47,30 +47,34 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">
+      <section className="relative py-24 px-4 bg-gradient-to-b from-[#111C2A] to-[#1A2C44] overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMzRjNFRUQiIHN0b3Atb3BhY2l0eT0iMC4wNSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzgwMjZEOSIgc3RvcC1vcGFjaXR5PSIwLjA1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTAgMGgyMDB2MjAwSDB6IiBmaWxsPSJ1cmwoI2cpIi8+PC9zdmc+')]" />
+        <div className="max-w-6xl mx-auto relative">
+          <h2 className="text-4xl font-bold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 animate-gradient">
             Why Choose Learn Sensei?
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="p-6 rounded-lg border bg-card">
-              <Brain className="h-12 w-12 text-[#3F3EED] dark:text-[#3F3EED] mb-4" />
-              <h3 className="text-xl font-semibold mb-2">AI-Powered Learning</h3>
-              <p className="text-muted-foreground">
+            <div className="group p-8 rounded-2xl bg-black/20 border border-white/10 backdrop-blur-sm transition-all duration-300 hover:transform hover:scale-105 hover:shadow-[0_0_30px_rgba(63,62,237,0.3)] relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <Brain className="h-16 w-16 text-[#3F3EED] mb-6 transform transition-transform group-hover:scale-110 group-hover:rotate-3" />
+              <h3 className="text-2xl font-semibold mb-3 text-white">AI-Powered Learning</h3>
+              <p className="text-gray-300">
                 Personalized learning experience adapting to your pace and style
               </p>
             </div>
-            <div className="p-6 rounded-lg border bg-card">
-              <Target className="h-12 w-12 text-[#3F3EED] dark:text-[#3F3EED] mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Instant Feedback</h3>
-              <p className="text-muted-foreground">
+            <div className="group p-8 rounded-2xl bg-black/20 border border-white/10 backdrop-blur-sm transition-all duration-300 hover:transform hover:scale-105 hover:shadow-[0_0_30px_rgba(63,62,237,0.3)] relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <Target className="h-16 w-16 text-[#3F3EED] mb-6 transform transition-transform group-hover:scale-110 group-hover:rotate-3" />
+              <h3 className="text-2xl font-semibold mb-3 text-white">Instant Feedback</h3>
+              <p className="text-gray-300">
                 Get real-time assessment and tailored suggestions for improvement
               </p>
             </div>
-            <div className="p-6 rounded-lg border bg-card">
-              <Sparkles className="h-12 w-12 text-[#3F3EED] dark:text-[#3F3EED] mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Diverse Content</h3>
-              <p className="text-muted-foreground">
+            <div className="group p-8 rounded-2xl bg-black/20 border border-white/10 backdrop-blur-sm transition-all duration-300 hover:transform hover:scale-105 hover:shadow-[0_0_30px_rgba(63,62,237,0.3)] relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <Sparkles className="h-16 w-16 text-[#3F3EED] mb-6 transform transition-transform group-hover:scale-110 group-hover:rotate-3" />
+              <h3 className="text-2xl font-semibold mb-3 text-white">Diverse Content</h3>
+              <p className="text-gray-300">
                 Access curated courses from leading institutions and experts
               </p>
             </div>
