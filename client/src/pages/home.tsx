@@ -26,7 +26,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
               <Link href="/sensei">
-                <Button size="lg" className="w-full sm:w-auto bg-[#3F3EED] border-[#3F3EED] text-white hover:bg-transparent hover:text-[#3F3EED] hover:border-[#3F3EED]">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto border-[#3F3EED] bg-[#3F3EED] text-white hover:bg-transparent hover:text-[#3F3EED]">
                   <Brain className="mr-2 h-5 w-5 group-hover:text-[#3F3EED]" />
                   Enter Sensei Mode
                 </Button>
