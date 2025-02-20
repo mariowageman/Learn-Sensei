@@ -24,7 +24,7 @@ export default function Home() {
             <p className="text-xl sm:text-2xl text-white/90 max-w-2xl mx-auto">
               Get the right content instantly with AI-powered questions and video explanations
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Link href="/sensei">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto border-[#3F3EED] bg-[#3F3EED] text-white hover:bg-transparent hover:text-[#3F3EED] dark:border-[#3F3EED] dark:bg-[#3F3EED] dark:text-white dark:hover:bg-transparent dark:hover:text-[#3F3EED]">
                   <Brain className="mr-2 h-5 w-5 group-hover:text-[#3F3EED] dark:group-hover:text-[#3F3EED]" />
