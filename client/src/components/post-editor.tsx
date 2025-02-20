@@ -162,7 +162,7 @@ export function PostEditor({
           placeholder="Post title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="text-xl font-bold mb-2"
+          className="text-xl font-bold mb-2 dark:text-white"
         />
 
         <div className="flex flex-wrap gap-2 items-center">
