@@ -21,7 +21,7 @@ export default function Home() {
           <div className="text-center space-y-6">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white flex flex-col sm:block">
               <span>Learn Sensei for</span>
-              <span className="flex items-center gap-2">
+              <span className="flex items-center justify-center gap-2">
                 <AnimatedText words={["Smarter", "Effortless", "Adaptive"]} /> Learning
               </span>
             </h1>
