@@ -8,27 +8,41 @@ interface AnimatedTextProps {
 
 export function AnimatedText({ words, interval = 2500 }: AnimatedTextProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
+  const [displayText, setDisplayText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const fadeTimeout = setInterval(() => {
-      setIsVisible(false);
-      setTimeout(() => {
+    let timeout: NodeJS.Timeout;
+    const currentWord = words[currentIndex];
+    
+    if (isDeleting) {
+      if (displayText === '') {
+        setIsDeleting(false);
         setCurrentIndex((prev) => (prev + 1) % words.length);
-        setIsVisible(true);
-      }, 200);
-    }, interval);
+      } else {
+        timeout = setTimeout(() => {
+          setDisplayText(displayText.slice(0, -1));
+        }, 50);
+      }
+    } else {
+      if (displayText === currentWord) {
+        timeout = setTimeout(() => {
+          setIsDeleting(true);
+        }, interval);
+      } else {
+        timeout = setTimeout(() => {
+          setDisplayText(currentWord.slice(0, displayText.length + 1));
+        }, 100);
+      }
+    }
 
-    return () => clearInterval(fadeTimeout);
-  }, [words, interval]);
+    return () => clearTimeout(timeout);
+  }, [displayText, isDeleting, currentIndex, words, interval]);
 
   return (
-    <span
-      className={`inline-block transition-opacity duration-200 bg-yellow-300/30 px-1 rounded ${
-        isVisible ? 'opacity-100' : 'opacity-0'
-      }`}
-    >
-      {words[currentIndex]}
+    <span className="text-[#FFD700]">
+      {displayText}
+      <span className="animate-pulse">|</span>
     </span>
   );
 }
