@@ -19,8 +19,11 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative h-full max-w-6xl mx-auto flex flex-col justify-end sm:pb-20 pb-[100px] px-4">
           <div className="text-center space-y-6">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white">
-              Learn Sensei for <AnimatedText words={["Smarter", "Effortless", "Adaptive"]} /> Learning
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white flex flex-col sm:block">
+              <span>Learn Sensei for</span>
+              <span className="flex items-center gap-2">
+                <AnimatedText words={["Smarter", "Effortless", "Adaptive"]} /> Learning
+              </span>
             </h1>
             <p className="text-xl sm:text-2xl text-white/90 max-w-2xl mx-auto">
               Get the right content instantly with AI-powered questions and video explanations
