@@ -16,7 +16,7 @@ export default function Home2() {
           style={{ backgroundImage: 'url(/src/assets/hero-bg.jpg)' }}
         />
         <div className="absolute inset-0 bg-black/50" />
-        <div className="relative max-w-6xl mx-auto text-center pt-24 md:pt-36 space-y-8">
+        <div className="relative max-w-6xl mx-auto text-center pt-32 md:pt-52 space-y-8">
           <div className="space-y-4">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#111C2A] dark:text-white">
               Learn Sensei for Smarter Learning
@@ -43,7 +43,7 @@ export default function Home2() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4">
+      <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">
             Why Choose Learn Sensei?
@@ -75,7 +75,7 @@ export default function Home2() {
       </section>
 
       {/* Recommendations */}
-      <section className="py-20 px-4 bg-muted/30">
+      <section className="py-16 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto">
           <LearningRecommendations />
         </div>
