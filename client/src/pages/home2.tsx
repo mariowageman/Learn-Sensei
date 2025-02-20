@@ -1,4 +1,3 @@
-
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { LearningRecommendations } from "@/components/learning/recommendations";
@@ -11,16 +10,13 @@ export default function Home2() {
     <div className="min-h-screen bg-background">
       <TawkTo />
       {/* Hero Section */}
-      <section className="relative py-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ 
-          backgroundImage: 'url(/src/assets/hero-bg.jpg)',
-          height: '900px',
-          '@media (max-width: 768px)': {
-            height: '500px'
-          }
-        }} />
+      <section className="relative min-h-[100vh] md:min-h-[90vh] px-4 overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat h-screen md:h-[1200px]"
+          style={{ backgroundImage: 'url(/src/assets/hero-bg.jpg)' }}
+        />
         <div className="absolute inset-0 bg-black/50" />
-        <div className="relative max-w-6xl mx-auto text-center space-y-8">
+        <div className="relative max-w-6xl mx-auto text-center pt-32 md:pt-48 space-y-8">
           <div className="space-y-4">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#111C2A] dark:text-white">
               Learn Sensei for Smarter Learning
