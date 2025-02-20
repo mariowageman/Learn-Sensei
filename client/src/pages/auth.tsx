@@ -20,8 +20,8 @@ export default function AuthPage() {
 
   return (
     <div className="container relative min-h-[calc(100vh-40px)] mt-[40px] flex flex-col items-center justify-start px-4 pt-4">
-      <div className="w-full max-w-[450px]">
-        <div className="mx-auto flex w-full flex-col justify-start sm:justify-center space-y-4 sm:space-y-6 sm:w-[350px]">
+      <div className="w-full max-w-[450px] mx-auto">
+        <div className="flex w-full flex-col justify-start sm:justify-center space-y-4 sm:space-y-6 sm:w-[350px] mx-auto">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
               Welcome to Learn Sensei
