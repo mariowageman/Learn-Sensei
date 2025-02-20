@@ -32,8 +32,8 @@ export default function Home() {
                 </Button>
               </Link>
               <Link href="/learning-paths">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white/10">
-                  <GraduationCap className="mr-2 h-5 w-5" />
+                <Button size="lg" variant="outline" className="w-full sm:w-auto border-[#3F3EED] text-[#3F3EED] hover:bg-[#3F3EED] hover:text-white dark:border-white dark:text-white dark:hover:bg-white/10">
+                  <GraduationCap className="mr-2 h-5 w-5 group-hover:text-white" />
                   Browse Courses
                 </Button>
               </Link>
