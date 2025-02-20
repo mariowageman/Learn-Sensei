@@ -223,7 +223,7 @@ export function PostEditor({
                 }
               }}
             >
-              Add
+              <span className="dark:text-white">Add</span>
             </Button>
           </div>
         </div>
