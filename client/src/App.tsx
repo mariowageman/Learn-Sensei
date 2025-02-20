@@ -21,6 +21,7 @@ import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
 import BlogPost from "@/pages/blog-post";
 import CreateBlog from "@/pages/create-blog";
+import Home2 from "@/pages/home2";
 import { useScrollTop } from "@/hooks/use-scroll-top";
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { UserMenu } from '@/components/auth/user-menu';
@@ -325,6 +326,11 @@ function Router() {
           <Route path="/create-blog">
             <div data-page="create-blog">
               <CreateBlog />
+            </div>
+          </Route>
+          <Route path="/home2">
+            <div data-page="home2">
+              <Home2 />
             </div>
           </Route>
           <Route path="/cookie-policy">
