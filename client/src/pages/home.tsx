@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { ContinuousCarousel } from "@/components/ui/continuous-carousel";
 import { AnimatedText } from "@/components/ui/animated-text";
 import { Button } from "@/components/ui/button";
 import { LearningRecommendations } from "@/components/learning/recommendations";
@@ -78,6 +79,19 @@ export default function Home() {
                 Access curated courses from leading institutions and experts
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trusted Platforms Section */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#F5F7FA] to-[#E4E9F2] py-16 dark:from-[#111C2A] dark:to-[#1A2C44]">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMzRjNFRUQiIHN0b3Atb3BhY2l0eT0iMC4wNSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzgwMjZEOSIgc3RvcC1vcGFjaXR5PSIwLjA1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTAgMGgyMDB2MjAwSDB6IiBmaWxsPSJ1cmwoI2cpIi8+PC9zdmc+')]" />
+        <div className="container relative mx-auto px-4">
+          <h2 className="mb-12 text-center text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
+            Trusted by Leading Education Platforms
+          </h2>
+          <div className="shadow-[0_0_50px_rgba(63,62,237,0.15)] dark:shadow-[0_0_50px_rgba(63,62,237,0.25)]">
+            <ContinuousCarousel />
           </div>
         </div>
       </section>
