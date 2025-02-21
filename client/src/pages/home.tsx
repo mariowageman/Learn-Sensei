@@ -99,10 +99,10 @@ export default function Home() {
       <section className="relative overflow-hidden bg-black py-24">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-purple-500/10 opacity-50" />
         <div className="container relative mx-auto px-4">
-          <h2 className="mb-16 text-center text-4xl font-bold text-white md:text-5xl">
+          <h2 className="mb-12 text-center text-3xl font-bold text-white md:text-4xl">
             How It Works
           </h2>
-          
+
           {/* Center Mascot */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <img 
@@ -170,10 +170,10 @@ export default function Home() {
       <section className="relative overflow-hidden bg-black py-24">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-purple-500/10 opacity-50" />
         <div className="container relative mx-auto px-4">
-          <h2 className="mb-16 text-center text-4xl font-bold text-white md:text-5xl">
+          <h2 className="mb-12 text-center text-3xl font-bold text-white md:text-4xl">
             How It Works
           </h2>
-          
+
           {/* Center Mascot */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <img 
