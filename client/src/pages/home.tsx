@@ -144,7 +144,7 @@ export default function Home() {
                     animation: `fadeInScale 0.5s ease-out ${index * 0.2}s both`
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-100 dark:opacity-0 transition-opacity duration-300 dark:group-hover:opacity-100 group-hover:opacity-50" />
                   <span className="mb-4 block text-4xl">{step.icon}</span>
                   <h3 className="mb-2 text-xl font-semibold text-gray-800 dark:text-white">
                     {step.title}
@@ -215,7 +215,7 @@ export default function Home() {
                     animation: `fadeInScale 0.5s ease-out ${index * 0.2}s both`
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-100 dark:opacity-0 transition-opacity duration-300 dark:group-hover:opacity-100 group-hover:opacity-50" />
                   <span className="mb-4 block text-4xl">{step.icon}</span>
                   <h3 className="mb-2 text-xl font-semibold text-gray-800 dark:text-white">
                     {step.title}
