@@ -103,6 +103,69 @@ export default function Home() {
       </section>
 
       <Footer />
+    {/* How It Works Section */}
+      <section className="relative overflow-hidden bg-black py-24">
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-purple-500/10 opacity-50" />
+        <div className="container relative mx-auto px-4">
+          <h2 className="mb-16 text-center text-4xl font-bold text-white md:text-5xl">
+            How It Works
+          </h2>
+          
+          {/* Center Mascot */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <img 
+              src="/assets/sensei-fox.png" 
+              alt="Sensei Fox"
+              className="h-48 w-48 animate-float opacity-80" 
+            />
+          </div>
+
+          {/* Steps Circle */}
+          <div className="relative mx-auto max-w-5xl">
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+              {[
+                {
+                  icon: "🎯",
+                  title: "Take a Quiz",
+                  description: "Answer AI-powered questions to assess your knowledge level"
+                },
+                {
+                  icon: "🧠",
+                  title: "AI Insights",
+                  description: "Get personalized learning recommendations dynamically"
+                },
+                {
+                  icon: "🎥",
+                  title: "Watch Videos",
+                  description: "Access smartly curated content based on your performance"
+                },
+                {
+                  icon: "📈",
+                  title: "Track Progress",
+                  description: "Monitor your improvement with our futuristic dashboard"
+                }
+              ].map((step, index) => (
+                <div 
+                  key={index}
+                  className="group relative overflow-hidden rounded-xl bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:shadow-[0_0_30px_rgba(63,62,237,0.3)]"
+                  style={{
+                    animation: `fadeInScale 0.5s ease-out ${index * 0.2}s both`
+                  }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <span className="mb-4 block text-4xl">{step.icon}</span>
+                  <h3 className="mb-2 text-xl font-semibold text-white">
+                    {step.title}
+                  </h3>
+                  <p className="text-gray-300">
+                    {step.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
