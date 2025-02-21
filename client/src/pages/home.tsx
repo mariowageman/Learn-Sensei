@@ -89,7 +89,7 @@ export default function Home() {
           <h2 className="mb-12 text-center text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
             Trusted by Leading Education Platforms
           </h2>
-          <div className="shadow-[0_0_50px_rgba(255,255,255,0.3)] dark:shadow-[0_0_50px_rgba(255,255,255,0.15)]">
+          <div>
             <ContinuousCarousel />
           </div>
         </div>
