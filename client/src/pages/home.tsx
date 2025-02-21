@@ -96,7 +96,7 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#F5F7FA] to-[#E4E9F2] dark:bg-black dark:from-transparent dark:to-transparent py-24">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#F5F7FA] to-[#E4E9F2] dark:from-[#111C2A] dark:to-[#1A2C44] py-24">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-purple-500/10 opacity-50" />
         <div className="container relative mx-auto px-4">
           <h2 className="mb-12 text-center text-3xl font-bold text-gray-800 dark:text-white md:text-4xl">
