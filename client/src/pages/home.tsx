@@ -99,18 +99,14 @@ export default function Home() {
       <section className="relative overflow-hidden bg-gradient-to-b from-[#F5F7FA] to-[#E4E9F2] dark:from-[#111C2A] dark:to-[#1A2C44] py-24">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-purple-500/10 opacity-50" />
         <div className="container relative mx-auto px-4">
+          <img 
+            src="/assets/sensei-fox.png" 
+            alt="Sensei Fox"
+            className="absolute left-0 w-12 h-12 animate-float-horizontal z-10" 
+          />
           <h2 className="mb-12 text-center text-3xl font-bold text-gray-800 dark:text-white md:text-4xl">
             How It Works
           </h2>
-
-          {/* Center Mascot */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <img 
-              src="/assets/sensei-fox.png" 
-              alt="Sensei Fox"
-              className="h-48 w-48 opacity-80 transform transition-all duration-500 hover:scale-110 animate-float" 
-            />
-          </div>
 
           {/* Steps Circle */}
           <div className="relative mx-auto max-w-5xl">
@@ -167,68 +163,7 @@ export default function Home() {
       </section>
 
       <Footer />
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#F5F7FA] to-[#E4E9F2] dark:bg-black py-24">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-purple-500/10 opacity-50" />
-        <div className="container relative mx-auto px-4">
-          <h2 className="mb-12 text-center text-3xl font-bold text-gray-800 dark:text-white md:text-4xl">
-            How It Works
-          </h2>
-
-          {/* Center Mascot */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <img 
-              src="/assets/sensei-fox.png" 
-              alt="Sensei Fox"
-              className="h-48 w-48 opacity-80 transform transition-all duration-500 hover:scale-110 animate-float" 
-            />
-          </div>
-
-          {/* Steps Circle */}
-          <div className="relative mx-auto max-w-5xl">
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-              {[
-                {
-                  icon: "🎯",
-                  title: "Take a Quiz",
-                  description: "Answer AI-powered questions to assess your knowledge level"
-                },
-                {
-                  icon: "🧠",
-                  title: "AI Insights",
-                  description: "Get personalized learning recommendations dynamically"
-                },
-                {
-                  icon: "🎥",
-                  title: "Watch Videos",
-                  description: "Access smartly curated content based on your performance"
-                },
-                {
-                  icon: "📈",
-                  title: "Track Progress",
-                  description: "Monitor your improvement with our futuristic dashboard"
-                }
-              ].map((step, index) => (
-                <div 
-                  key={index}
-                  className="group relative overflow-hidden rounded-xl bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:shadow-[0_0_30px_rgba(63,62,237,0.3)]"
-                  style={{
-                    animation: `fadeInScale 0.5s ease-out ${index * 0.2}s both`
-                  }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-100 dark:opacity-0 transition-opacity duration-300 dark:group-hover:opacity-100 group-hover:opacity-50" />
-                  <span className="mb-4 block text-4xl transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">{step.icon}</span>
-                  <h3 className="mb-2 text-xl font-semibold text-gray-800 dark:text-white">
-                    {step.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {step.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* The duplicated "How it Works" section was removed. */}
     </div>
   );
 }
