@@ -108,7 +108,6 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
 function Navigation() {
   const { isVisible } = useScroll();
   const [isOpen, setIsOpen] = useState(false);
-  const [logoError, setLogoError] = useState(false);
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
   const [location] = useLocation();
 
@@ -166,35 +165,11 @@ function Navigation() {
       <div className="container max-w-6xl mx-auto py-4 px-4 flex items-center justify-between">
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
-            {logoError ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                className="h-12 w-12 -my-2 text-primary dark:text-white"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                <path d="M6 8h4" />
-                <path d="M14 8h4" />
-                <path d="M6 12h4" />
-                <path d="M14 12h4" />
-              </svg>
-            ) : (
-              <img
-                src="/logo.svg"
-                alt="Learn Sensei Logo"
-                className="h-12 w-12 -my-2"
-                onError={(e) => {
-                  console.error('Logo failed to load:', e);
-                  setLogoError(true);
-                }}
-              />
-            )}
+            <img
+              src="/logo.svg"
+              alt="Learn Sensei Logo"
+              className="h-12 w-12 -my-2"
+            />
             <span className="sr-only">Learn Sensei</span>
           </Link>
         </div>
