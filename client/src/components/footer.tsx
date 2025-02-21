@@ -31,19 +31,13 @@ export function Footer() {
             <h3 className="text-lg font-semibold">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/sensei">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Sensei Mode</a>
-                </Link>
+                <Link href="/sensei" className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Sensei Mode</Link>
               </li>
               <li>
-                <Link href="/learning-paths">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Learning Paths</a>
-                </Link>
+                <Link href="/learning-paths" className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Learning Paths</Link>
               </li>
               <li>
-                <Link href="/dashboard">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Dashboard</a>
-                </Link>
+                <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Dashboard</Link>
               </li>
             </ul>
           </div>
@@ -56,9 +50,7 @@ export function Footer() {
                 <a href="https://learnsensei.tawk.help/" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Documentation</a>
               </li>
               <li>
-                <Link href="/blog">
-  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]">Blog</a>
-</Link>
+                <Link href="/blog" className="text-sm text-muted-foreground hover:text-[#3F3EED">Blog</Link>
               </li>
               <li>
                 <a href="mailto:support@learnsensei.com" className="text-sm text-muted-foreground hover:text-[#3F3EED]">Support</a>
@@ -71,19 +63,13 @@ export function Footer() {
             <h3 className="text-lg font-semibold">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/terms">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Terms of Service</a>
-                </Link>
+                <Link href="/terms" className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Terms of Service</Link>
               </li>
               <li>
-                <Link href="/privacy">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Privacy Policy</a>
-                </Link>
+                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Privacy Policy</Link>
               </li>
               <li>
-                <Link href="/cookie-policy">
-                  <a className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Cookie Policy</a>
-                </Link>
+                <Link href="/cookie-policy" className="text-sm text-muted-foreground hover:text-[#3F3EED]" onClick={() => window.scrollTo(0, 0)}>Cookie Policy</Link>
               </li>
             </ul>
           </div>
