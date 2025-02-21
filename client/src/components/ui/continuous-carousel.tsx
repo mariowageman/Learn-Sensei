@@ -46,7 +46,11 @@ export function ContinuousCarousel() {
             key={`${platform.name}-${index}`}
             className="inline-flex h-12 w-32 items-center justify-center opacity-70 transition-opacity duration-300 hover:opacity-100"
           >
-            <div className="h-8 w-32 rounded-lg bg-gradient-to-r from-gray-300 to-gray-200 dark:from-gray-700 dark:to-gray-600" />
+            <img 
+              src={platform.logo} 
+              alt={platform.name}
+              className="h-8 w-32 object-contain text-gray-900 dark:text-white [&>path]:fill-current" 
+            />
           </div>
         ))}
       </div>
