@@ -109,23 +109,7 @@ function Navigation() {
   const { isVisible } = useScroll();
   const [isOpen, setIsOpen] = useState(false);
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
-  const [logoError, setLogoError] = useState(false);
   const [location] = useLocation();
-
-  useEffect(() => {
-    fetch('/debug/check-logo')
-      .then(res => res.json())
-      .then(data => {
-        console.log('Logo file check:', data);
-        if (!data.exists) {
-          setLogoError(true);
-        }
-      })
-      .catch(err => {
-        console.error('Error checking logo:', err);
-        setLogoError(true);
-      });
-  }, []);
 
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
