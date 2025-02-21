@@ -46,7 +46,7 @@ export default function BlogPost() {
         .slice(0, 2)
     : [];
 
-  const handleSave = async (content: string, title: string, tags: string[], image: string) => {
+  const handleSave = async (content: string, title: string, tags: string[]) => {
     if (!currentPost) return;
     try {
       const response = await fetch(`/api/blog/${currentPost.slug}`, {
