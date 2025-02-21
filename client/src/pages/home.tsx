@@ -150,13 +150,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Recommendations */}
-      <section className="py-16 px-4 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <LearningRecommendations />
-        </div>
-      </section>
-
       <Footer />
       {/* The duplicated "How it Works" section was removed. */}
     </div>
