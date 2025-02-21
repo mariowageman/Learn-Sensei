@@ -35,8 +35,6 @@ export function ContinuousCarousel() {
 
   return (
     <div className="relative w-full overflow-hidden">
-      <div className="absolute left-0 top-0 z-10 h-full w-32 bg-gradient-to-r from-[#F5F7FA] to-transparent dark:from-[#111C2A]" />
-      <div className="absolute right-0 top-0 z-10 h-full w-32 bg-gradient-to-l from-[#F5F7FA] to-transparent dark:from-[#111C2A]" />
       <div
         ref={scrollRef}
         className="flex animate-scroll gap-16 py-8"
