@@ -76,7 +76,7 @@ export default function Home() {
               <Sparkles className="h-16 w-16 text-[#3F3EED] mb-6 transform transition-transform group-hover:scale-110 group-hover:rotate-3" />
               <h3 className="text-2xl font-semibold mb-3 text-gray-800 dark:text-white">Expert-Curated Content</h3>
               <p className="text-gray-600 dark:text-gray-300">
-                Access curated courses from leading institutions and experts
+                Access top-tier courses from leading educators and institutions, ensuring you're always learning from the best.
               </p>
             </div>
           </div>
