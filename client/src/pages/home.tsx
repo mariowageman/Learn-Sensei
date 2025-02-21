@@ -74,7 +74,7 @@ export default function Home() {
             <div className="group p-8 rounded-2xl bg-white/80 dark:bg-black/20 border border-gray-200 dark:border-white/10 backdrop-blur-sm transition-all duration-300 hover:transform hover:scale-105 hover:shadow-[0_0_30px_rgba(63,62,237,0.3)] relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <Sparkles className="h-16 w-16 text-[#3F3EED] mb-6 transform transition-transform group-hover:scale-110 group-hover:rotate-3" />
-              <h3 className="text-2xl font-semibold mb-3 text-gray-800 dark:text-white">Diverse Content</h3>
+              <h3 className="text-2xl font-semibold mb-3 text-gray-800 dark:text-white">Expert-Curated Content</h3>
               <p className="text-gray-600 dark:text-gray-300">
                 Access curated courses from leading institutions and experts
               </p>
