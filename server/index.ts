@@ -82,16 +82,7 @@ app.use('/public', express.static(path.join(process.cwd(), 'client', 'public'), 
   }
 }));
 
-// Debug endpoint to check if the file exists
-app.get('/debug/check-logo', (req, res) => {
-  const logoPath = path.join(process.cwd(), 'client', 'public', 'learn-sensei-logo-icon.png');
-  const exists = fs.existsSync(logoPath);
-  res.json({
-    exists,
-    path: logoPath,
-    size: exists ? fs.statSync(logoPath).size : null
-  });
-});
+// Removed debug endpoint as it's no longer needed
 
 // Request logging middleware
 app.use((req, res, next) => {
