@@ -96,10 +96,10 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section className="relative overflow-hidden bg-black py-24">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#F5F7FA] to-[#E4E9F2] dark:bg-black py-24">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-purple-500/10 opacity-50" />
         <div className="container relative mx-auto px-4">
-          <h2 className="mb-12 text-center text-3xl font-bold text-white md:text-4xl">
+          <h2 className="mb-12 text-center text-3xl font-bold text-gray-800 dark:text-white md:text-4xl">
             How It Works
           </h2>
 
@@ -146,10 +146,10 @@ export default function Home() {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   <span className="mb-4 block text-4xl">{step.icon}</span>
-                  <h3 className="mb-2 text-xl font-semibold text-white">
+                  <h3 className="mb-2 text-xl font-semibold text-gray-800 dark:text-white">
                     {step.title}
                   </h3>
-                  <p className="text-gray-300">
+                  <p className="text-gray-600 dark:text-gray-300">
                     {step.description}
                   </p>
                 </div>
@@ -167,10 +167,10 @@ export default function Home() {
       </section>
 
       <Footer />
-      <section className="relative overflow-hidden bg-black py-24">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#F5F7FA] to-[#E4E9F2] dark:bg-black py-24">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-purple-500/10 opacity-50" />
         <div className="container relative mx-auto px-4">
-          <h2 className="mb-12 text-center text-3xl font-bold text-white md:text-4xl">
+          <h2 className="mb-12 text-center text-3xl font-bold text-gray-800 dark:text-white md:text-4xl">
             How It Works
           </h2>
 
@@ -217,10 +217,10 @@ export default function Home() {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   <span className="mb-4 block text-4xl">{step.icon}</span>
-                  <h3 className="mb-2 text-xl font-semibold text-white">
+                  <h3 className="mb-2 text-xl font-semibold text-gray-800 dark:text-white">
                     {step.title}
                   </h3>
-                  <p className="text-gray-300">
+                  <p className="text-gray-600 dark:text-gray-300">
                     {step.description}
                   </p>
                 </div>
