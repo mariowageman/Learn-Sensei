@@ -1,22 +1,46 @@
+import express from 'express';
+import { Server } from 'http';
+import WebSocket from 'ws';
+import { db } from '@db';
+import { and, eq, sql } from 'drizzle-orm';
+import { 
+  learningPaths,
+  learningPathProgress,
+  progressAnalytics,
+  sessions,
+  subjectHistory,
+  quizProgress,
+  messages,
+  quizQuestions,
+  blogPosts,
+  users
+} from '@db/schema';
+import { AVAILABLE_SUBJECTS, fetchCourseraCourses } from './coursera';
 import type { Express } from "express";
-import { createServer, type Server } from "http";
-import { Client } from "@replit/object-storage";
+import { createServer, type Server as HttpServer } from "http";
 import type { UploadedFile } from "express-fileupload";
 import path from "path";
-import { db } from "@db";
-import { eq, desc } from "drizzle-orm";
-import {
-  blogPosts,
-  users,
-  type BlogPostType
-} from "@db/schema";
+import { 
+  generateExplanation, 
+  generateQuestion, 
+  checkAnswer 
+} from './openai';
+import { generateRSSFeed } from './lib/rss';
+import type { BlogPostType } from "@db/schema";
+import { Client } from "@replit/object-storage";
+import type { ObjectStorageOptions } from "@replit/object-storage";
+
+interface ObjectStorageClientOptions {
+  bucketId: string;
+  apiToken: string;
+}
 
 // Interface extending BlogPostType for frontend use
 interface BlogPost extends BlogPostType {
   tags: string[]; // Override tags to be string[] instead of unknown
 }
 
-export function registerRoutes(app: Express): Server {
+export function registerRoutes(app: Express): HttpServer {
   const httpServer = createServer(app);
 
   // Blog routes
@@ -152,29 +176,18 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "No image file uploaded" });
       }
 
-      const bucketId = process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID || "replit-objstore-86412e8a-40c3-4bc7-9aa4-a3c42add1445";
-      const token = process.env.REPLIT_TOKEN;
+      const bucketId = process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID;
+      const replitToken = process.env.REPLIT_TOKEN;
 
-      console.log('Storage configuration:', {
-        bucketId,
-        hasToken: !!token,
-        envBucketId: process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID
-      });
-
-      if (!bucketId || !token) {
-        console.error('Storage configuration missing:', { bucketId: !!bucketId, token: !!token });
+      if (!bucketId || !replitToken) {
+        console.error('Storage configuration missing:', { bucketId: !!bucketId, token: !!replitToken });
         return res.status(500).json({ error: "Storage configuration incomplete" });
       }
 
-      console.log('Initializing storage client with bucket:', bucketId);
-      try {
-        const storage = new Client({
-          bucketId: bucketId,
-          token: token,
-          maxRetries: 3,
-          retryDelay: 1000,
-          timeout: 30000
-        });
+      const storage = new Client({
+        bucketId,
+        apiToken: replitToken
+      } as ObjectStorageClientOptions);
       const file = req.files.image as UploadedFile;
 
       // Validate file type
@@ -199,28 +212,24 @@ export function registerRoutes(app: Express): Server {
           console.error('Empty file buffer');
           return res.status(400).json({ error: "Invalid file data" });
         }
-          await storage.write(filename, fileBuffer, {
-            public: true,
-            contentType: file.mimetype,
-            metadata: {
-              originalName: file.name
-            }
-          });
-        } catch (err) {
-          console.error('Storage write error:', err);
-          throw new Error('Failed to upload file to storage');
-        }
-        console.log('File uploaded to storage successfully');
-
-        // Generate public URL using the correct bucket URL format
-        const url = `https://${bucketId}.replit.dev/${encodeURIComponent(filename)}`;
-        console.log('Generated URL:', url);
-
-        res.json({ url });
-      } catch (storageError) {
-        console.error('Storage operation failed:', storageError);
-        res.status(500).json({ error: "Failed to store file", details: (storageError as Error).message });
+        await storage.write(filename, fileBuffer, {
+          public: true,
+          contentType: file.mimetype,
+          metadata: {
+            originalName: file.name
+          }
+        });
+      } catch (err) {
+        console.error('Storage write error:', err);
+        throw new Error('Failed to upload file to storage');
       }
+      console.log('File uploaded to storage successfully');
+
+      // Generate public URL using the correct bucket URL format
+      const url = `https://${bucketId}.replit.dev/${encodeURIComponent(filename)}`;
+      console.log('Generated URL:', url);
+
+      res.json({ url });
     } catch (error) {
       console.error('Upload process error:', error);
       res.status(500).json({ error: "Failed to process upload", details: (error as Error).message });
@@ -482,7 +491,6 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Learning Paths routes
-  import { AVAILABLE_SUBJECTS, fetchCourseraCourses } from "./coursera";
   app.get("/api/learning-paths", async (req, res) => {
     try {
       const subject = req.query.subject as string | undefined;
@@ -754,14 +762,19 @@ export function registerRoutes(app: Express): Server {
         newStreakDays = 1;
       }
 
-      // Update progress
-      const completedTopics = currentProgress.completedTopics || [];
+      // Update progress with type safety
+      const completedTopics = Array.isArray(currentProgress.completedTopics) 
+        ? currentProgress.completedTopics 
+        : [];
       const updatedCompletedTopics = Array.from(new Set([...completedTopics, completedTopic]));
-      const isCompleted = updatedCompletedTopics.length >= (path.topics as string[]).length;
+      const topics = Array.isArray(path.topics) ? path.topics : [];
+      const isCompleted = updatedCompletedTopics.length >= topics.length;
       const nextTopic = isCompleted ? completedTopic : completedTopic + 1;
 
-      // Update time spent
-      const currentTimeSpent = (currentProgress.timeSpentMinutes || {}) as Record<string, number>;
+      // Update time spent with type safety
+      const currentTimeSpent = (typeof currentProgress.timeSpentMinutes === 'object' && currentProgress.timeSpentMinutes) 
+        ? currentProgress.timeSpentMinutes as Record<string, number>
+        : {};
       const updatedTimeSpent = {
         ...currentTimeSpent,
         [completedTopic]: (currentTimeSpent[completedTopic] || 0) + (timeSpentMinutes || 0)
@@ -797,7 +810,6 @@ export function registerRoutes(app: Express): Server {
       res.status(500).json({ error: "Failed to update progress" });
     }
   });
-
 
 
   app.get("/api/recommendations", async (req, res) => {
@@ -877,115 +889,7 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/recent-subjects", async (req, res) => {
     try {
       const recentSubjects = await db.query.subjectHistory.findMany({
-        orderBy: (history, { desc }) => [desc(history.createdAt)],
-        limit: 10
-      });
-      res.json(recentSubjects);
-    } catch (error) {
-      console.error('Error fetching recent subjects:', error);
-      res.status(500).json({ error: "Failed to fetch recent subjects" });
-    }
-  });
-
-  app.post("/api/session", async (req, res) => {
-    const { subject } = req.body;
-
-    try {
-      // Save to session
-      const [session] = await db.insert(sessions).values({
-        subject
-      }).returning();
-
-      // Save to history
-      await db.insert(subjectHistory).values({
-        subject
-      });
-
-      res.json(session);
-    } catch (error) {
-      console.error('Error creating session:', error);
-      res.status(500).json({ error: "Failed to create session" });
-    }
-  });
-
-  app.get("/api/dashboard", async (req, res) => {
-    try {
-      // Get all quiz attempts
-      const quizAttempts = await db.query.quizProgress.findMany({
-        orderBy: (progress, { desc }) => [desc(progress.createdAt)]
-      });
-
-      // Get unique subjects
-      const subjects = [...new Set(quizAttempts.map(attempt => attempt.subject))];
-
-      // Calculate overall stats
-      const totalSubjects = subjects.length;
-      let totalCorrect = 0;
-      let totalAttempts = 0;
-
-      // Calculate subject-specific performance
-      const subjectPerformance = subjects.map(subject => {
-        const subjectAttempts = quizAttempts.filter(attempt => attempt.subject === subject);
-        const correct = subjectAttempts.filter(attempt => attempt.isCorrect).length;
-        const total = subjectAttempts.length;
-
-        totalCorrect += correct;
-        totalAttempts += total;
-
-        return {
-          subject,
-          totalAttempts: total,
-          correctAnswers: correct,
-          accuracy: Math.round((correct / total) * 100)
-        };
-      });
-
-      // Get the current learning streak
-      const pathProgress = await db.query.learningPathProgress.findMany({
-        orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
-      });
-
-      const currentStreak = pathProgress[0]?.streakDays || 0;
-
-      // Calculate total time spent
-      const totalTimeSpent = pathProgress.reduce((total, progress) => {
-        const timeSpent = progress.timeSpentMinutes as Record<string, number>;
-        return total + Object.values(timeSpent).reduce((sum, time) => sum + (time || 0), 0);
-      }, 0);
-
-      // Get recent activity
-      const recentActivity = await Promise.all(
-        quizAttempts.slice(0, 5).map(async attempt => {
-          return {
-            subject: attempt.subject,
-            type: 'Quiz Question',
-            result: attempt.isCorrect ? 'Correct' : 'Incorrect',
-            timestamp: attempt.createdAt
-          };
-        })
-      );
-
-      res.json({
-        overallProgress: {
-          totalSubjects,
-          completedSubjects: subjects.length,
-          averageAccuracy: totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0,
-          totalTimeSpent,
-          currentStreak
-        },
-        subjectPerformance,
-        recentActivity
-      });
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      res.status(500).json({ error: "Failed to fetch dashboard data" });
-    }
-  });
-
-  app.get("/api/recent-subjects", async (req, res) => {
-    try {
-      const recentSubjects = await db.query.subjectHistory.findMany({
-        orderBy: (history, { desc }) => [desc(history.createdAt)],
+        orderBy: (history, {desc }) => [desc(history.createdAt)],
         limit: 10
       });
       res.json(recentSubjects);
