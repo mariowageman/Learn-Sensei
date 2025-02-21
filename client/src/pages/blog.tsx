@@ -28,39 +28,18 @@ export interface BlogPost {
   content: string;
 }
 
-import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
-
 // Fetch blog posts from API
 const useBlogPosts = () => {
-  const queryClient = useQueryClient();
-  const updatePost = useMutation({
-    mutationFn: async ({ slug, image }: { slug: string, image: string }) => {
-      const response = await fetch(`/api/blog/${slug}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image })
-      });
-      if (!response.ok) throw new Error('Failed to update blog post');
+  return useQuery<BlogPost[]>({
+    queryKey: ['blogPosts'],
+    queryFn: async () => {
+      const response = await fetch('/api/blog');
+      if (!response.ok) {
+        throw new Error('Failed to fetch blog posts');
+      }
       return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['blogPosts']);
     }
   });
-
-  return {
-    posts: useQuery<BlogPost[]>({
-      queryKey: ['blogPosts'],
-      queryFn: async () => {
-        const response = await fetch('/api/blog');
-        if (!response.ok) {
-          throw new Error('Failed to fetch blog posts');
-        }
-        return response.json();
-      }
-    }),
-    updatePost
-  };
 };
 
 export default function BlogPage() {
@@ -77,17 +56,7 @@ export default function BlogPage() {
     }
   }, []);
 
-  const { posts: { data: blogPosts, isLoading, error }, updatePost } = useBlogPosts();
-
-  useEffect(() => {
-    const post = blogPosts?.find(p => p.slug === 'the-evolution-of-ai-in-learning-beyond-personalization');
-    if (post) {
-      updatePost.mutate({ 
-        slug: post.slug, 
-        image: '/assets/blog/ai-education.jpg'
-      });
-    }
-  }, [blogPosts]);
+  const { data: blogPosts, isLoading, error } = useBlogPosts();
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (error) {
