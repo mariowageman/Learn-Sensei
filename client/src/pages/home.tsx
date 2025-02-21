@@ -148,8 +148,8 @@ export default function Home() {
             </div>
             <div className="mt-12 text-center">
               <Link href="/sensei">
-                <Button size="lg" className="border-2 border-[#3F3EED] bg-transparent text-[#3F3EED] hover:bg-[#3F3EED] hover:text-white dark:border-[#3F3EED] dark:bg-transparent dark:text-white dark:hover:bg-[#3F3EED] dark:hover:text-white transition-all duration-300 transform hover:scale-105">
-                  <Brain className="mr-2 h-5 w-5 text-[#3F3EED] hover:text-white dark:text-white" />
+                <Button size="lg" className="border-2 border-[#3F3EED] bg-transparent text-[#3F3EED] hover:bg-[#3F3EED] hover:text-white dark:border-[#3F3EED] dark:bg-transparent dark:text-white dark:hover:bg-[#3F3EED] dark:hover:text-white transition-all duration-300 transform hover:scale-105 group">
+                  <Brain className="mr-2 h-5 w-5 text-[#3F3EED] group-hover:text-white dark:text-white" />
                   Start Learning Now
                 </Button>
               </Link>
