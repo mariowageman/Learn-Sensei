@@ -50,7 +50,7 @@ export function ContinuousCarousel() {
             <img 
               src={platform.logo} 
               alt={platform.name}
-              className="h-8 w-32 object-contain text-gray-900 dark:brightness-[1.3] dark:contrast-[1.2] dark:opacity-95 dark:drop-shadow-[0_0_2px_rgba(255,255,255,0.3)]" 
+              className="h-8 w-32 object-contain text-gray-900 dark:brightness-[1.15] dark:contrast-[1.1] dark:opacity-90" 
             />
           </div>
         ))}
