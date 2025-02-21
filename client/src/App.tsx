@@ -108,6 +108,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
 function Navigation() {
   const { isVisible } = useScroll();
   const [isOpen, setIsOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
   const [location] = useLocation();
 
