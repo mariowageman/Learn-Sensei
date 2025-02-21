@@ -68,7 +68,7 @@ export default function Home() {
               <Target className="h-16 w-16 text-[#3F3EED] mb-6 transform transition-transform group-hover:scale-110 group-hover:rotate-3" />
               <h3 className="text-2xl font-semibold mb-3 text-gray-800 dark:text-white">Instant Feedback</h3>
               <p className="text-gray-600 dark:text-gray-300">
-                Get real-time assessment and tailored suggestions for improvement
+                Know exactly where you stand with real-time assessments and smart suggestions to help you improve faster than ever.
               </p>
             </div>
             <div className="group p-8 rounded-2xl bg-white/80 dark:bg-black/20 border border-gray-200 dark:border-white/10 backdrop-blur-sm transition-all duration-300 hover:transform hover:scale-105 hover:shadow-[0_0_30px_rgba(63,62,237,0.3)] relative overflow-hidden">
