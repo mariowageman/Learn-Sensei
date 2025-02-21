@@ -22,7 +22,9 @@ export function ProtectedRoute({ children, path }: ProtectedRouteProps) {
   }
 
   if (!user) {
-    sessionStorage.setItem('redirectPath', path);
+    // Store both the path and any query parameters
+    const currentPath = window.location.pathname + window.location.search;
+    sessionStorage.setItem('redirectPath', currentPath);
     setLocation("/auth");
     return null;
   }

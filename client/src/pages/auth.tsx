@@ -13,9 +13,10 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (user) {
-      const redirectPath = sessionStorage.getItem('redirectPath') || '/';
+      const redirectPath = sessionStorage.getItem('redirectPath');
       sessionStorage.removeItem('redirectPath');
-      setLocation(redirectPath);
+      // Ensure we have a valid path, default to home if none stored
+      setLocation(redirectPath || '/');
     }
   }, [user, setLocation]);
 
