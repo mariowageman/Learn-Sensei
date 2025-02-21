@@ -54,7 +54,12 @@ export default function BlogPost() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content, title, tags }),
+        body: JSON.stringify({ 
+          content, 
+          title, 
+          tags,
+          image: '/assets/blog/The-Evolution-of-AI-in-Learning-Beyond-Personalization.jpeg'
+        }),
       });
 
       if (!response.ok) throw new Error('Failed to update post');
