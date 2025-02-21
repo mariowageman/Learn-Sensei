@@ -58,7 +58,7 @@ export default function BlogPost() {
           content, 
           title, 
           tags,
-          image: '/assets/blog/The-Evolution-of-AI-in-Learning-Beyond-Personalization.jpeg'
+          image
         }),
       });
 
