@@ -53,12 +53,8 @@ export function registerRoutes(app: Express): HttpServer {
       console.log('Found posts:', posts.length);
       res.json(posts);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error fetching blog posts:', errorMessage);
-      res.status(500).json({ 
-        error: "Failed to fetch blog posts",
-        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
-      });
+      console.error('Error fetching blog posts:', error);
+      res.status(500).json({ error: "Failed to fetch blog posts" });
     }
   });
 
