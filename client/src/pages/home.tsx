@@ -108,7 +108,7 @@ export default function Home() {
             <img 
               src="/assets/sensei-fox.png" 
               alt="Sensei Fox"
-              className="h-48 w-48 animate-float opacity-80" 
+              className="h-48 w-48 opacity-80 transform transition-all duration-500 hover:scale-110 animate-float" 
             />
           </div>
 
@@ -179,7 +179,7 @@ export default function Home() {
             <img 
               src="/assets/sensei-fox.png" 
               alt="Sensei Fox"
-              className="h-48 w-48 animate-float opacity-80" 
+              className="h-48 w-48 opacity-80 transform transition-all duration-500 hover:scale-110 animate-float" 
             />
           </div>
 
