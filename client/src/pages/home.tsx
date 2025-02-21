@@ -52,7 +52,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMzRjNFRUQiIHN0b3Atb3BhY2l0eT0iMC4wNSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzgwMjZEOSIgc3RvcC1vcGFjaXR5PSIwLjA1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTAgMGgyMDB2MjAwSDB6IiBmaWxsPSJ1cmwoI2cpIi8+PC9zdmc+')]" />
         <div className="max-w-6xl mx-auto relative">
           <h2 className="text-4xl font-bold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 animate-gradient">
-            Why Choose Learn Sensei?
+            Unlock Your Full Potential
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="group p-8 rounded-2xl bg-white/80 dark:bg-black/20 border border-gray-200 dark:border-white/10 backdrop-blur-sm transition-all duration-300 hover:transform hover:scale-105 hover:shadow-[0_0_30px_rgba(63,62,237,0.3)] relative overflow-hidden">
