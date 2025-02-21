@@ -87,8 +87,8 @@ const NavigationMenuLink = React.forwardRef<
   <NavigationMenuPrimitive.Link
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50",
-      active && "!text-[#3F3EED] [&>svg]:!text-[#3F3EED]",
+      "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 hover:text-accent-foreground hover:bg-accent",
+      active && "text-accent-foreground bg-accent [&>svg]:text-accent-foreground",
       className
     )}
     {...props}
