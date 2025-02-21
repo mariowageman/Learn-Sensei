@@ -1132,7 +1132,6 @@ function calculateConfidenceScore(
 
   return Math.max(0.70, Math.min(1, score));
 }
-}
 
 function generateRecommendationReason(
   path: typeof learningPaths.$inferSelect,
