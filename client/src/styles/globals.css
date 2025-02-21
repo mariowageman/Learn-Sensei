@@ -21,22 +21,6 @@
   }
 }
 
-@keyframes float-horizontal {
-  0% {
-    transform: translateX(0%);
-  }
-  50% {
-    transform: translateX(800%);
-  }
-  100% {
-    transform: translateX(0%);
-  }
-}
-
 .animate-float {
   animation: float 6s ease-in-out infinite;
-}
-
-.animate-float-horizontal {
-  animation: float-horizontal 15s ease-in-out infinite;
 }

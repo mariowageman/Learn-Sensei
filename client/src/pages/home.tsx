@@ -99,11 +99,6 @@ export default function Home() {
       <section className="relative overflow-hidden bg-gradient-to-b from-[#F5F7FA] to-[#E4E9F2] dark:from-[#111C2A] dark:to-[#1A2C44] py-24">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-purple-500/10 opacity-50" />
         <div className="container relative mx-auto px-4">
-          <img 
-            src="/assets/sensei-fox.png" 
-            alt="Sensei Fox"
-            className="absolute left-0 w-12 h-12 animate-float-horizontal z-10" 
-          />
           <h2 className="mb-12 text-center text-3xl font-bold text-gray-800 dark:text-white md:text-4xl">
             How It Works
           </h2>
