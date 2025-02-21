@@ -28,7 +28,7 @@ export interface BlogPost {
   content: string;
 }
 
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 
 // Fetch blog posts from API
 const useBlogPosts = () => {
