@@ -194,7 +194,7 @@ export function registerRoutes(app: Express): Server {
       try {
         console.log('Processing file:', file.name, 'Size:', file.size, 'Type:', file.mimetype);
         const fileBuffer = Buffer.isBuffer(file.data) ? file.data : Buffer.from(file.data);
-        
+
         if (!fileBuffer || fileBuffer.length === 0) {
           console.error('Empty file buffer');
           return res.status(400).json({ error: "Invalid file data" });
@@ -482,6 +482,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Learning Paths routes
+  import { AVAILABLE_SUBJECTS, fetchCourseraCourses } from "./coursera";
   app.get("/api/learning-paths", async (req, res) => {
     try {
       const subject = req.query.subject as string | undefined;
