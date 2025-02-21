@@ -146,12 +146,19 @@ export default function Home() {
                 </div>
               ))}
             </div>
+            <div className="mt-12 text-center">
+              <Link href="/sensei">
+                <Button size="lg" className="bg-[#3F3EED] hover:bg-[#3F3EED]/90 text-white dark:bg-[#3F3EED] dark:hover:bg-[#3F3EED]/90 dark:text-white transition-all duration-300 transform hover:scale-105">
+                  <Brain className="mr-2 h-5 w-5" />
+                  Start Learning Now
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       <Footer />
-      {/* The duplicated "How it Works" section was removed. */}
     </div>
   );
 }
