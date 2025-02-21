@@ -79,7 +79,7 @@ export default function Home() {
                 Access top-tier courses from leading educators and institutions, ensuring you're always learning from the best.
               </p>
             </div>
-          </div>
+            </div>
         </div>
       </section>
 
