@@ -22,23 +22,27 @@ import Privacy from "@/pages/privacy";
 import BlogPost from "@/pages/blog-post";
 import CreateBlog from "@/pages/create-blog";
 import Home2 from "@/pages/home2";
-import { useScrollTop } from "@/hooks/use-scroll-top";
+import { useScroll } from "@/hooks/use-scroll-top";
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { UserMenu } from '@/components/auth/user-menu';
 import { AuthProvider } from '@/lib/auth-context';
 import AuthPage from "@/pages/auth";
 import SettingsPage from "@/pages/settings";
-import { useScroll } from "@/hooks/use-scroll-top";
 import cn from 'classnames';
-
+import { useLocation } from "wouter";
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
+  const [location] = useLocation();
+
   return (
     <>
       <Link href="/">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 dark:text-white"
+          className={cn(
+            "w-full justify-start gap-2 dark:text-white",
+            location === "/" && "bg-accent text-accent-foreground"
+          )}
           onClick={onNavigate}
         >
           <HomeIcon className="h-4 w-4" />
@@ -48,7 +52,10 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
       <Link href="/sensei">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 dark:text-white"
+          className={cn(
+            "w-full justify-start gap-2 dark:text-white",
+            location === "/sensei" && "bg-accent text-accent-foreground"
+          )}
           onClick={onNavigate}
         >
           <Brain className="h-4 w-4" />
@@ -58,7 +65,10 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
       <Link href="/learning-paths">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 dark:text-white"
+          className={cn(
+            "w-full justify-start gap-2 dark:text-white",
+            location === "/learning-paths" && "bg-accent text-accent-foreground"
+          )}
           onClick={onNavigate}
         >
           <BookOpen className="h-4 w-4" />
@@ -68,7 +78,10 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
       <Link href="/dashboard">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 dark:text-white"
+          className={cn(
+            "w-full justify-start gap-2 dark:text-white",
+            location === "/dashboard" && "bg-accent text-accent-foreground"
+          )}
           onClick={onNavigate}
         >
           <LayoutDashboard className="h-4 w-4" />
@@ -78,7 +91,10 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
       <Link href="/blog">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 dark:text-white"
+          className={cn(
+            "w-full justify-start gap-2 dark:text-white",
+            location === "/blog" && "bg-accent text-accent-foreground"
+          )}
           onClick={onNavigate}
         >
           <BookText className="h-4 w-4" />
@@ -94,6 +110,7 @@ function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
   const [logoError, setLogoError] = useState(false);
+  const [location] = useLocation();
 
   useEffect(() => {
     fetch('/debug/check-logo')
@@ -217,7 +234,13 @@ function Navigation() {
                 <div className="flex flex-col gap-4">
                   <Link href="/">
                     <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2 dark:text-white">
+                      <Button 
+                        variant="ghost" 
+                        className={cn(
+                          "w-full justify-start gap-2 dark:text-white",
+                          location === "/" && "bg-accent text-accent-foreground"
+                        )}
+                      >
                         <HomeIcon className="h-4 w-4" />
                         Home
                       </Button>
@@ -225,7 +248,13 @@ function Navigation() {
                   </Link>
                   <Link href="/sensei">
                     <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2 dark:text-white">
+                      <Button 
+                        variant="ghost" 
+                        className={cn(
+                          "w-full justify-start gap-2 dark:text-white",
+                          location === "/sensei" && "bg-accent text-accent-foreground"
+                        )}
+                      >
                         <Brain className="h-4 w-4" />
                         Sensei Mode
                       </Button>
@@ -233,7 +262,13 @@ function Navigation() {
                   </Link>
                   <Link href="/learning-paths">
                     <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2 dark:text-white">
+                      <Button 
+                        variant="ghost" 
+                        className={cn(
+                          "w-full justify-start gap-2 dark:text-white",
+                          location === "/learning-paths" && "bg-accent text-accent-foreground"
+                        )}
+                      >
                         <BookOpen className="h-4 w-4" />
                         Learning Paths
                       </Button>
@@ -241,7 +276,13 @@ function Navigation() {
                   </Link>
                   <Link href="/dashboard">
                     <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2 dark:text-white">
+                      <Button 
+                        variant="ghost" 
+                        className={cn(
+                          "w-full justify-start gap-2 dark:text-white",
+                          location === "/dashboard" && "bg-accent text-accent-foreground"
+                        )}
+                      >
                         <LayoutDashboard className="h-4 w-4" />
                         Progress
                       </Button>
@@ -249,7 +290,13 @@ function Navigation() {
                   </Link>
                   <Link href="/blog">
                     <SheetClose asChild>
-                      <Button variant="ghost" className="w-full justify-start gap-2 dark:text-white">
+                      <Button 
+                        variant="ghost" 
+                        className={cn(
+                          "w-full justify-start gap-2 dark:text-white",
+                          location === "/blog" && "bg-accent text-accent-foreground"
+                        )}
+                      >
                         <BookText className="h-4 w-4" />
                         Blog
                       </Button>
