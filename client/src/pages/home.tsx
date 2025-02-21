@@ -139,13 +139,13 @@ export default function Home() {
               ].map((step, index) => (
                 <div 
                   key={index}
-                  className="group relative overflow-hidden rounded-xl bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:shadow-[0_0_30px_rgba(63,62,237,0.3)]"
+                  className="group relative overflow-hidden rounded-xl bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:shadow-[0_0_30px_rgba(63,62,237,0.3)]"
                   style={{
                     animation: `fadeInScale 0.5s ease-out ${index * 0.2}s both`
                   }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-100 dark:opacity-0 transition-opacity duration-300 dark:group-hover:opacity-100 group-hover:opacity-50" />
-                  <span className="mb-4 block text-4xl">{step.icon}</span>
+                  <span className="mb-4 block text-4xl transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">{step.icon}</span>
                   <h3 className="mb-2 text-xl font-semibold text-gray-800 dark:text-white">
                     {step.title}
                   </h3>
@@ -210,13 +210,13 @@ export default function Home() {
               ].map((step, index) => (
                 <div 
                   key={index}
-                  className="group relative overflow-hidden rounded-xl bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:shadow-[0_0_30px_rgba(63,62,237,0.3)]"
+                  className="group relative overflow-hidden rounded-xl bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:shadow-[0_0_30px_rgba(63,62,237,0.3)]"
                   style={{
                     animation: `fadeInScale 0.5s ease-out ${index * 0.2}s both`
                   }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-100 dark:opacity-0 transition-opacity duration-300 dark:group-hover:opacity-100 group-hover:opacity-50" />
-                  <span className="mb-4 block text-4xl">{step.icon}</span>
+                  <span className="mb-4 block text-4xl transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">{step.icon}</span>
                   <h3 className="mb-2 text-xl font-semibold text-gray-800 dark:text-white">
                     {step.title}
                   </h3>
