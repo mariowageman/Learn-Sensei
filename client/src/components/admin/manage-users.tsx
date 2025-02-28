@@ -86,15 +86,21 @@ export function ManageUsers() {
   });
 
   // Fetch roles for the select dropdown
-  const { data: roles, isLoading: rolesLoading } = useQuery<Role[]>({
+  const { data: roles, isLoading: rolesLoading, error: rolesError } = useQuery<Role[]>({
     queryKey: ["/api/roles"],
     onSuccess: (data) => {
-      console.log("Fetched roles:", data);
+      console.log("Fetched roles successfully:", data);
     },
     onError: (error) => {
       console.error("Error fetching roles:", error);
-    }
+    },
+    retry: 3,
+    retryDelay: 1000,
+    staleTime: 60000
   });
+  
+  // Debug roles data
+  console.log("Current roles state:", { roles, isLoading: rolesLoading, error: rolesError });
 
   const form = useForm<EditUserFormValues>({
     resolver: zodResolver(editUserSchema),
@@ -318,16 +324,24 @@ export function ManageUsers() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {roles && roles.length > 0 ? (
+                            {rolesLoading ? (
+                              <SelectItem value="loading" disabled>
+                                Loading roles...
+                              </SelectItem>
+                            ) : rolesError ? (
+                              <SelectItem value="error" disabled>
+                                Error loading roles
+                              </SelectItem>
+                            ) : !roles || roles.length === 0 ? (
+                              <SelectItem value="empty" disabled>
+                                No roles available
+                              </SelectItem>
+                            ) : (
                               roles.map((role) => (
                                 <SelectItem key={role.id} value={String(role.id)}>
                                   {role.name}
                                 </SelectItem>
                               ))
-                            ) : (
-                              <SelectItem value="loading" disabled>
-                                Loading roles...
-                              </SelectItem>
                             )}
                           </SelectContent>
                         </Select>

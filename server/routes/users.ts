@@ -8,13 +8,16 @@ import bcrypt from "bcrypt";
 
 const router = Router();
 
-// Get all roles (admin only)
+// Get all roles
 router.get("/api/roles", async (req, res) => {
   try {
     if (!req.session?.userId) {
       return res.status(401).json({ message: "Authentication required" });
     }
+    
     const allRoles = await db.query.roles.findMany();
+    console.log("Roles fetched successfully:", allRoles);
+    
     res.json(allRoles);
   } catch (error) {
     console.error("Error fetching roles:", error);
