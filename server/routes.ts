@@ -29,11 +29,7 @@ import { generateRSSFeed } from './lib/rss';
 import type { BlogPostType } from "@db/schema";
 import { Client } from "@replit/object-storage";
 import type { ObjectStorageOptions } from "@replit/object-storage";
-
-interface ObjectStorageClientOptions {
-  bucketId: string;
-  apiToken: string;
-}
+import { usersRouter } from './routes/users';  // Add this import
 
 // Interface extending BlogPostType for frontend use
 interface BlogPost extends BlogPostType {
@@ -42,6 +38,9 @@ interface BlogPost extends BlogPostType {
 
 export function registerRoutes(app: Express): HttpServer {
   const httpServer = createServer(app);
+
+  // Register the users router
+  app.use(usersRouter);
 
   // Blog routes
   app.get("/api/blog", async (req, res) => {
@@ -764,8 +763,8 @@ export function registerRoutes(app: Express): HttpServer {
       }
 
       // Update progress with type safety
-      const completedTopics = Array.isArray(currentProgress.completedTopics) 
-        ? currentProgress.completedTopics 
+      const completedTopics = Array.isArray(currentProgress.completedTopics)
+        ? currentProgress.completedTopics
         : [];
       const updatedCompletedTopics = Array.from(new Set([...completedTopics, completedTopic]));
       const topics = Array.isArray(path.topics) ? path.topics : [];
@@ -773,7 +772,7 @@ export function registerRoutes(app: Express): HttpServer {
       const nextTopic = isCompleted ? completedTopic : completedTopic + 1;
 
       // Update time spent with type safety
-      const currentTimeSpent = (typeof currentProgress.timeSpentMinutes === 'object' && currentProgress.timeSpentMinutes) 
+      const currentTimeSpent = (typeof currentProgress.timeSpentMinutes === 'object' && currentProgress.timeSpentMinutes)
         ? currentProgress.timeSpentMinutes as Record<string, number>
         : {};
       const updatedTimeSpent = {
@@ -893,8 +892,7 @@ export function registerRoutes(app: Express): HttpServer {
         orderBy: (history, {desc }) => [desc(history.createdAt)],
         limit: 10
       });
-      res.json(recentSubjects);
-    } catch (error) {
+      res.json(recentSubjects);    } catch (error) {
       console.error('Error fetching recent subjects:', error);
       res.status(500).json({ error: "Failed to fetch recent subjects" });
     }

@@ -4,6 +4,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ManageUsers } from "@/components/admin/manage-users";
 import { 
   User, 
   Shield, 
@@ -11,7 +13,8 @@ import {
   Lock,
   LogOut,
   Calendar,
-  Clock
+  Clock,
+  Users
 } from "lucide-react";
 
 export default function ProfilePage() {
@@ -59,114 +62,155 @@ export default function ProfilePage() {
 
         <Separator className="my-6" />
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Profile Overview Card */}
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <div className="flex items-center space-x-4">
-                <Avatar className="h-20 w-20">
-                  <AvatarFallback className="text-2xl bg-primary/10">
-                    {user.username[0].toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="space-y-1">
-                  <CardTitle className="text-2xl">{user.username}</CardTitle>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Badge variant={getRoleBadgeVariant(user.role)} className="text-sm">
-                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                    </Badge>
+        <Tabs defaultValue="profile" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="profile" className="gap-2">
+              <User className="h-4 w-4" />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="security" className="gap-2">
+              <Lock className="h-4 w-4" />
+              Security
+            </TabsTrigger>
+            {user.role === 'admin' && (
+              <TabsTrigger value="manage-users" className="gap-2">
+                <Users className="h-4 w-4" />
+                Manage Users
+              </TabsTrigger>
+            )}
+          </TabsList>
+
+          <TabsContent value="profile">
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Profile Overview Card */}
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <div className="flex items-center space-x-4">
+                    <Avatar className="h-20 w-20">
+                      <AvatarFallback className="text-2xl bg-primary/10">
+                        {user.username[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="space-y-1">
+                      <CardTitle className="text-2xl">{user.username}</CardTitle>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge variant={getRoleBadgeVariant(user.role)} className="text-sm">
+                          {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                        </Badge>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
+                </CardHeader>
+              </Card>
 
-          {/* Account Details Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Account Details
-              </CardTitle>
-              <CardDescription>
-                Your account information and status
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Username</span>
-                  <span className="text-sm text-muted-foreground">{user.username}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Account ID</span>
-                  <span className="text-sm text-muted-foreground">{user.id}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Account Status</span>
-                  <Badge variant="outline" className="text-sm">Active</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              {/* Account Details Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    Account Details
+                  </CardTitle>
+                  <CardDescription>
+                    Your account information and status
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Username</span>
+                      <span className="text-sm text-muted-foreground">{user.username}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Account ID</span>
+                      <span className="text-sm text-muted-foreground">{user.id}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Account Status</span>
+                      <Badge variant="outline" className="text-sm">Active</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          {/* Role & Permissions Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Role & Permissions
-              </CardTitle>
-              <CardDescription>
-                Your access level and permissions
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 rounded-lg bg-primary/5 space-y-2">
+              {/* Role & Permissions Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Role & Permissions
+                  </CardTitle>
+                  <CardDescription>
+                    Your access level and permissions
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-4 rounded-lg bg-primary/5 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">Current Role</span>
+                      <Badge variant={getRoleBadgeVariant(user.role)}>
+                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {getRoleDescription(user.role)}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="security">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lock className="h-5 w-5" />
+                  Security Settings
+                </CardTitle>
+                <CardDescription>
+                  Manage your account security settings
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Current Role</span>
-                  <Badge variant={getRoleBadgeVariant(user.role)}>
-                    {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                  </Badge>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">Account Access</p>
+                    <p className="text-sm text-muted-foreground">
+                      Sign out from your current session
+                    </p>
+                  </div>
+                  <Button 
+                    variant="destructive" 
+                    onClick={logout}
+                    className="w-auto"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </Button>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {getRoleDescription(user.role)}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-          {/* Security Card */}
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lock className="h-5 w-5" />
-                Security
-              </CardTitle>
-              <CardDescription>
-                Manage your account security settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Account Access</p>
-                  <p className="text-sm text-muted-foreground">
-                    Sign out from your current session
-                  </p>
-                </div>
-                <Button 
-                  variant="destructive" 
-                  onClick={logout}
-                  className="w-auto"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Sign Out
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+          {user.role === 'admin' && (
+            <TabsContent value="manage-users">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    User Management
+                  </CardTitle>
+                  <CardDescription>
+                    Manage user accounts and permissions
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ManageUsers />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+        </Tabs>
       </div>
     </div>
   );
