@@ -68,10 +68,6 @@ export default function ProfilePage() {
               <User className="h-4 w-4" />
               Profile
             </TabsTrigger>
-            <TabsTrigger value="security" className="gap-2">
-              <Lock className="h-4 w-4" />
-              Security
-            </TabsTrigger>
             {user.role === 'admin' && (
               <TabsTrigger value="manage-users" className="gap-2">
                 <Users className="h-4 w-4" />
@@ -158,38 +154,16 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
-
-          <TabsContent value="security">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lock className="h-5 w-5" />
-                  Security Settings
-                </CardTitle>
-                <CardDescription>
-                  Manage your account security settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">Account Access</p>
-                    <p className="text-sm text-muted-foreground">
-                      Sign out from your current session
-                    </p>
-                  </div>
-                  <Button 
-                    variant="destructive" 
-                    onClick={logout}
-                    className="w-auto"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="flex items-center justify-center mt-4">
+              <Button 
+                variant="destructive" 
+                onClick={logout}
+                className="w-auto"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </Button>
+            </div>
           </TabsContent>
 
           {user.role === 'admin' && (
