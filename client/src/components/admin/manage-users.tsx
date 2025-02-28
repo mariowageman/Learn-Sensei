@@ -62,6 +62,11 @@ interface User {
   };
 }
 
+interface Role {
+  id: number;
+  name: string;
+}
+
 const editUserSchema = z.object({
   username: z.string().min(1, "Username is required"),
   roleId: z.coerce.number(),
@@ -81,7 +86,7 @@ export function ManageUsers() {
   });
 
   // Fetch roles for the select dropdown
-  const { data: roles } = useQuery({
+  const { data: roles } = useQuery<Role[]>({
     queryKey: ["/api/roles"],
   });
 
@@ -256,7 +261,7 @@ export function ManageUsers() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {roles?.map((role) => (
+                        {roles?.map((role: Role) => (
                           <SelectItem key={role.id} value={String(role.id)}>
                             {role.name}
                           </SelectItem>

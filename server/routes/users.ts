@@ -8,6 +8,17 @@ import bcrypt from "bcrypt";
 
 const router = Router();
 
+// Get all roles (admin only)
+router.get("/api/roles", requireRole([UserRole.ADMIN]), async (req, res) => {
+  try {
+    const allRoles = await db.query.roles.findMany();
+    res.json(allRoles);
+  } catch (error) {
+    console.error("Error fetching roles:", error);
+    res.status(500).json({ message: "Failed to fetch roles" });
+  }
+});
+
 // Get all users (admin only)
 router.get("/api/users", requireRole([UserRole.ADMIN]), async (req, res) => {
   try {
@@ -78,7 +89,7 @@ router.patch(
       // Check if username is already taken
       if (username) {
         const existingUser = await db.query.users.findFirst({
-          where: (users, { eq, and, ne }) => 
+          where: (users, { eq, and, ne }) =>
             and(
               eq(users.username, username),
               ne(users.id, parseInt(userId))
@@ -92,7 +103,7 @@ router.patch(
 
       const [updatedUser] = await db
         .update(users)
-        .set({ 
+        .set({
           username: username,
           roleId: roleId,
           updatedAt: new Date(),
@@ -135,8 +146,8 @@ router.delete(
       });
 
       if (targetUser?.roleId === 1 && adminUsers.length === 1) {
-        return res.status(400).json({ 
-          message: "Cannot delete the last admin user" 
+        return res.status(400).json({
+          message: "Cannot delete the last admin user"
         });
       }
 
