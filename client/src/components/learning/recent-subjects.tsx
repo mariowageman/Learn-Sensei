@@ -1,11 +1,10 @@
 
-import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { History, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface RecentSubject {
   id: number;
@@ -13,54 +12,51 @@ interface RecentSubject {
   createdAt: string;
 }
 
-interface RecentSubjectsProps {
-  onSelectSubject: (subject: string) => void;
-}
+export function RecentSubjects() {
+  const [showAllSubjects, setShowAllSubjects] = useState(false);
+  const [recentSubjects, setRecentSubjects] = useState<RecentSubject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
-  const { data: recentSubjects, isLoading } = useQuery<RecentSubject[]>({
-    queryKey: ["/api/recent-subjects"],
-    staleTime: 0,
-    refetchInterval: 5000, // Refetch every 5 seconds
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
-    refetchOnReconnect: true,
-    retry: 3
-  });
+  useEffect(() => {
+    const fetchRecentSubjects = async () => {
+      try {
+        const response = await fetch("/api/recent-subjects");
+        if (!response.ok) {
+          throw new Error("Failed to fetch recent subjects");
+        }
+        const data = await response.json();
+        setRecentSubjects(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching recent subjects:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchRecentSubjects();
+  }, []);
 
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-8 w-48" />
-        <div className="space-y-2">
-          {[...Array(3)].map((_, i) => (
-            <Skeleton key={i} className="h-10" />
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <History className="h-4 w-4" />
+          <span>Recent Subjects</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-10 w-[120px]" />
           ))}
         </div>
       </div>
     );
   }
 
-  if (!recentSubjects?.length) {
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <History className="h-4 w-4" />
-          <h3 className="text-sm font-medium text-muted-foreground">Recent Subjects</h3>
-        </div>
-        <p className="text-sm text-muted-foreground">No recent subjects found. Start a new conversation!</p>
-      </div>
-    );
-  }
-
-  // State to control how many subjects to display
-  const [showAllSubjects, setShowAllSubjects] = useState(false);
-  
   // Create a unique list of subjects, maintaining the most recent order
   const uniqueSubjects: RecentSubject[] = [];
   const addedSubjects = new Set<string>();
-  
-  recentSubjects.forEach(subject => {
+
+  recentSubjects.forEach((subject) => {
     if (!addedSubjects.has(subject.subject)) {
       uniqueSubjects.push(subject);
       addedSubjects.add(subject.subject);
@@ -73,7 +69,7 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-muted-foreground">
         <History className="h-4 w-4" />
-        <h3 className="text-sm font-medium text-muted-foreground">Recent Subjects</h3>
+        <span>Recent Subjects</span>
       </div>
       <ScrollArea className="max-h-[200px] pr-3">
         <div className="flex flex-wrap gap-2">
@@ -82,17 +78,13 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
               key={subject.id}
               variant="outline"
               size="sm"
-              className="inline-flex items-center hover:bg-accent/60 dark:text-white group"
-              onClick={() => onSelectSubject(subject.subject)}
+              className="flex items-center gap-1"
+              asChild
             >
-              <Clock className="mr-1.5 h-3.5 w-3.5 group-hover:text-blue-500 transition-colors" />
-              {subject.subject}
-              <span className="ml-1.5 text-xs text-muted-foreground opacity-75">
-                {new Date(subject.createdAt).toLocaleDateString(undefined, {
-                  month: 'short',
-                  day: 'numeric'
-                })}
-              </span>
+              <a href={`/sensei?subject=${encodeURIComponent(subject.subject)}`}>
+                <Clock className="h-3 w-3 text-muted-foreground" />
+                {subject.subject}
+              </a>
             </Button>
           ))}
         </div>
