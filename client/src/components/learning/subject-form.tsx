@@ -35,6 +35,7 @@ export function SubjectForm({ onSubmit }: SubjectFormProps) {
               <FormControl>
                 <Input
                   placeholder="Enter a subject (e.g. photosynthesis, quantum physics)"
+                  className="dark:text-white"
                   {...field}
                 />
               </FormControl>
