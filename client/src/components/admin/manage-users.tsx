@@ -268,66 +268,74 @@ export function ManageUsers() {
 
       {/* Edit User Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-[425px] h-fit max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[425px] h-fit max-h-[90vh] overflow-y-auto flex flex-col">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
             <DialogDescription>
               Update user information and role
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
+          <div className="py-4 flex-grow flex flex-col">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onEditSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Username</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="roleId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Role</FormLabel>
-                      <Select
-                        onValueChange={(value) => field.onChange(parseInt(value, 10))}
-                        value={field.value ? String(field.value) : undefined}
-                      >
+              <form onSubmit={form.handleSubmit(onEditSubmit)} className="flex flex-col h-full space-y-4">
+                {/* Form fields at the top */}
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select a role">
-                              {roles?.find((role) => role.id === field.value)?.name || "Select a role"}
-                            </SelectValue>
-                          </SelectTrigger>
+                          <Input {...field} />
                         </FormControl>
-                        <SelectContent position="popper" className="w-full">
-                          {roles?.map((role) => (
-                            <SelectItem key={role.id} value={String(role.id)}>
-                              {role.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <DialogFooter>
-                  <Button
-                    type="submit"
-                    disabled={updateMutation.isPending}
-                  >
-                    {updateMutation.isPending ? "Saving..." : "Save changes"}
-                  </Button>
-                </DialogFooter>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="roleId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Role</FormLabel>
+                        <Select
+                          onValueChange={(value) => field.onChange(parseInt(value, 10))}
+                          value={field.value ? String(field.value) : undefined}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select a role">
+                                {roles?.find((role) => role.id === field.value)?.name || "Select a role"}
+                              </SelectValue>
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent position="popper" className="w-full">
+                            {roles?.map((role) => (
+                              <SelectItem key={role.id} value={String(role.id)}>
+                                {role.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                {/* Push the footer to the bottom */}
+                <div className="flex-grow mt-auto pt-4">
+                  <DialogFooter>
+                    <Button
+                      type="submit"
+                      disabled={updateMutation.isPending}
+                      className="w-full"
+                    >
+                      {updateMutation.isPending ? "Saving..." : "Save changes"}
+                    </Button>
+                  </DialogFooter>
+                </div>
               </form>
             </Form>
           </div>
