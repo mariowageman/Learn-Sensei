@@ -49,7 +49,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import { format } from "date-fns";
-import { Pencil, Trash2, UserCog } from "lucide-react";
+import { Pencil, Trash2, UserPlus } from "lucide-react";
 
 // Define types based on your schema
 interface User {
@@ -95,6 +95,32 @@ export function ManageUsers() {
     defaultValues: {
       username: selectedUser?.username || "",
       roleId: selectedUser?.roleId || 0,
+    },
+  });
+
+  // Create test users mutation
+  const createTestUsersMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/users/create-test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) throw new Error("Failed to create test users");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({
+        title: "Success",
+        description: "Test users created successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to create test users",
+      });
     },
   });
 
@@ -172,11 +198,23 @@ export function ManageUsers() {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>Loading users...</div>;
   }
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-medium">User List</h2>
+        <Button
+          onClick={() => createTestUsersMutation.mutate()}
+          disabled={createTestUsersMutation.isPending}
+          className="gap-2"
+        >
+          <UserPlus className="h-4 w-4" />
+          Create Test Users
+        </Button>
+      </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -188,6 +226,13 @@ export function ManageUsers() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {users?.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                  No users found. Click "Create Test Users" to add some test accounts.
+                </TableCell>
+              </TableRow>
+            )}
             {users?.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>{user.username}</TableCell>
