@@ -7,10 +7,11 @@ import { UserRole } from "@/lib/rbac";
 
 const router = Router();
 
-// Get all roles (admin only)
-router.get("/api/roles", requireRole([UserRole.ADMIN]), async (req, res) => {
+// Get all roles (publicly accessible)
+router.get("/api/roles", async (req, res) => {
   try {
     const allRoles = await db.query.roles.findMany();
+    console.log("Roles fetched successfully:", allRoles);
     res.json(allRoles);
   } catch (error) {
     console.error("Error fetching roles:", error);

@@ -107,6 +107,11 @@ export function ManageUsers() {
   });
   
   // Debug roles data
+  console.log("Current roles state:", {
+    isLoading: rolesLoading,
+    error: rolesError,
+    data: roles
+  });
   console.log("Current roles state:", { roles, isLoading: rolesLoading, error: rolesError });
 
   const form = useForm<EditUserFormValues>({
