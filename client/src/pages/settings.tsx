@@ -154,7 +154,7 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
             </div>
-            <div className="flex items-center justify-center mt-4">
+            <div className="flex items-center justify-center mt-4 mb-16 md:mb-4">
               <Button 
                 variant="destructive" 
                 onClick={logout}
