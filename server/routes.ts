@@ -418,7 +418,7 @@ export function registerRoutes(app: Express): HttpServer {
       const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
 
       // Calculate time spent and streak
-      const learningPaths = await db.query.learningPaths.findMany({
+      const pathsData = await db.query.learningPaths.findMany({
         where: subject !== 'all' ? eq(learningPaths.title, subject) : undefined,
         with: {
           progress: {
@@ -430,7 +430,7 @@ export function registerRoutes(app: Express): HttpServer {
       let timeSpentMinutes = 0;
       let streakDays = 0;
 
-      learningPaths.forEach(path => {
+      pathsData.forEach(path => {
         if (path.progress?.[0]) {
           const pathProgress = path.progress[0];
           const timeSpentObj = pathProgress.timeSpentMinutes as Record<string, number>;
@@ -442,7 +442,7 @@ export function registerRoutes(app: Express): HttpServer {
       // Calculate weekly progress
       const weeklyProgress = await db.query.progressAnalytics.findMany({
         where: and(
-          subject !== 'all' ? eq(progressAnalytics.pathId, learningPaths[0]?.id ?? 0) : undefined,
+          subject !== 'all' ? eq(progressAnalytics.pathId, pathsData[0]?.id ?? 0) : undefined,
           sql`date >= NOW() - INTERVAL '7 days'`
         ),
         orderBy: (analytics, { asc }) => [asc(analytics.date)]
@@ -908,11 +908,21 @@ export function registerRoutes(app: Express): HttpServer {
       }).returning();
 
       // Save to history
+      console.log('Saving subject to history:', subject);
       await db.insert(subjectHistory).values({
         subject
       });
 
-      res.json(session);
+      // Return both session and updated history
+      const history = await db.query.subjectHistory.findMany({
+        orderBy: (history, { desc }) => [desc(history.createdAt)],
+        limit: 10
+      });
+
+      res.json({
+        session,
+        history
+      });
     } catch (error) {
       console.error('Error creating session:', error);
       res.status(500).json({ error: "Failed to create session" });
