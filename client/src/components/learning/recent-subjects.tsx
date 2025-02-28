@@ -72,6 +72,20 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
     );
   }
 
+  // Create a unique list of subjects, maintaining the most recent occurrence
+  const uniqueSubjects = Array.from(
+    recentSubjects.reduce((map, subject) => {
+      // Only keep the most recent occurrence of each subject
+      if (!map.has(subject.subject) || 
+          new Date(subject.createdAt) > new Date(map.get(subject.subject)!.createdAt)) {
+        map.set(subject.subject, subject);
+      }
+      return map;
+    }, new Map<string, RecentSubject>())
+  ).map(([_, subject]) => subject)
+  // Sort by createdAt in descending order (most recent first)
+  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -80,13 +94,13 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
           <span>Recent Subjects</span>
         </div>
         <span className="text-sm text-muted-foreground">
-          {recentSubjects.length} subjects
+          {uniqueSubjects.length} subjects
         </span>
       </div>
 
       <ScrollArea className="h-auto max-h-[300px]">
         <div className="flex flex-wrap gap-2">
-          {recentSubjects.map((subject) => (
+          {uniqueSubjects.map((subject) => (
             <Button
               key={subject.id}
               variant="outline"
