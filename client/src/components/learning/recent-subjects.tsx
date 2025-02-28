@@ -20,20 +20,24 @@ export function RecentSubjects() {
   useEffect(() => {
     const fetchRecentSubjects = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch("/api/recent-subjects");
         if (!response.ok) {
           throw new Error("Failed to fetch recent subjects");
         }
         const data = await response.json();
         setRecentSubjects(data);
-        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching recent subjects:", error);
+      } finally {
         setIsLoading(false);
       }
     };
 
     fetchRecentSubjects();
+    // Set up polling to refresh subjects every 10 seconds
+    const intervalId = setInterval(fetchRecentSubjects, 10000);
+    return () => clearInterval(intervalId);
   }, []);
 
   if (isLoading) {
@@ -48,6 +52,18 @@ export function RecentSubjects() {
             <Skeleton key={i} className="h-10 w-[120px]" />
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (!recentSubjects?.length) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <History className="h-4 w-4" />
+          <span>Recent Subjects</span>
+        </div>
+        <p className="text-sm text-muted-foreground">No recent subjects found. Start a new conversation!</p>
       </div>
     );
   }
