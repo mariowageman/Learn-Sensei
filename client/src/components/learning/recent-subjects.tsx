@@ -5,10 +5,13 @@ import { History, Clock } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState, useEffect } from "react";
 
-interface RecentSubject {
-  id: number;
-  subject: string;
-  createdAt: string;
+interface DashboardData {
+  subjectPerformance: Array<{
+    subject: string;
+    totalAttempts: number;
+    correctAnswers: number;
+    accuracy: number;
+  }>;
 }
 
 interface RecentSubjectsProps {
@@ -16,29 +19,30 @@ interface RecentSubjectsProps {
 }
 
 export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
-  const [recentSubjects, setRecentSubjects] = useState<RecentSubject[]>([]);
+  const [subjects, setSubjects] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRecentSubjects = async () => {
+    const fetchSubjects = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/recent-subjects");
+        const response = await fetch("/api/dashboard");
         if (!response.ok) {
-          throw new Error("Failed to fetch recent subjects");
+          throw new Error("Failed to fetch subjects");
         }
-        const data = await response.json();
-        setRecentSubjects(data);
+        const data: DashboardData = await response.json();
+        const subjectNames = data.subjectPerformance.map(item => item.subject);
+        setSubjects(subjectNames);
       } catch (error) {
-        console.error("Error fetching recent subjects:", error);
+        console.error("Error fetching subjects:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchRecentSubjects();
-    // Set up polling to refresh subjects every 10 seconds
-    const intervalId = setInterval(fetchRecentSubjects, 10000);
+    fetchSubjects();
+    // Poll for updates every 30 seconds
+    const intervalId = setInterval(fetchSubjects, 30000);
     return () => clearInterval(intervalId);
   }, []);
 
@@ -58,7 +62,7 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
     );
   }
 
-  if (!recentSubjects?.length) {
+  if (!subjects?.length) {
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-muted-foreground">
@@ -66,25 +70,11 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
           <span>Recent Subjects</span>
         </div>
         <Card className="p-4 text-center">
-          <p className="text-sm text-muted-foreground">No recent subjects found. Start a new conversation!</p>
+          <p className="text-sm text-muted-foreground">No subjects found. Start a new conversation!</p>
         </Card>
       </div>
     );
   }
-
-  // Create a unique list of subjects, maintaining the most recent occurrence
-  const uniqueSubjects = Array.from(
-    recentSubjects.reduce((map, subject) => {
-      // Only keep the most recent occurrence of each subject
-      if (!map.has(subject.subject) || 
-          new Date(subject.createdAt) > new Date(map.get(subject.subject)!.createdAt)) {
-        map.set(subject.subject, subject);
-      }
-      return map;
-    }, new Map<string, RecentSubject>())
-  ).map(([_, subject]) => subject)
-  // Sort by createdAt in descending order (most recent first)
-  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
     <div className="space-y-4">
@@ -94,22 +84,22 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
           <span>Recent Subjects</span>
         </div>
         <span className="text-sm text-muted-foreground">
-          {uniqueSubjects.length} subjects
+          {subjects.length} subjects
         </span>
       </div>
 
       <ScrollArea className="h-auto max-h-[300px]">
         <div className="flex flex-wrap gap-2">
-          {uniqueSubjects.map((subject) => (
+          {subjects.map((subject, index) => (
             <Button
-              key={subject.id}
+              key={index}
               variant="outline"
               size="sm"
               className="flex items-center gap-2"
-              onClick={() => onSelectSubject?.(subject.subject)}
+              onClick={() => onSelectSubject?.(subject)}
             >
               <Clock className="h-3 w-3 text-muted-foreground" />
-              <span>{subject.subject}</span>
+              <span>{subject}</span>
             </Button>
           ))}
         </div>
