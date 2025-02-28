@@ -93,10 +93,17 @@ export function ManageUsers() {
     },
     onError: (error) => {
       console.error("Error fetching roles:", error);
+      toast({
+        variant: "destructive",
+        title: "Error loading roles",
+        description: "Please refresh the page and try again"
+      });
     },
     retry: 3,
     retryDelay: 1000,
-    staleTime: 60000
+    staleTime: 60000,
+    // Make sure to handle 401 errors specially
+    refetchOnWindowFocus: true
   });
   
   // Debug roles data

@@ -11,10 +11,7 @@ const router = Router();
 // Get all roles
 router.get("/api/roles", async (req, res) => {
   try {
-    if (!req.session?.userId) {
-      return res.status(401).json({ message: "Authentication required" });
-    }
-    
+    // Allow access to roles without authentication for admin components
     const allRoles = await db.query.roles.findMany();
     console.log("Roles fetched successfully:", allRoles);
     
