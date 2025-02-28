@@ -3,8 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { History, Clock } from "lucide-react";
+import { History, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState } from "react";
 
 interface RecentSubject {
   id: number;
@@ -52,6 +53,9 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
     );
   }
 
+  // State to control how many subjects to display
+  const [showAllSubjects, setShowAllSubjects] = useState(false);
+  
   // Create a unique list of subjects, maintaining the most recent order
   const uniqueSubjects: RecentSubject[] = [];
   const addedSubjects = new Set<string>();
@@ -63,6 +67,8 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
     }
   });
 
+  console.log(`Displaying ${uniqueSubjects.length} unique subjects`);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-muted-foreground">
@@ -71,7 +77,7 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
       </div>
       <ScrollArea className="max-h-[200px] pr-3">
         <div className="flex flex-wrap gap-2">
-          {uniqueSubjects.map((subject) => (
+          {uniqueSubjects.slice(0, showAllSubjects ? uniqueSubjects.length : 10).map((subject) => (
             <Button
               key={subject.id}
               variant="outline"
@@ -90,6 +96,20 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
             </Button>
           ))}
         </div>
+        {uniqueSubjects.length > 10 && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setShowAllSubjects(!showAllSubjects)} 
+            className="mt-3 text-muted-foreground hover:text-foreground flex items-center gap-1 w-full justify-center"
+          >
+            {showAllSubjects ? 'Show Less' : 'Show More'}
+            {showAllSubjects ? 
+              <ChevronUp className="h-4 w-4" /> : 
+              <ChevronDown className="h-4 w-4" />
+            }
+          </Button>
+        )}
       </ScrollArea>
     </div>
   );
