@@ -299,9 +299,10 @@ export function ManageUsers() {
                     <Select
                       onValueChange={(value) => field.onChange(parseInt(value, 10))}
                       value={String(field.value)}
+                      defaultValue={String(field.value)}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select a role" />
                         </SelectTrigger>
                       </FormControl>
