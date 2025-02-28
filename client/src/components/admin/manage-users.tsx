@@ -86,8 +86,14 @@ export function ManageUsers() {
   });
 
   // Fetch roles for the select dropdown
-  const { data: roles } = useQuery<Role[]>({
+  const { data: roles, isLoading: rolesLoading } = useQuery<Role[]>({
     queryKey: ["/api/roles"],
+    onSuccess: (data) => {
+      console.log("Fetched roles:", data);
+    },
+    onError: (error) => {
+      console.error("Error fetching roles:", error);
+    }
   });
 
   const form = useForm<EditUserFormValues>({
@@ -302,6 +308,7 @@ export function ManageUsers() {
                         <Select
                           onValueChange={(value) => field.onChange(parseInt(value, 10))}
                           value={field.value ? String(field.value) : undefined}
+                          defaultOpen={false}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
@@ -310,12 +317,18 @@ export function ManageUsers() {
                               </SelectValue>
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent position="popper" className="w-full">
-                            {roles?.map((role) => (
-                              <SelectItem key={role.id} value={String(role.id)}>
-                                {role.name}
+                          <SelectContent>
+                            {roles && roles.length > 0 ? (
+                              roles.map((role) => (
+                                <SelectItem key={role.id} value={String(role.id)}>
+                                  {role.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="loading" disabled>
+                                Loading roles...
                               </SelectItem>
-                            ))}
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
