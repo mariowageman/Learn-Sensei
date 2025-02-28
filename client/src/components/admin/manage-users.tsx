@@ -298,12 +298,13 @@ export function ManageUsers() {
                     <FormLabel>Role</FormLabel>
                     <Select
                       onValueChange={(value) => field.onChange(parseInt(value, 10))}
-                      value={String(field.value)}
-                      defaultValue={String(field.value)}
+                      value={field.value ? String(field.value) : undefined}
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a role" />
+                          <SelectValue placeholder="Select a role">
+                            {roles?.find((role) => role.id === field.value)?.name || "Select a role"}
+                          </SelectValue>
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
