@@ -93,8 +93,8 @@ export function ManageUsers() {
   const form = useForm<EditUserFormValues>({
     resolver: zodResolver(editUserSchema),
     defaultValues: {
-      username: selectedUser?.username || "",
-      roleId: selectedUser?.roleId || 0,
+      username: "",
+      roleId: 0,
     },
   });
 
@@ -297,8 +297,8 @@ export function ManageUsers() {
                   <FormItem>
                     <FormLabel>Role</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
-                      defaultValue={String(field.value)}
+                      onValueChange={(value) => field.onChange(parseInt(value, 10))}
+                      value={String(field.value)}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -306,7 +306,7 @@ export function ManageUsers() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {roles?.map((role: Role) => (
+                        {roles?.map((role) => (
                           <SelectItem key={role.id} value={String(role.id)}>
                             {role.name}
                           </SelectItem>
