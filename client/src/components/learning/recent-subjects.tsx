@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { History, Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { History, Clock } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState, useEffect } from "react";
 
@@ -16,7 +16,6 @@ interface RecentSubjectsProps {
 }
 
 export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
-  const [showAllSubjects, setShowAllSubjects] = useState(false);
   const [recentSubjects, setRecentSubjects] = useState<RecentSubject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -98,7 +97,7 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
 
       <ScrollArea className="h-auto max-h-[300px]">
         <div className="flex flex-wrap gap-2">
-          {uniqueSubjects.slice(0, showAllSubjects ? undefined : 10).map((subject) => (
+          {uniqueSubjects.map((subject) => (
             <Button
               key={subject.id}
               variant="outline"
@@ -111,27 +110,6 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
             </Button>
           ))}
         </div>
-
-        {uniqueSubjects.length > 10 && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setShowAllSubjects(!showAllSubjects)} 
-            className="mt-4 text-muted-foreground hover:text-foreground w-full justify-center"
-          >
-            {showAllSubjects ? (
-              <>
-                Show Less
-                <ChevronUp className="ml-2 h-4 w-4" />
-              </>
-            ) : (
-              <>
-                Show {uniqueSubjects.length - 10} More
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </>
-            )}
-          </Button>
-        )}
       </ScrollArea>
     </div>
   );
