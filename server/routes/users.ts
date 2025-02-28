@@ -9,8 +9,11 @@ import bcrypt from "bcrypt";
 const router = Router();
 
 // Get all roles (admin only)
-router.get("/api/roles", requireRole([UserRole.ADMIN]), async (req, res) => {
+router.get("/api/roles", async (req, res) => {
   try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
     const allRoles = await db.query.roles.findMany();
     res.json(allRoles);
   } catch (error) {
@@ -20,8 +23,12 @@ router.get("/api/roles", requireRole([UserRole.ADMIN]), async (req, res) => {
 });
 
 // Get all users (admin only)
-router.get("/api/users", requireRole([UserRole.ADMIN]), async (req, res) => {
+router.get("/api/users", async (req, res) => {
   try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
     const allUsers = await db.query.users.findMany({
       with: {
         role: true,
@@ -38,8 +45,24 @@ router.get("/api/users", requireRole([UserRole.ADMIN]), async (req, res) => {
 });
 
 // Create test users (admin only, development purpose)
-router.post("/api/users/create-test", requireRole([UserRole.ADMIN]), async (req, res) => {
+router.post("/api/users/create-test", async (req, res) => {
   try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    // Verify if current user is admin
+    const currentUser = await db.query.users.findFirst({
+      where: eq(users.id, req.session.userId),
+      with: {
+        role: true
+      }
+    });
+
+    if (!currentUser || currentUser.role.name !== 'admin') {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
     // First, get available role IDs
     const availableRoles = await db.query.roles.findMany();
     if (!availableRoles.length) {
@@ -78,89 +101,113 @@ router.post("/api/users/create-test", requireRole([UserRole.ADMIN]), async (req,
 });
 
 // Update user (admin only)
-router.patch(
-  "/api/users/:userId",
-  requireRole([UserRole.ADMIN]),
-  async (req, res) => {
+router.patch("/api/users/:userId", async (req, res) => {
+  try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    // Verify if current user is admin
+    const currentUser = await db.query.users.findFirst({
+      where: eq(users.id, req.session.userId),
+      with: {
+        role: true
+      }
+    });
+
+    if (!currentUser || currentUser.role.name !== 'admin') {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
     const { userId } = req.params;
     const { username, roleId } = req.body;
 
-    try {
-      // Check if username is already taken
-      if (username) {
-        const existingUser = await db.query.users.findFirst({
-          where: (users, { eq, and, ne }) =>
-            and(
-              eq(users.username, username),
-              ne(users.id, parseInt(userId))
-            ),
-        });
-
-        if (existingUser) {
-          return res.status(400).json({ message: "Username already taken" });
-        }
-      }
-
-      const [updatedUser] = await db
-        .update(users)
-        .set({
-          username: username,
-          roleId: roleId,
-          updatedAt: new Date(),
-        })
-        .where(eq(users.id, parseInt(userId)))
-        .returning();
-
-      const userWithRole = await db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.id, updatedUser.id),
-        with: {
-          role: true,
-        },
+    // Check if username is already taken
+    if (username) {
+      const existingUser = await db.query.users.findFirst({
+        where: (users, { eq, and, ne }) =>
+          and(
+            eq(users.username, username),
+            ne(users.id, parseInt(userId))
+          ),
       });
 
-      // Remove sensitive information
-      const { password, ...sanitizedUser } = userWithRole!;
-      res.json(sanitizedUser);
-    } catch (error) {
-      console.error("Error updating user:", error);
-      res.status(500).json({ message: "Failed to update user" });
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already taken" });
+      }
     }
+
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        username: username,
+        roleId: roleId,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, parseInt(userId)))
+      .returning();
+
+    const userWithRole = await db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.id, updatedUser.id),
+      with: {
+        role: true,
+      },
+    });
+
+    // Remove sensitive information
+    const { password, ...sanitizedUser } = userWithRole!;
+    res.json(sanitizedUser);
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ message: "Failed to update user" });
   }
-);
+});
 
 // Delete user (admin only)
-router.delete(
-  "/api/users/:userId",
-  requireRole([UserRole.ADMIN]),
-  async (req, res) => {
+router.delete("/api/users/:userId", async (req, res) => {
+  try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    // Verify if current user is admin
+    const currentUser = await db.query.users.findFirst({
+      where: eq(users.id, req.session.userId),
+      with: {
+        role: true
+      }
+    });
+
+    if (!currentUser || currentUser.role.name !== 'admin') {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
     const { userId } = req.params;
 
-    try {
-      // Prevent deleting the last admin user
-      const adminUsers = await db.query.users.findMany({
-        where: (users, { eq }) => eq(users.roleId, 1), // Assuming 1 is admin role ID
+    // Prevent deleting the last admin user
+    const adminUsers = await db.query.users.findMany({
+      where: (users, { eq }) => eq(users.roleId, 1), // Assuming 1 is admin role ID
+    });
+
+    const targetUser = await db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.id, parseInt(userId)),
+    });
+
+    if (targetUser?.roleId === 1 && adminUsers.length === 1) {
+      return res.status(400).json({
+        message: "Cannot delete the last admin user"
       });
-
-      const targetUser = await db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.id, parseInt(userId)),
-      });
-
-      if (targetUser?.roleId === 1 && adminUsers.length === 1) {
-        return res.status(400).json({
-          message: "Cannot delete the last admin user"
-        });
-      }
-
-      await db
-        .delete(users)
-        .where(eq(users.id, parseInt(userId)));
-
-      res.json({ message: "User deleted successfully" });
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      res.status(500).json({ message: "Failed to delete user" });
     }
+
+    await db
+      .delete(users)
+      .where(eq(users.id, parseInt(userId)));
+
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Failed to delete user" });
   }
-);
+});
 
 export { router as usersRouter };
