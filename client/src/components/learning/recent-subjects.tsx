@@ -72,17 +72,6 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
     );
   }
 
-  // Create a unique list of subjects, maintaining the most recent order
-  const uniqueSubjects: RecentSubject[] = [];
-  const addedSubjects = new Set<string>();
-
-  recentSubjects.forEach((subject) => {
-    if (!addedSubjects.has(subject.subject)) {
-      uniqueSubjects.push(subject);
-      addedSubjects.add(subject.subject);
-    }
-  });
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -91,13 +80,13 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
           <span>Recent Subjects</span>
         </div>
         <span className="text-sm text-muted-foreground">
-          {uniqueSubjects.length} subjects
+          {recentSubjects.length} subjects
         </span>
       </div>
 
       <ScrollArea className="h-auto max-h-[300px]">
         <div className="flex flex-wrap gap-2">
-          {uniqueSubjects.map((subject) => (
+          {recentSubjects.map((subject) => (
             <Button
               key={subject.id}
               variant="outline"
