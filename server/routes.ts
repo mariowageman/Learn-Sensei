@@ -888,11 +888,14 @@ export function registerRoutes(app: Express): HttpServer {
 
   app.get("/api/recent-subjects", async (req, res) => {
     try {
+      console.log('Fetching recent subjects');
       const recentSubjects = await db.query.subjectHistory.findMany({
-        orderBy: (history, {desc }) => [desc(history.createdAt)],
-        limit: 10
+        orderBy: (history, { desc }) => [desc(history.createdAt)],
+        limit: 20 // Increased limit to show more history
       });
-      res.json(recentSubjects);    } catch (error) {
+      console.log(`Found ${recentSubjects.length} recent subjects`);
+      res.json(recentSubjects);
+    } catch (error) {
       console.error('Error fetching recent subjects:', error);
       res.status(500).json({ error: "Failed to fetch recent subjects" });
     }

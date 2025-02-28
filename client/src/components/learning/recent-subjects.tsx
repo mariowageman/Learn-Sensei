@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { History, Clock } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface RecentSubject {
   id: number;
@@ -19,7 +20,7 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
   const { data: recentSubjects, isLoading } = useQuery<RecentSubject[]>({
     queryKey: ["/api/recent-subjects"],
     staleTime: 0,
-    refetchInterval: 1000,
+    refetchInterval: 5000, // Refetch every 5 seconds
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     refetchOnReconnect: true,
@@ -40,12 +41,27 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
   }
 
   if (!recentSubjects?.length) {
-    return null;
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <History className="h-4 w-4" />
+          <h3 className="text-sm font-medium text-muted-foreground">Recent Subjects</h3>
+        </div>
+        <p className="text-sm text-muted-foreground">No recent subjects found. Start a new conversation!</p>
+      </div>
+    );
   }
 
-  const uniqueSubjects = Array.from(new Set(recentSubjects.map(s => s.subject))).map(subject => 
-    recentSubjects.find(s => s.subject === subject)!
-  );
+  // Create a unique list of subjects, maintaining the most recent order
+  const uniqueSubjects: RecentSubject[] = [];
+  const addedSubjects = new Set<string>();
+  
+  recentSubjects.forEach(subject => {
+    if (!addedSubjects.has(subject.subject)) {
+      uniqueSubjects.push(subject);
+      addedSubjects.add(subject.subject);
+    }
+  });
 
   return (
     <div className="space-y-4">
@@ -53,20 +69,28 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
         <History className="h-4 w-4" />
         <h3 className="text-sm font-medium text-muted-foreground">Recent Subjects</h3>
       </div>
-      <div className="flex flex-wrap gap-2">
-        {uniqueSubjects.map((subject) => (
-          <Button
-            key={subject.id}
-            variant="outline"
-            size="sm"
-            className="inline-flex items-center hover:bg-accent/60 dark:text-white"
-            onClick={() => onSelectSubject(subject.subject)}
-          >
-            <Clock className="mr-1.5 h-3.5 w-3.5" />
-            {subject.subject}
-          </Button>
-        ))}
-      </div>
+      <ScrollArea className="max-h-[200px] pr-3">
+        <div className="flex flex-wrap gap-2">
+          {uniqueSubjects.map((subject) => (
+            <Button
+              key={subject.id}
+              variant="outline"
+              size="sm"
+              className="inline-flex items-center hover:bg-accent/60 dark:text-white group"
+              onClick={() => onSelectSubject(subject.subject)}
+            >
+              <Clock className="mr-1.5 h-3.5 w-3.5 group-hover:text-blue-500 transition-colors" />
+              {subject.subject}
+              <span className="ml-1.5 text-xs text-muted-foreground opacity-75">
+                {new Date(subject.createdAt).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric'
+                })}
+              </span>
+            </Button>
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   );
 }
