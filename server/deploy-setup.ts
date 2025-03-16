@@ -34,7 +34,7 @@ export async function setupDeployment() {
     console.log('Initializing database connection...');
     neonConfig.webSocketConstructor = ws;
     const sql = neon(process.env.DATABASE_URL);
-    const db = drizzle(sql, { schema });
+    const db = drizzle({ client: sql, schema });
 
     console.log('Running database migrations...');
     try {
