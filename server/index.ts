@@ -159,28 +159,38 @@ app.use((req, res, next) => {
       serveStatic(app);
     }
 
-    const tryPort = async (port: number): Promise<number> => {
-      try {
-        await new Promise((resolve, reject) => {
-          server.listen(port, "0.0.0.0")
-            .once('listening', () => {
-              server.close(() => resolve(port));
-            })
-            .once('error', reject);
-        });
-        return port;
-      } catch (err) {
-        if (port < 3010) {
-          return tryPort(port + 1);
+    const startServer = async (initialPort: number) => {
+      const maxRetries = 10;
+      let currentPort = initialPort;
+      
+      while (currentPort < initialPort + maxRetries) {
+        try {
+          await new Promise((resolve, reject) => {
+            server.listen(currentPort, "0.0.0.0", () => {
+              log(`Server running at http://0.0.0.0:${currentPort}`);
+              resolve(currentPort);
+            }).once('error', (err) => {
+              if (err.code === 'EADDRINUSE') {
+                currentPort++;
+                resolve(null);
+              } else {
+                reject(err);
+              }
+            });
+          });
+          break;
+        } catch (err) {
+          console.error(`Failed to start server on port ${currentPort}:`, err);
+          if (currentPort >= initialPort + maxRetries - 1) {
+            throw err;
+          }
+          currentPort++;
         }
-        throw err;
       }
     };
 
-    const PORT = process.env.PORT || await tryPort(3000);
-    server.listen(PORT, () => {
-      log(`Server running at http://0.0.0.0:${PORT}`);
-    });
+    const initialPort = parseInt(process.env.PORT || "3000", 10);
+    await startServer(initialPort);
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
