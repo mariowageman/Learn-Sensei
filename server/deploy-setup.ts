@@ -90,6 +90,9 @@ export async function setupDeployment() {
         ORDER BY table_name;
       `;
 
+      const tableNames = tables.map(t => t.table_name);
+      console.log('Found tables:', tableNames);
+
       const requiredTables = [
         'blog_posts', 'learning_path_progress', 'learning_paths',
         'messages', 'progress_analytics', 'quiz_progress',
@@ -98,7 +101,7 @@ export async function setupDeployment() {
 
       console.log('Verifying required tables...');
       const missingTables = requiredTables.filter(
-        required => !tables.find(t => t.table_name === required)
+        required => !tableNames.includes(required)
       );
 
       if (missingTables.length > 0) {
