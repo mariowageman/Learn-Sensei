@@ -98,8 +98,10 @@ export function RecentSubjects({ onSelectSubject }: RecentSubjectsProps) {
               className="flex items-center gap-2"
               onClick={() => onSelectSubject?.(subject)}
             >
-              <Clock className="h-3 w-3 text-muted-foreground" />
-              <span>{subject}</span>
+              <span className="flex items-center gap-2 dark:text-white">
+                <Clock className="h-3 w-3 text-muted-foreground dark:text-white" />
+                <span>{subject}</span>
+              </span>
             </Button>
           ))}
         </div>
