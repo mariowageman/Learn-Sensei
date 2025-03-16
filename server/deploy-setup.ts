@@ -5,7 +5,8 @@ import * as schema from '@db/schema';
 import ws from "ws";
 import path from "path";
 import fs from "fs";
-import { Pool } from 'pg'; // Added import for Pool
+import pkg from 'pg';
+const { Pool } = pkg;
 
 export async function setupDeployment() {
   try {
@@ -39,7 +40,8 @@ export async function setupDeployment() {
 
     console.log('Initializing database connection...');
     neonConfig.webSocketConstructor = ws;
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL }); // Changed client initialization
+    const poolUrl = process.env.DATABASE_URL?.replace('.us-east-2', '-pooler.us-east-2');
+    const pool = new Pool({ connectionString: poolUrl }); // Using pooler URL
     const db = drizzle(pool, { schema });
 
     // First verify we can connect to the database
