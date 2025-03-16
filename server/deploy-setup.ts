@@ -42,7 +42,7 @@ export async function setupDeployment() {
     neonConfig.webSocketConstructor = ws;
     const poolUrl = process.env.DATABASE_URL?.replace('.us-east-2', '-pooler.us-east-2');
     const pool = new Pool({ connectionString: poolUrl }); // Using pooler URL
-    const db = drizzle(pool, { schema });
+    const db = drizzle({ client: pool, schema });
 
     // First verify we can connect to the database
     try {

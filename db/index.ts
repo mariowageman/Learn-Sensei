@@ -11,5 +11,6 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const poolUrl = process.env.DATABASE_URL?.replace('.us-east-2', '-pooler.us-east-2');
+export const pool = new Pool({ connectionString: poolUrl });
 export const db = drizzle({ client: pool, schema });
