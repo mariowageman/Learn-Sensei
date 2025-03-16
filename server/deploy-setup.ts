@@ -78,11 +78,26 @@ export async function setupDeployment() {
 
     console.log('Running database migrations...');
     try {
+      // Ensure migrations table exists
+      await sql`CREATE TABLE IF NOT EXISTS drizzle_migrations (
+        id serial PRIMARY KEY,
+        hash text NOT NULL,
+        created_at timestamptz DEFAULT now()
+      )`;
+      
       await migrate(db, { 
         migrationsFolder: migrationPath,
         migrationsTable: 'drizzle_migrations'
       });
       console.log('Database migrations completed successfully');
+      
+      // Verify migrations by checking tables
+      const tables = await sql`
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public'
+      `;
+      console.log('Tables after migration:', tables.map(t => t.table_name));
     } catch (migrationError: any) {
       console.error('Migration error details:', migrationError);
       throw new Error(`Failed to run migrations: ${migrationError.message}`);
