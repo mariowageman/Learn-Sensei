@@ -60,6 +60,7 @@ export const quizQuestions = pgTable("quiz_questions", {
 
 export const quizProgress = pgTable("quiz_progress", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
   questionId: integer("question_id").references(() => quizQuestions.id),
   subject: text("subject").notNull(),
   isCorrect: boolean("is_correct").notNull(),
@@ -81,6 +82,7 @@ export const learningPaths = pgTable("learning_paths", {
 
 export const learningPathProgress = pgTable("learning_path_progress", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
   pathId: integer("path_id").references(() => learningPaths.id),
   currentTopic: integer("current_topic").notNull(),
   completed: boolean("completed").notNull().default(false),
@@ -121,6 +123,7 @@ export const blogPosts = pgTable("blog_posts", {
 
 export const subjectHistory = pgTable("subject_history", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
   subject: text("subject").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull()
 });

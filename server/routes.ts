@@ -813,19 +813,28 @@ export function registerRoutes(app: Express): HttpServer {
 
 
   app.get("/api/recommendations", async (req, res) => {
+    const userId = req.session.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
     try {
       // Get user's progress across all learning paths
       const progress = await db.query.learningPathProgress.findMany({
+        where: eq(learningPathProgress.userId, userId),
         orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
       });
 
       // Get quiz performance data
       const quizPerformance = await db.query.quizProgress.findMany({
+        where: eq(quizProgress.userId, userId),
         orderBy: (quiz, { desc }) => [desc(quiz.createdAt)]
       });
 
       // Get subject history
       const subjectHistory = await db.query.subjectHistory.findMany({
+        where: eq(subjectHistory.userId, userId),
         orderBy: (history, { desc }) => [desc(history.createdAt)]
       });
 
