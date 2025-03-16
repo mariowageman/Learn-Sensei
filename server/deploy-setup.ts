@@ -5,6 +5,7 @@ import * as schema from '@db/schema';
 import ws from "ws";
 import path from "path";
 import fs from "fs";
+import { Pool } from 'pg'; // Added import for Pool
 
 export async function setupDeployment() {
   try {
@@ -38,13 +39,13 @@ export async function setupDeployment() {
 
     console.log('Initializing database connection...');
     neonConfig.webSocketConstructor = ws;
-    const sql = neon(process.env.DATABASE_URL);
-    const db = drizzle(sql, { schema });
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL }); // Changed client initialization
+    const db = drizzle(pool, { schema });
 
     // First verify we can connect to the database
     try {
-      const result = await sql`SELECT current_database()`;
-      console.log('Connected to database:', result[0].current_database);
+      const result = await pool.query('SELECT current_database()'); // Changed query method
+      console.log('Connected to database:', result.rows[0].current_database);
     } catch (error) {
       console.error('Failed to connect to database:', error);
       throw error;
@@ -52,13 +53,13 @@ export async function setupDeployment() {
 
     // Verify database schema before running migrations
     try {
-      const tables = await sql`
+      const tables = await pool.query(`
         SELECT table_name 
         FROM information_schema.tables 
         WHERE table_schema = 'public'
         ORDER BY table_name;
-      `;
-      console.log('Existing tables:', tables.map(t => t.table_name));
+      `); // Changed query method
+      console.log('Existing tables:', tables.rows.map(t => t.table_name));
     } catch (error) {
       console.error('Failed to check existing tables:', error);
       throw error;
@@ -78,12 +79,12 @@ export async function setupDeployment() {
 
     // Verify schema after migrations
     try {
-      const tables = await sql`
+      const tables = await pool.query(`
         SELECT table_name 
         FROM information_schema.tables 
         WHERE table_schema = 'public'
         ORDER BY table_name;
-      `;
+      `); // Changed query method
 
       const requiredTables = [
         'blog_posts', 'learning_path_progress', 'learning_paths',
@@ -93,7 +94,7 @@ export async function setupDeployment() {
 
       console.log('Verifying required tables...');
       const missingTables = requiredTables.filter(
-        required => !tables.find(t => t.table_name === required)
+        required => !tables.rows.find(t => t.table_name === required)
       );
 
       if (missingTables.length > 0) {
