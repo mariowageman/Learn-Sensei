@@ -6,13 +6,13 @@ import * as schema from '@db/schema';
 export async function setupDeployment() {
   try {
     console.log('Starting deployment setup...');
-    
+
     const sql = neon(process.env.DATABASE_URL!);
-    const db = drizzle(sql, { schema });
-    
+    const db = drizzle(sql);
+
     console.log('Running database migrations...');
     await migrate(db, { migrationsFolder: './drizzle' });
-    
+
     console.log('Database migrations completed successfully');
     return true;
   } catch (error) {
