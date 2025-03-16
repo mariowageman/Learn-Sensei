@@ -63,7 +63,7 @@ export async function setupDeployment() {
         WHERE table_schema = 'public'
         ORDER BY table_name;
       `;
-      console.log('Existing tables:', tables.rows.map(t => t.table_name));
+      console.log('Existing tables:', tables.map(t => t.table_name));
     } catch (error) {
       console.error('Failed to check existing tables:', error);
       throw error;
