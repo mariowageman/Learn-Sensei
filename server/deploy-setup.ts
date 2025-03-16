@@ -83,12 +83,12 @@ export async function setupDeployment() {
 
     // Verify schema after migrations
     try {
-      const tables = await pool.query(`
+      const tables = await sql`
         SELECT table_name 
         FROM information_schema.tables 
         WHERE table_schema = 'public'
         ORDER BY table_name;
-      `); // Changed query method
+      `;
 
       const requiredTables = [
         'blog_posts', 'learning_path_progress', 'learning_paths',
