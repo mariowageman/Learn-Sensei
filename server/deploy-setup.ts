@@ -48,8 +48,8 @@ export async function setupDeployment() {
 
     // First verify we can connect to the database
     try {
-      const result = await pool.query('SELECT current_database()'); // Changed query method
-      console.log('Connected to database:', result.rows[0].current_database);
+      const result = await sql`SELECT current_database()`;
+      console.log('Connected to database:', result[0].current_database);
     } catch (error) {
       console.error('Failed to connect to database:', error);
       throw error;
@@ -57,12 +57,12 @@ export async function setupDeployment() {
 
     // Verify database schema before running migrations
     try {
-      const tables = await pool.query(`
+      const tables = await sql`
         SELECT table_name 
         FROM information_schema.tables 
         WHERE table_schema = 'public'
         ORDER BY table_name;
-      `); // Changed query method
+      `;
       console.log('Existing tables:', tables.rows.map(t => t.table_name));
     } catch (error) {
       console.error('Failed to check existing tables:', error);
@@ -98,7 +98,7 @@ export async function setupDeployment() {
 
       console.log('Verifying required tables...');
       const missingTables = requiredTables.filter(
-        required => !tables.rows.find(t => t.table_name === required)
+        required => !tables.find(t => t.table_name === required)
       );
 
       if (missingTables.length > 0) {

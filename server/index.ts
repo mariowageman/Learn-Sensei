@@ -41,7 +41,9 @@ app.listen(PORT, '0.0.0.0', () => {
 const PostgresStore = connectPg(session);
 app.use(session({
   store: new PostgresStore({
-    pool,
+    conObject: {
+      connectionString: process.env.DATABASE_URL,
+    },
     tableName: 'session',
     createTableIfMissing: true
   }),
