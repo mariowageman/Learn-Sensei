@@ -1,6 +1,6 @@
-import { drizzle } from 'drizzle-orm/neon-serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 import { neon, neonConfig } from '@neondatabase/serverless';
-import { migrate } from 'drizzle-orm/neon-serverless/migrator';
+import { migrate } from 'drizzle-orm/neon-http/migrator';
 import * as schema from '@db/schema';
 import ws from "ws";
 import path from "path";
