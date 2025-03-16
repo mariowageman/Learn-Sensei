@@ -9,6 +9,7 @@ import connectPg from "connect-pg-simple";
 import { pool } from "@db";
 import { rolesRouter } from "./routes/roles";
 import fileUpload from 'express-fileupload';
+import { setupDeployment } from './deploy-setup';
 
 declare module 'express-session' {
   interface SessionData {
@@ -125,43 +126,54 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = registerRoutes(app);
-
-  // Error handling middleware
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    console.error('Server error:', err);
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-  });
-
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
-
-  const tryPort = async (port: number): Promise<number> => {
-    try {
-      await new Promise((resolve, reject) => {
-        server.listen(port, "0.0.0.0")
-          .once('listening', () => {
-            server.close(() => resolve(port));
-          })
-          .once('error', reject);
-      });
-      return port;
-    } catch (err) {
-      if (port < 3010) {
-        return tryPort(port + 1);
-      }
-      throw err;
+  try {
+    // Run deployment setup if in production
+    if (process.env.NODE_ENV === 'production') {
+      console.log('Running deployment setup...');
+      await setupDeployment();
     }
-  };
 
-  const PORT = process.env.PORT || await tryPort(3000);
-  server.listen(PORT, "0.0.0.0", () => {
-    log(`Server running at http://0.0.0.0:${PORT}`);
-  });
+    const server = registerRoutes(app);
+
+    // Error handling middleware
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      console.error('Server error:', err);
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+
+      res.status(status).json({ message });
+    });
+
+    if (app.get("env") === "development") {
+      await setupVite(app, server);
+    } else {
+      serveStatic(app);
+    }
+
+    const tryPort = async (port: number): Promise<number> => {
+      try {
+        await new Promise((resolve, reject) => {
+          server.listen(port, "0.0.0.0")
+            .once('listening', () => {
+              server.close(() => resolve(port));
+            })
+            .once('error', reject);
+        });
+        return port;
+      } catch (err) {
+        if (port < 3010) {
+          return tryPort(port + 1);
+        }
+        throw err;
+      }
+    };
+
+    const PORT = process.env.PORT || await tryPort(3000);
+    server.listen(PORT, "0.0.0.0", () => {
+      log(`Server running at http://0.0.0.0:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
 })();
