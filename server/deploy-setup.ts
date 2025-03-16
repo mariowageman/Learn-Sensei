@@ -1,6 +1,6 @@
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import { neon, neonConfig } from '@neondatabase/serverless';
-import { migrate } from 'drizzle-orm/neon-serverless/migrator';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { neon } from '@neondatabase/serverless';
+import { migrate } from 'drizzle-orm/neon-http/migrator';
 import * as schema from '@db/schema';
 import ws from "ws";
 import path from "path";
@@ -16,27 +16,9 @@ export async function setupDeployment() {
       );
     }
 
-    // Verify migration folder exists
-    const migrationPath = path.join(process.cwd(), 'drizzle');
-    console.log('Checking migrations folder:', migrationPath);
-    if (!fs.existsSync(migrationPath)) {
-      throw new Error(`Migration folder not found at ${migrationPath}`);
-    }
-
-    // List migration files
-    const files = fs.readdirSync(migrationPath);
-    console.log('Found migration files:', files);
-
-    if (files.length === 0) {
-      throw new Error('No migration files found in the drizzle folder');
-    }
-
-    // Configure WebSocket for Neon database connection
-    neonConfig.webSocketConstructor = ws;
-
     console.log('Initializing database connection...');
     const sql = neon(process.env.DATABASE_URL);
-    const db = drizzle({ client: sql, schema });
+    const db = drizzle(sql, { schema });
 
     console.log('Running database migrations...');
     try {
