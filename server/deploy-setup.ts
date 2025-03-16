@@ -54,6 +54,9 @@ export async function setupDeployment() {
       
       const version = await sql`SELECT version()`;
       console.log('Database version:', version[0].version);
+      
+      const tableCheck = await sql`SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'`;
+      console.log('Number of tables in database:', tableCheck[0].count);
     } catch (error) {
       console.error('Failed to connect to database:', error);
       throw error;
