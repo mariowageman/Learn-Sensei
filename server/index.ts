@@ -169,7 +169,7 @@ app.use((req, res, next) => {
     };
 
     const PORT = process.env.PORT || await tryPort(3000);
-    server.listen(PORT, "0.0.0.0", () => {
+    server.listen(PORT, () => {
       log(`Server running at http://0.0.0.0:${PORT}`);
     });
   } catch (error) {
