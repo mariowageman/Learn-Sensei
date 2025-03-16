@@ -43,12 +43,8 @@ export async function setupDeployment() {
     if (!process.env.DATABASE_URL) {
       throw new Error('DATABASE_URL is not set');
     }
-    const poolUrl = process.env.DATABASE_URL.replace('.us-east-2', '-pooler.us-east-2');
-    const pool = new Pool({ 
-      connectionString: poolUrl,
-      ssl: { rejectUnauthorized: false }
-    });
-    const db = drizzle({ client: pool, schema });
+    const sql = neon(process.env.DATABASE_URL);
+    const db = drizzle(sql, { schema });
 
     // First verify we can connect to the database
     try {
