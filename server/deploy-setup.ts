@@ -34,7 +34,7 @@ export async function setupDeployment() {
     console.log('Initializing database connection...');
     neonConfig.webSocketConstructor = ws;
     const sql = neon(process.env.DATABASE_URL);
-    const db = drizzle({ client: sql, schema });
+    const db = drizzle(sql);
 
     console.log('Running database migrations...');
     try {
@@ -43,7 +43,7 @@ export async function setupDeployment() {
         migrationsTable: 'drizzle_migrations'
       });
       console.log('Database migrations completed successfully');
-    } catch (migrationError) {
+    } catch (migrationError: any) {
       console.error('Migration error details:', migrationError);
       throw new Error(`Failed to run migrations: ${migrationError.message}`);
     }
