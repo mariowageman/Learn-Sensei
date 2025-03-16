@@ -40,8 +40,14 @@ export async function setupDeployment() {
 
     console.log('Initializing database connection...');
     neonConfig.webSocketConstructor = ws;
-    const poolUrl = process.env.DATABASE_URL?.replace('.us-east-2', '-pooler.us-east-2');
-    const pool = new Pool({ connectionString: poolUrl }); // Using pooler URL
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL is not set');
+    }
+    const poolUrl = process.env.DATABASE_URL.replace('.us-east-2', '-pooler.us-east-2');
+    const pool = new Pool({ 
+      connectionString: poolUrl,
+      ssl: { rejectUnauthorized: false }
+    });
     const db = drizzle({ client: pool, schema });
 
     // First verify we can connect to the database
