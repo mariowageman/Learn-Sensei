@@ -368,6 +368,7 @@ export function registerRoutes(app: Express): HttpServer {
 
       // Save quiz progress
       await db.insert(quizProgress).values({
+        userId: req.session.userId!,
         questionId,
         subject: question.subject,
         isCorrect: result.correct,
@@ -393,9 +394,15 @@ export function registerRoutes(app: Express): HttpServer {
 
   app.get("/api/progress/:subject", async (req, res) => {
     const { subject } = req.params;
+    const userId = req.session.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
     try {
       let progressQuery = db.query.quizProgress;
-      let whereClause = undefined;
+      let whereClause = eq(quizProgress.userId, userId);
 
       if (subject !== 'all') {
         whereClause = eq(quizProgress.subject, subject);
@@ -943,8 +950,14 @@ export function registerRoutes(app: Express): HttpServer {
 
   app.get("/api/dashboard", async (req, res) => {
     try {
-      // Get all quiz attempts
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      // Get all quiz attempts for the user
       const quizAttempts = await db.query.quizProgress.findMany({
+        where: eq(quizProgress.userId, userId),
         orderBy: (progress, { desc }) => [desc(progress.createdAt)]
       });
 
