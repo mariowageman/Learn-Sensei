@@ -60,7 +60,7 @@ export const quizQuestions = pgTable("quiz_questions", {
 
 export const quizProgress = pgTable("quiz_progress", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
+  userId: integer("user_id").references(() => users.id),
   questionId: integer("question_id").references(() => quizQuestions.id),
   subject: text("subject").notNull(),
   isCorrect: boolean("is_correct").notNull(),
