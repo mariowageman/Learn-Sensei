@@ -50,6 +50,10 @@ export async function setupDeployment() {
     try {
       const result = await sql`SELECT current_database()`;
       console.log('Connected to database:', result[0].current_database);
+      console.log('Database connection test successful');
+      
+      const version = await sql`SELECT version()`;
+      console.log('Database version:', version[0].version);
     } catch (error) {
       console.error('Failed to connect to database:', error);
       throw error;
