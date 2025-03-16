@@ -293,20 +293,30 @@ export function registerRoutes(app: Express): HttpServer {
 
   app.post("/api/quiz/check", async (req, res) => {
     const { questionId, answer, timeSpent } = req.body;
+    const userId = req.session.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
 
     const question = await db.query.quizQuestions.findFirst({
       where: eq(quizQuestions.id, questionId)
     });
-    if (!question) return res.status(404).json({ error: "Question not found" });
+
+    if (!question) {
+      return res.status(404).json({ error: "Question not found" });
+    }
 
     try {
       const result = await checkAnswer(question.text, question.answer, answer);
+      console.log('Answer check result:', result);
 
-      // Get or create learning path progress
+      // Get or create learning path progress with userId
       let learningPath = await db.query.learningPaths.findFirst({
         where: eq(learningPaths.title, question.subject),
         with: {
           progress: {
+            where: eq(learningPathProgress.userId, userId),
             orderBy: (progress, { desc }) => [desc(progress.updatedAt)]
           }
         }
@@ -321,13 +331,17 @@ export function registerRoutes(app: Express): HttpServer {
           prerequisites: [],
           estimatedHours: 1
         }).returning();
-        learningPath = newPath;
+        learningPath = {
+          ...newPath,
+          progress: []
+        };
       }
 
       let pathProgress = learningPath.progress?.[0];
 
       if (!pathProgress) {
         const [newProgress] = await db.insert(learningPathProgress).values({
+          userId,
           pathId: learningPath.id,
           currentTopic: 0,
           completed: false,
@@ -337,45 +351,19 @@ export function registerRoutes(app: Express): HttpServer {
           lastStreakDate: new Date()
         }).returning();
         pathProgress = newProgress;
-      } else {
-        // Update existing progress
-        const lastStreakDate = new Date(pathProgress.lastStreakDate);
-        const today = new Date();
-        const daysDiff = Math.floor((today.getTime() - lastStreakDate.getTime()) / (1000 * 60 * 60 * 24));
-
-        let newStreakDays = pathProgress.streakDays;
-        if (daysDiff === 0) {
-          newStreakDays = pathProgress.streakDays;
-        } else if (daysDiff === 1) {
-          newStreakDays = pathProgress.streakDays + 1;
-        } else {
-          newStreakDays = 1;
-        }
-
-        // Update time spent with actual time
-        const currentTimeSpent = (pathProgress.timeSpentMinutes || {}) as Record<string, number>;
-        currentTimeSpent.quiz = (currentTimeSpent.quiz || 0) + (timeSpent || 0);
-
-        await db.update(learningPathProgress)
-          .set({
-            timeSpentMinutes: currentTimeSpent,
-            streakDays: newStreakDays,
-            lastStreakDate: today,
-            updatedAt: today
-          })
-          .where(eq(learningPathProgress.id, pathProgress.id));
       }
 
       // Save quiz progress
       await db.insert(quizProgress).values({
-        userId: req.session.userId!,
+        userId,
         questionId,
         subject: question.subject,
         isCorrect: result.correct,
         userAnswer: answer,
-        videoSuggestions: !result.correct && result.videoSuggestions ? result.videoSuggestions : []
+        videoSuggestions: result.videoSuggestions || []
       });
 
+      // Send response with feedback and video suggestions
       res.json({
         correct: result.correct,
         feedback: result.feedback,
@@ -903,13 +891,20 @@ export function registerRoutes(app: Express): HttpServer {
   });
 
   app.get("/api/recent-subjects", async (req, res) => {
+    const userId = req.session.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
     try {
-      console.log('Fetching recent subjects');
+      console.log('Fetching recent subjects for user:', userId);
       const recentSubjects = await db.query.subjectHistory.findMany({
+        where: eq(subjectHistory.userId, userId),
         orderBy: (history, { desc }) => [desc(history.createdAt)],
-        limit: 20 // Increased limit to show more history
+        limit: 20
       });
-      console.log(`Found ${recentSubjects.length} recent subjects`);
+      console.log(`Found ${recentSubjects.length} recent subjects for user ${userId}`);
       res.json(recentSubjects);
     } catch (error) {
       console.error('Error fetching recent subjects:', error);
@@ -919,21 +914,29 @@ export function registerRoutes(app: Express): HttpServer {
 
   app.post("/api/session", async (req, res) => {
     const { subject } = req.body;
+    const userId = req.session.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
 
     try {
       // Save to session
       const [session] = await db.insert(sessions).values({
-        subject
+        subject,
+        userId // Add userId to sessions
       }).returning();
 
-      // Save to history
-      console.log('Saving subject to history:', subject);
+      // Save to history with userId
+      console.log('Saving subject to history:', subject, 'for user:', userId);
       await db.insert(subjectHistory).values({
-        subject
+        subject,
+        userId
       });
 
-      // Return both session and updated history
+      // Return both session and updated history filtered by userId
       const history = await db.query.subjectHistory.findMany({
+        where: eq(subjectHistory.userId, userId),
         orderBy: (history, { desc }) => [desc(history.createdAt)],
         limit: 10
       });
