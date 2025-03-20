@@ -85,10 +85,8 @@ export function CookieConsent() {
               <p>
                 We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic. 
                 By clicking "Accept All", you consent to our use of cookies.{" "}
-                <Link href="/cookie-policy">
-                  <a className="text-primary hover:underline font-medium">
-                    Read our Cookie Policy
-                  </a>
+                <Link href="/cookie-policy" className="text-primary hover:underline font-medium">
+                  Read our Cookie Policy
                 </Link>
               </p>
             </div>
