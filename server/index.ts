@@ -172,6 +172,18 @@ app.use((req, res, next) => {
 
     const port = parseInt(process.env.PORT || "3000", 10);
     await startServer(port);
+
+    // Handle graceful shutdown
+    const signals = ['SIGTERM', 'SIGINT'];
+    signals.forEach(signal => {
+      process.on(signal, () => {
+        console.log(`Received ${signal}, shutting down gracefully`);
+        server.close(() => {
+          console.log('Server closed');
+          process.exit(0);
+        });
+      });
+    });
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
